@@ -11,7 +11,7 @@ dependencies:
   cupertino_icons:
   provider:
   web_socket_channel:
-  
+  crypto:
 
 dev_dependencies:
   flutter_test:
