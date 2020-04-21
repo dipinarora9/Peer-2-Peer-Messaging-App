@@ -1,4 +1,4 @@
-# blockchainapp
+# peer2peer
 
 A new Flutter application.
 
