@@ -1,16 +1,19 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:peer2peer/models/node.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:peer2peer/models/common_classes.dart';
 
-class ServerService {
+import 'p2p.dart';
+
+class ServerService with ChangeNotifier {
   static Map<int, Node> allNodes;
 
-  /*
-  * key: uid
-  * value: Node (class)
-  */
+  final ServerSocket _serverSocket;
   int _lastNodeTillNow;
+
+  ServerService(this._serverSocket);
 
   int getAvailableID() {
     // check if state is not true
@@ -36,11 +39,10 @@ class ServerService {
     _lastNodeTillNow = allNodes.keys.last;
     // returns map [int: node] of outbound connections for this node---------------------
     Map<int, Node> peers = connect(id);
-    //     0|192.168.0.100|1;1|192.168.0.101|1
-    String code = '';
+    //     123>0|192.168.0.100|1;1|192.168.0.101|1
+    String code = '$id>';
     peers.forEach((k, v) {
-      if (v.state == true)
-        code += v.toString();
+      if (v.state == true) code += v.toString();
     });
     // removes semicolon at end of code
     code = code.substring(0, code.length - 1);
@@ -82,5 +84,12 @@ class ServerService {
       distanceFromMe *= 2;
     }
     return mp;
+  }
+
+  closeServer() async {
+    await _serverSocket.close();
+    Fluttertoast.showToast(msg: 'Socket closed');
+    notifyListeners();
+    P2P.navKey.currentState.pop();
   }
 }

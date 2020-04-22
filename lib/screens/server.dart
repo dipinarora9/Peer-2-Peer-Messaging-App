@@ -1,11 +1,11 @@
-import 'package:peer2peer/services/p2p.dart';
 import 'package:flutter/material.dart';
+import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
 class ServerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final p2p = Provider.of<P2P>(context, listen: false);
+    final p2p = Provider.of<ServerService>(context, listen: false);
     return Scaffold(
       body: Center(
         child: Padding(

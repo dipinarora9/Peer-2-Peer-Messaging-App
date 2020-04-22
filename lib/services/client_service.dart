@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:peer2peer/models/node.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:peer2peer/models/common_classes.dart';
 
-class ClientService {
+import 'p2p.dart';
+
+class ClientService with ChangeNotifier {
   final int serverPort = 32465;
   final int clientPort = 23654;
   static ServerSocket _clientSocket;
@@ -12,6 +16,9 @@ class ClientService {
   Map<int, Node> incomingNodes = {};
   Map<int, Node> outgoingNodes = {};
   Timer _timer;
+  int myUid;
+  Map<int, Map<int, Message>> chats = {};
+  String text = '';
 
   ClientService(this._serverAddress);
 
@@ -41,8 +48,19 @@ class ClientService {
               incomingNodes[uid] = Node(uid, sock.address);
             }
           }
-        } else if (String.fromCharCodes(data) == 'PING') {
-          // other listeners
+        } else if (String.fromCharCodes(data).startsWith('MESSAGE')) {
+          Message message = Message.fromString(String.fromCharCodes(data));
+          if (message.receiverUid != myUid)
+            forwardMessage(message);
+          else {
+            debugPrint(message.toString());
+            text = message.message;
+            notifyListeners();
+          }
+        } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED')) {
+          String mes = String.fromCharCodes(data).split('>')[1];
+          Message message = Message.fromString(mes);
+          //todo: deal with it
         }
       });
     });
@@ -60,8 +78,10 @@ class ClientService {
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
       return false;
     }).first;
-
-    String.fromCharCodes(data).split(';').forEach((peer) {
+    String table = String.fromCharCodes(data);
+    myUid = int.parse(table.split('>')[0]);
+    table = table.split('>')[1];
+    table.split(';').forEach((peer) {
       Node node = Node.fromString(peer);
       outgoingNodes[node.id] = node;
     });
@@ -126,6 +146,7 @@ class ClientService {
     server.close();
     _timer.cancel();
     await _clientSocket.close();
+    P2P.navKey.currentState.pop();
   }
 
   Future<int> requestUID(String ip) async {
@@ -137,5 +158,48 @@ class ClientService {
     }).first;
     await server.close();
     return int.parse(String.fromCharCodes(data));
+  }
+
+  sendMessage(Message message, InternetAddress address) async {
+    try {
+      final Socket peer = await Socket.connect(address.host, clientPort);
+      peer.add(message.toString().codeUnits);
+      peer.close();
+    } on Exception {}
+  }
+
+  forwardMessage(Message message) async {
+    if (outgoingNodes.containsKey(message.receiverUid)) {
+      await sendMessage(message, outgoingNodes[message.receiverUid].ip);
+      await sendMessage(
+          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
+              DateTime.now().millisecondsSinceEpoch),
+          outgoingNodes[message.senderUid].ip);
+    } else if (incomingNodes.containsKey(message.receiverUid)) {
+      await sendMessage(message, incomingNodes[message.receiverUid].ip);
+      await sendMessage(
+          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
+              DateTime.now().millisecondsSinceEpoch),
+          incomingNodes[message.senderUid].ip);
+    } else {
+      Map<int, Node> allNodes = Map.from(incomingNodes);
+      allNodes.addAll(outgoingNodes);
+      if (message.receiverUid > message.senderUid) {
+        int dist = message.receiverUid - message.senderUid;
+        int jump = math.log(dist) / math.log(2) as int;
+        await sendMessage(message, allNodes[message.senderUid + jump].ip);
+      } else {
+        int dist = message.senderUid - message.receiverUid;
+        int jump = math.log(dist) / math.log(2) as int;
+        await sendMessage(message, allNodes[message.senderUid - jump].ip);
+      }
+    }
+  }
+
+  createMessage(String message, int receiverUID) {
+    int time = DateTime.now().millisecondsSinceEpoch;
+    Message mess = Message(myUid, receiverUID, message, time);
+    forwardMessage(mess);
+    chats[receiverUID] = {time: mess};
   }
 }

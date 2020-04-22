@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:peer2peer/screens/client.dart';
-import 'package:peer2peer/screens/server.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:peer2peer/screens/client.dart';
+import 'package:peer2peer/screens/server.dart';
+import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
@@ -22,8 +23,6 @@ class P2P with ChangeNotifier {
 
   bool get searching => _searching;
 
-  P2P({this.serverAddress});
-
   initializer() async {
     if (_serverSocket == null) {
       _searching = true;
@@ -34,7 +33,6 @@ class P2P with ChangeNotifier {
       final InternetAddress address = await findServer();
       if (address == null) {
         _serverSocket = await ServerSocket.bind('0.0.0.0', serverPort);
-        _serverService = ServerService();
         addServerListener();
         Fluttertoast.showToast(msg: 'Server started');
         _searching = false;
@@ -43,7 +41,7 @@ class P2P with ChangeNotifier {
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider(
               child: ServerScreen(),
-              create: (_) => P2P(),
+              create: (_) => ServerService(_serverSocket),
             ),
           ),
         );
@@ -56,7 +54,7 @@ class P2P with ChangeNotifier {
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider(
               child: ClientScreen(),
-              create: (_) => P2P(serverAddress: address),
+              create: (_) => ClientService(address),
             ),
           ),
         );
@@ -124,14 +122,6 @@ class P2P with ChangeNotifier {
       return true;
     } else
       return false;
-  }
-
-  closeServer() async {
-    await _serverSocket.close();
-    _serverSocket = null;
-    Fluttertoast.showToast(msg: 'Socket closed');
-    notifyListeners();
-    navKey.currentState.pop();
   }
 
   Future<InternetAddress> findServer({int start: 100, int end: 255}) async {
