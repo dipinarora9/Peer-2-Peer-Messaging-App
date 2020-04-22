@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:peer2peer/models/node.dart';
 
@@ -13,25 +14,54 @@ class ServerService {
 
   int getAvailableID() {
     // check if state is not true
-
-    return 0;
+    int id = allNodes.keys.last + 1;
+    allNodes.values.any((v) {
+      if (v.state == false) {
+        id = v.id;
+        return true;
+      }
+      return false;
+    });
+    return id;
   }
 
-  addNode(InternetAddress ip) {
+  Uint8List addNode(InternetAddress ip) {
     int id = getAvailableID(); // to be done
     /*
     * returns first available id from disconnected list
     * otherwise give a next new ID
     */
-    Node node = Node(id, ip, true);
+    Node node = Node(id, ip);
     allNodes[id] = node;
     _lastNodeTillNow = allNodes.keys.last;
+    // returns map [int: node] of outbound connections for this node---------------------
+    Map<int, Node> peers = connect(id);
+    //     0|192.168.0.100|1;1|192.168.0.101|1
+    String code = '';
+    peers.forEach((k, v) {
+      if (v.state == true)
+        code += v.toString();
+    });
+    // removes semicolon at end of code
+    code = code.substring(0, code.length - 1);
+    return code.codeUnits;
   }
 
-  removeNode(int id){
+  removeNode(int id) {
+    // updating state of this node as dead {false}---------------------
+    allNodes[id].state = false;
+  }
 
-
-    allNodes[id].state=false;
+//  ---------------------function to get uid from ip---------------------
+  int getUID(InternetAddress ip) {
+    int uid;
+    allNodes.forEach((k, v) {
+      if (v.ip == ip) {
+        uid = v.id;
+        return;
+      }
+    });
+    return uid;
   }
 
   Map<int, Node> connect(int uid) {

@@ -6,7 +6,7 @@ import 'package:peer2peer/models/node.dart';
 
 class ClientService {
   final int serverPort = 32465;
-  int clientPort = 23654;
+  final int clientPort = 23654;
   static ServerSocket _clientSocket;
   InternetAddress _serverAddress;
   Map<int, Node> incomingNodes = {};
@@ -18,6 +18,7 @@ class ClientService {
   setupIncomingServer() async {
     _clientSocket = await ServerSocket.bind('0.0.0.0', clientPort);
     setupListener();
+    requestPeers();
   }
 
   setupListener() {
@@ -64,7 +65,7 @@ class ClientService {
       Node node = Node.fromString(peer);
       outgoingNodes[node.id] = node;
     });
-    // setup periodic timer to ping clients
+    setTimer();
     server.close();
   }
 
@@ -90,6 +91,7 @@ class ClientService {
         outgoingNodes[uid].downCount = 0;
         outgoingNodes[uid].state = true;
       } else {
+        outgoingNodes[uid].downCount++;
         outgoingNodes[uid].state = false;
       }
       peer.close();

@@ -1,17 +1,18 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:peer2peer/screens/client.dart';
+import 'package:peer2peer/screens/server.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:peer2peer/screens/client.dart';
-import 'package:peer2peer/screens/server.dart';
 import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
 class P2P with ChangeNotifier {
   final int serverPort = 32465;
+  final int clientPort = 23654;
   final String mask = '192.168.0.';
   bool _searching = false;
   static ServerSocket _serverSocket;
@@ -67,16 +68,46 @@ class P2P with ChangeNotifier {
 
   addServerListener() {
     _serverSocket.listen((sock) {
-      sock.listen((data) {
+      sock.listen((data) async {
         debugPrint("Message from client ${String.fromCharCodes(data)}");
         if (String.fromCharCodes(data) == "PING") {
           sock.add('PONG'.codeUnits);
         } else if (String.fromCharCodes(data) == "ROUTING_TABLE") {
-          _serverService.addNode(sock.address);
+          Uint8List tables = _serverService.addNode(sock.address);
+          sock.add(tables);
           // send routing tables
-        } else if (String.fromCharCodes(data) == "DEAD") {
-          // change state of that ip to dead
+        } else if (String.fromCharCodes(data) == "QUIT") {
+          //--------------------- change state of that ip who quits------------
+          InternetAddress ip = sock.address;
+          int uid = _serverService.getUID(ip);
+          _serverService.removeNode(uid);
           // reply
+        } else if (String.fromCharCodes(data).startsWith('DEAD-')) {
+          //--------------------- change state of that ip to dead--------------
+          InternetAddress ip =
+              InternetAddress(String.fromCharCodes(data).substring(5));
+          int uid = _serverService.getUID(ip);
+          bool dead;
+          try {
+            Socket _clientSock = await Socket.connect(
+                ServerService.allNodes[uid].ip, clientPort);
+            dead = await ping(_clientSock, ServerService.allNodes[uid].ip);
+            _clientSock.close();
+          } on Exception {
+            dead = true;
+          }
+          if (dead) {
+            _serverService.removeNode(uid);
+            sock.add('DEAD'.codeUnits);
+          } else
+            sock.add('NOT_DEAD'.codeUnits);
+          // reply
+        } else if (String.fromCharCodes(data).startsWith('UID-')) {
+          //--------------------- get uid of given ip {'UID-192.65.23.155}------
+          InternetAddress ip =
+              InternetAddress(String.fromCharCodes(data).substring(4));
+          int uid = _serverService.getUID(ip);
+          sock.add('$uid'.codeUnits);
         }
       });
     });

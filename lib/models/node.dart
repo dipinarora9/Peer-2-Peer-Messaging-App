@@ -27,6 +27,6 @@ class Node {
 
   @override
   toString() {
-    return '$_id|${_ip.address};';
+    return '$_id|${_ip.host};';
   }
 }
