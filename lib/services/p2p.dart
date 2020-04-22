@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:peer2peer/models/node.dart';
-import 'package:peer2peer/screens/client.dart';
-import 'package:peer2peer/screens/server.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:peer2peer/screens/client.dart';
+import 'package:peer2peer/screens/server.dart';
 import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
@@ -72,14 +71,11 @@ class P2P with ChangeNotifier {
         debugPrint("Message from client ${String.fromCharCodes(data)}");
         if (String.fromCharCodes(data) == "PING") {
           sock.add('PONG'.codeUnits);
-
-
-        }else if (String.fromCharCodes(data) == "ROUTING_TABLE") {
-
-         _serverService.addNode(sock.address);
-         // send routing tables
-        }else if (String.fromCharCodes(data) == "DEAD") {
-         // change state of that ip to dead
+        } else if (String.fromCharCodes(data) == "ROUTING_TABLE") {
+          _serverService.addNode(sock.address);
+          // send routing tables
+        } else if (String.fromCharCodes(data) == "DEAD") {
+          // change state of that ip to dead
           // reply
         }
       });
