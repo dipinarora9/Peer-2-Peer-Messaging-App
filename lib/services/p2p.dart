@@ -1,11 +1,14 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:peer2peer/models/node.dart';
 import 'package:peer2peer/screens/client.dart';
 import 'package:peer2peer/screens/server.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
 class P2P with ChangeNotifier {
@@ -15,6 +18,7 @@ class P2P with ChangeNotifier {
   static ServerSocket _serverSocket;
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
   InternetAddress serverAddress;
+  ServerService _serverService;
 
   bool get searching => _searching;
 
@@ -30,9 +34,11 @@ class P2P with ChangeNotifier {
       final InternetAddress address = await findServer();
       if (address == null) {
         _serverSocket = await ServerSocket.bind('0.0.0.0', serverPort);
-        pong();
+        _serverService = ServerService();
+        addServerListener();
         Fluttertoast.showToast(msg: 'Server started');
         _searching = false;
+
         navKey.currentState.push(
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider(
@@ -60,28 +66,37 @@ class P2P with ChangeNotifier {
     }
   }
 
-  pong() {
+  addServerListener() {
     _serverSocket.listen((sock) {
       sock.listen((data) {
         debugPrint("Message from client ${String.fromCharCodes(data)}");
         if (String.fromCharCodes(data) == "PING") {
           sock.add('PONG'.codeUnits);
+
+
+        }else if (String.fromCharCodes(data) == "ROUTING_TABLE") {
+
+         _serverService.addNode(sock.address);
+         // send routing tables
+        }else if (String.fromCharCodes(data) == "DEAD") {
+         // change state of that ip to dead
+          // reply
         }
       });
     });
   }
 
-  ping(Socket sock, InternetAddress address) {
+  Future<bool> ping(Socket sock, InternetAddress address) async {
     sock.add('PING'.codeUnits);
-    sock.listen((data) {
-      debugPrint("Message from server ${String.fromCharCodes(data)}");
-      if ('PONG' == String.fromCharCodes(data)) {
-        Fluttertoast.showToast(msg: 'Connected at host $address');
-//        return true;
-      }
-//      return false;
-    });
-//    return false;
+    Uint8List data = await sock.timeout(Duration(seconds: 1), onTimeout: (abc) {
+      return false;
+    }).first;
+    debugPrint("Message from server ${String.fromCharCodes(data)}");
+    if ('PONG' == String.fromCharCodes(data)) {
+      Fluttertoast.showToast(msg: 'Connected at host $address');
+      return true;
+    } else
+      return false;
   }
 
   closeServer() async {
@@ -99,12 +114,12 @@ class P2P with ChangeNotifier {
             timeout: Duration(milliseconds: 200));
         InternetAddress address = sock.address;
         Fluttertoast.showToast(msg: 'Found a server at $address, pinging');
-        ping(sock, address);
-//        if (pong) {
-        await sock.close();
-        return address;
-//        } else
-//          continue;
+        bool pong = await ping(sock, address);
+        if (pong) {
+          await sock.close();
+          return address;
+        } else
+          continue;
       } on Exception {
         debugPrint('$mask$i is not a server');
         continue;
