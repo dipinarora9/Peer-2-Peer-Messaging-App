@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,7 +7,7 @@ import 'package:peer2peer/models/common_classes.dart';
 import 'p2p.dart';
 
 class ServerService with ChangeNotifier {
-  static Map<int, Node> allNodes;
+  Map<int, Node> allNodes = {};
 
   final ServerSocket _serverSocket;
   int _lastNodeTillNow;
@@ -16,8 +15,9 @@ class ServerService with ChangeNotifier {
   ServerService(this._serverSocket);
 
   int getAvailableID() {
-    // check if state is not true
-    int id = allNodes.keys.last + 1;
+    // check if state is not true\
+    int id = 0;
+    if (allNodes.length > 0) id = allNodes.keys.toList().last + 1;
     allNodes.values.any((v) {
       if (v.state == false) {
         id = v.id;
@@ -28,7 +28,7 @@ class ServerService with ChangeNotifier {
     return id;
   }
 
-  Uint8List addNode(InternetAddress ip) {
+  String addNode(InternetAddress ip) {
     int id = getAvailableID(); // to be done
     /*
     * returns first available id from disconnected list
@@ -36,17 +36,17 @@ class ServerService with ChangeNotifier {
     */
     Node node = Node(id, ip);
     allNodes[id] = node;
+    notifyListeners();
     _lastNodeTillNow = allNodes.keys.last;
     // returns map [int: node] of outbound connections for this node---------------------
-    Map<int, Node> peers = connect(id);
-    //     123>0|192.168.0.100|1;1|192.168.0.101|1
+    Map<int, Node> peers = _connect(id);
+    //     123>0|192.168.0.100;1|192.168.0.101
     String code = '$id>';
     peers.forEach((k, v) {
       if (v.state == true) code += v.toString();
     });
     // removes semicolon at end of code
-    code = code.substring(0, code.length - 1);
-    return code.codeUnits;
+    return code.substring(0, code.length - 1);
   }
 
   removeNode(int id) {
@@ -66,8 +66,8 @@ class ServerService with ChangeNotifier {
     return uid;
   }
 
-  Map<int, Node> connect(int uid) {
-    Map<int, Node> mp;
+  Map<int, Node> _connect(int uid) {
+    Map<int, Node> mp = {};
     int distanceFromMe = 1;
     // for connecting 255 nodes only
     while (distanceFromMe + uid <= _lastNodeTillNow) {

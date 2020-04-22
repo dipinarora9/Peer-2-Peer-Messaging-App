@@ -8,17 +8,32 @@ class ServerScreen extends StatelessWidget {
     final p2p = Provider.of<ServerService>(context, listen: false);
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: RaisedButton(
-            child: Padding(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Consumer<ServerService>(builder: (_, value, __) {
+              return ListView.builder(
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(value.allNodes.keys.toList()[index].toString()),
+                  );
+                },
+                itemCount: value.allNodes.length,
+                shrinkWrap: true,
+              );
+            }),
+            Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Close Server'),
+              child: RaisedButton(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Close Server'),
+                ),
+                elevation: 20,
+                color: Color(0xffEF6F6C),
+                onPressed: p2p.closeServer,
+              ),
             ),
-            elevation: 20,
-            color: Color(0xffEF6F6C),
-            onPressed: p2p.closeServer,
-          ),
+          ],
         ),
       ),
     );

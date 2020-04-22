@@ -20,12 +20,15 @@ class ClientService with ChangeNotifier {
   Map<int, Map<int, Message>> chats = {};
   String text = '';
 
-  ClientService(this._serverAddress);
+  ClientService(this._serverAddress) {
+    setupIncomingServer();
+  }
 
   setupIncomingServer() async {
-    _clientSocket = await ServerSocket.bind('0.0.0.0', clientPort);
-    setupListener();
-    requestPeers();
+    _clientSocket =
+        await ServerSocket.bind('0.0.0.0', clientPort, shared: true);
+    await setupListener();
+    await requestPeers();
   }
 
   setupListener() {
@@ -33,10 +36,10 @@ class ClientService with ChangeNotifier {
       sock.listen((data) async {
         if (String.fromCharCodes(data) == 'PING') {
           sock.add('PONG'.codeUnits);
-          if (sock.address != _serverAddress) {
+          if (sock.remoteAddress != _serverAddress) {
             bool callServer = true;
             incomingNodes.values.any((peer) {
-              if (peer.ip == sock.address) {
+              if (peer.ip == sock.remoteAddress) {
                 incomingNodes[peer.id].state = true;
                 callServer = false;
                 return true;
@@ -44,8 +47,8 @@ class ClientService with ChangeNotifier {
               return false;
             });
             if (callServer) {
-              int uid = await requestUID(sock.address.host);
-              incomingNodes[uid] = Node(uid, sock.address);
+              int uid = await requestUID(sock.remoteAddress.host);
+              incomingNodes[uid] = Node(uid, sock.remoteAddress);
             }
           }
         } else if (String.fromCharCodes(data).startsWith('MESSAGE')) {
@@ -67,6 +70,7 @@ class ClientService with ChangeNotifier {
   }
 
   Future<Socket> _connectToServer() async {
+    debugPrint(_serverAddress.host);
     final sock = await Socket.connect(_serverAddress.host, serverPort);
     return sock;
   }
@@ -75,16 +79,18 @@ class ClientService with ChangeNotifier {
     final Socket server = await _connectToServer();
     server.add('ROUTING_TABLE'.codeUnits);
     Uint8List data =
-        await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
-      return false;
-    }).first;
+        await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
     String table = String.fromCharCodes(data);
     myUid = int.parse(table.split('>')[0]);
-    table = table.split('>')[1];
-    table.split(';').forEach((peer) {
-      Node node = Node.fromString(peer);
-      outgoingNodes[node.id] = node;
-    });
+    debugPrint(myUid.toString());
+    if (table.split('>').length > 1) {
+      table = table.split('>')[1];
+      table.split(';').forEach((peer) {
+        debugPrint(peer);
+        Node node = Node.fromString(peer);
+        outgoingNodes[node.id] = node;
+      });
+    }
     setTimer();
     server.close();
   }
@@ -171,16 +177,16 @@ class ClientService with ChangeNotifier {
   forwardMessage(Message message) async {
     if (outgoingNodes.containsKey(message.receiverUid)) {
       await sendMessage(message, outgoingNodes[message.receiverUid].ip);
-      await sendMessage(
-          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
-              DateTime.now().millisecondsSinceEpoch),
-          outgoingNodes[message.senderUid].ip);
+//      await sendMessage(
+//          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
+//              DateTime.now().millisecondsSinceEpoch),
+//          outgoingNodes[message.senderUid].ip);
     } else if (incomingNodes.containsKey(message.receiverUid)) {
       await sendMessage(message, incomingNodes[message.receiverUid].ip);
-      await sendMessage(
-          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
-              DateTime.now().millisecondsSinceEpoch),
-          incomingNodes[message.senderUid].ip);
+//      await sendMessage(
+//          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
+//              DateTime.now().millisecondsSinceEpoch),
+//          incomingNodes[message.senderUid].ip);
     } else {
       Map<int, Node> allNodes = Map.from(incomingNodes);
       allNodes.addAll(outgoingNodes);

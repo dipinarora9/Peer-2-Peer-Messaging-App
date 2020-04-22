@@ -21,7 +21,7 @@ class Node {
   Node(this._id, this._ip);
 
   Node.fromString(String node) {
-    this._id = node.split('|')[0] as int;
+    this._id = int.parse(node.split('|')[0]);
     this._ip = InternetAddress(node.split('|')[1]);
   }
 

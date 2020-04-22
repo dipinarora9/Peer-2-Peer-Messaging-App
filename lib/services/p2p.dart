@@ -33,6 +33,7 @@ class P2P with ChangeNotifier {
       final InternetAddress address = await findServer();
       if (address == null) {
         _serverSocket = await ServerSocket.bind('0.0.0.0', serverPort);
+        _serverService = ServerService(_serverSocket);
         addServerListener();
         Fluttertoast.showToast(msg: 'Server started');
         _searching = false;
@@ -41,7 +42,7 @@ class P2P with ChangeNotifier {
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider(
               child: ServerScreen(),
-              create: (_) => ServerService(_serverSocket),
+              create: (_) => _serverService,
             ),
           ),
         );
@@ -71,12 +72,12 @@ class P2P with ChangeNotifier {
         if (String.fromCharCodes(data) == "PING") {
           sock.add('PONG'.codeUnits);
         } else if (String.fromCharCodes(data) == "ROUTING_TABLE") {
-          Uint8List tables = _serverService.addNode(sock.address);
-          sock.add(tables);
+          String tables = _serverService.addNode(sock.remoteAddress);
+          sock.add(tables.codeUnits);
           // send routing tables
         } else if (String.fromCharCodes(data) == "QUIT") {
           //--------------------- change state of that ip who quits------------
-          InternetAddress ip = sock.address;
+          InternetAddress ip = sock.remoteAddress;
           int uid = _serverService.getUID(ip);
           _serverService.removeNode(uid);
           // reply
@@ -88,8 +89,8 @@ class P2P with ChangeNotifier {
           bool dead;
           try {
             Socket _clientSock = await Socket.connect(
-                ServerService.allNodes[uid].ip, clientPort);
-            dead = await ping(_clientSock, ServerService.allNodes[uid].ip);
+                _serverService.allNodes[uid].ip, clientPort);
+            dead = await ping(_clientSock, _serverService.allNodes[uid].ip);
             _clientSock.close();
           } on Exception {
             dead = true;
