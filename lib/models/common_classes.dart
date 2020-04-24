@@ -61,12 +61,23 @@ class User {
   }
 }
 
+class Chat {
+  bool _allowed = false;
+  Map<int, Message> _chats = {};
+  set allowed(v) => _allowed = v;
+  bool get allowed => _allowed;
+  Map<int, Message> get chats => _chats;
+  set chats(v) => _chats;
+}
+
+enum MessageStatus { DENY, SENDING, SENT, TIMEOUT }
+
 class Message {
   User _sender;
   User _receiver;
   String _message; // encrypted message -> Message_content
   int _timestamp;
-  int _acknowledged = 0;
+  MessageStatus _status = MessageStatus.SENDING;
 
   Message(this._sender, this._receiver, this._message, this._timestamp);
 
@@ -83,7 +94,7 @@ class Message {
     _sender = User.fromString(message.split('|')[0]);
     _receiver = User.fromString(message.split('|')[1]);
     _timestamp = int.parse(message.split('|')[2]);
-    _acknowledged = 1;
+    _status = MessageStatus.values[int.parse(message.split('|')[3])];
   }
 
   String get message => _message;
@@ -94,12 +105,12 @@ class Message {
 
   User get receiver => _receiver;
 
-  int get acknowledged => _acknowledged;
+  MessageStatus get status => _status;
 
-  set acknowledged(v) => _acknowledged = v;
+  set status(v) => _status = v;
 
   String acknowledgementMessage() {
-    return 'ACKNOWLEDGED>$_receiver|$_sender|$_timestamp';
+    return 'ACKNOWLEDGED>$_receiver|$_sender|$_timestamp|$_status';
   }
 
   @override

@@ -3,7 +3,7 @@ import 'package:peer2peer/services/client_service.dart';
 import 'package:provider/provider.dart';
 
 class ClientScreen extends StatelessWidget {
-  final TextEditingController _uid = TextEditingController();
+  final TextEditingController _username = TextEditingController();
   final TextEditingController _message = TextEditingController();
 
   @override
@@ -15,15 +15,14 @@ class ClientScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextFormField(
-              controller: _uid,
-              decoration: InputDecoration(labelText: ''),
+              controller: _username,
+              decoration: InputDecoration(labelText: 'username'),
             ),
             TextFormField(
               controller: _message,
             ),
             RaisedButton(
-              onPressed: () =>
-                  p2p.createMessage(_message.text, int.parse(_uid.text)),
+              onPressed: () => p2p.createMessage(_message.text, _username.text),
               child: Text('Send Message'),
             ),
             Consumer<ClientService>(

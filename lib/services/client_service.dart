@@ -18,7 +18,7 @@ class ClientService with ChangeNotifier {
   Map<int, Node> outgoingNodes = {};
   Timer _timer;
   User me;
-  Map<User, Map<int, Message>> chats = {};
+  Map<User, Chat> chats = {};
   String text = '';
 
   ClientService(this._serverAddress);
@@ -66,26 +66,47 @@ class ClientService with ChangeNotifier {
               incomingNodes[user.uid] = Node(sock.remoteAddress, user);
             }
           }
-        } else if (String.fromCharCodes(data).startsWith('MESSAGE')) {
+        } else if (String.fromCharCodes(data).startsWith('MESSAGE>')) {
           Message message = Message.fromString(String.fromCharCodes(data));
           if (message.receiver.uid != me.uid)
             forwardMessage(message);
           else {
-            chats[message.sender] = {message.timestamp: message};
+            if (chats.containsKey(message.sender)) {
+              chats[message.sender].chats[message.timestamp] = message;
+              forwardMessage(message..status = MessageStatus.SENT);
+            } else
+              allowChat(message);
             notifyListeners();
           }
         } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED>')) {
-          String mes = String.fromCharCodes(data).split('>')[1];
-          Message message = Message.fromAcknowledgement(mes);
+          Message message =
+              Message.fromAcknowledgement(String.fromCharCodes(data));
           if (message.receiver.uid != me.uid)
             forwardMessage(message);
           else {
-            chats[message.sender][message.timestamp].acknowledged = 1;
+            if (message.status == MessageStatus.DENY)
+              chats.remove(message.sender);
+            else if (message.status == MessageStatus.SENT)
+              chats[message.sender].chats[message.timestamp] = message
+                ..status = message.status;
+            chats[message.sender].allowed = true;
             notifyListeners();
           }
         }
       });
     });
+  }
+
+  allowChat(Message message) {
+    //todo: show popup
+
+    bool accept;
+    if (accept) {
+      forwardMessage(message..status = MessageStatus.SENT);
+      chats[message.sender].chats = {message.timestamp: message};
+      notifyListeners();
+    } else
+      forwardMessage(message..status = MessageStatus.DENY);
   }
 
   Future<Socket> _connectToServer() async {
@@ -188,7 +209,7 @@ class ClientService with ChangeNotifier {
   sendMessage(Message message, InternetAddress address) async {
     try {
       final Socket peer = await Socket.connect(address.host, clientPort);
-      if (message.acknowledged == 0)
+      if (message.status == MessageStatus.SENDING)
         peer.add(message.toString().codeUnits);
       else
         peer.add(message.acknowledgementMessage().codeUnits);
@@ -197,16 +218,14 @@ class ClientService with ChangeNotifier {
   }
 
   forwardMessage(Message message) async {
+    if ((message.timestamp - DateTime.now().millisecondsSinceEpoch).abs() >
+            90 &&
+        message.status == MessageStatus.SENDING) return;
+
     if (outgoingNodes.containsKey(message.receiver.uid)) {
       await sendMessage(message, outgoingNodes[message.receiver.uid].ip);
-      forwardMessage(Message.fromAcknowledgement(
-        message.acknowledgementMessage(),
-      ));
     } else if (incomingNodes.containsKey(message.receiver.uid)) {
       await sendMessage(message, incomingNodes[message.receiver.uid].ip);
-      forwardMessage(Message.fromAcknowledgement(
-        message.acknowledgementMessage(),
-      ));
     } else {
       Map<int, Node> allNodes = Map.from(incomingNodes);
       allNodes.addAll(outgoingNodes);
@@ -223,15 +242,22 @@ class ClientService with ChangeNotifier {
   }
 
   createMessage(String message, String username) async {
-    int time = DateTime.now().millisecondsSinceEpoch;
     final Socket server = await _connectToServer();
     server.add('UID_FROM_USERNAME-$username'.codeUnits);
     Uint8List data =
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
     User receiver = User.fromString(String.fromCharCodes(data));
     server.close();
+    int time = DateTime.now().millisecondsSinceEpoch;
     Message mess = Message(me, receiver, message, time);
     forwardMessage(mess);
-    chats[receiver] = {time: mess};
+    if (!chats.containsKey(receiver))
+      chats[receiver].chats = {time: mess};
+    else
+      chats[receiver].chats[time] = mess;
+    Timer(Duration(seconds: 90), () {
+      if (chats[receiver].chats[time].status == MessageStatus.SENDING)
+        chats[receiver].chats[time].status = MessageStatus.TIMEOUT;
+    });
   }
 }
