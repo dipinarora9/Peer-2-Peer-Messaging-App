@@ -16,6 +16,7 @@ class ClientScreen extends StatelessWidget {
           children: <Widget>[
             TextFormField(
               controller: _uid,
+              decoration: InputDecoration(labelText: ''),
             ),
             TextFormField(
               controller: _message,

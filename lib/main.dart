@@ -1,5 +1,5 @@
-import 'package:peer2peer/screens/homepage.dart';
 import 'package:flutter/material.dart';
+import 'package:peer2peer/screens/homepage.dart';
 import 'package:provider/provider.dart';
 
 import 'services/p2p.dart';

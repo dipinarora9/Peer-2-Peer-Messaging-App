@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
 
 import 'p2p.dart';
@@ -16,12 +17,26 @@ class ClientService with ChangeNotifier {
   Map<int, Node> incomingNodes = {};
   Map<int, Node> outgoingNodes = {};
   Timer _timer;
-  int myUid;
-  Map<int, Map<int, Message>> chats = {};
+  User me;
+  Map<User, Map<int, Message>> chats = {};
   String text = '';
 
-  ClientService(this._serverAddress) {
-    setupIncomingServer();
+  ClientService(this._serverAddress);
+
+  requestUsername(String username) async {
+    bool flag = false;
+    final Socket server = await _connectToServer();
+    server.add('USERNAME-$username'.codeUnits);
+    Uint8List data =
+        await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
+      return false;
+    }).first;
+    if (String.fromCharCodes(data).startsWith('ACCEPTED>')) flag = true;
+    server.close();
+    if (flag)
+      setupIncomingServer();
+    else
+      Fluttertoast.showToast(msg: 'Username already taken');
   }
 
   setupIncomingServer() async {
@@ -40,30 +55,34 @@ class ClientService with ChangeNotifier {
             bool callServer = true;
             incomingNodes.values.any((peer) {
               if (peer.ip == sock.remoteAddress) {
-                incomingNodes[peer.id].state = true;
+                incomingNodes[peer.user.uid].state = true;
                 callServer = false;
                 return true;
               }
               return false;
             });
             if (callServer) {
-              int uid = await requestUID(sock.remoteAddress.host);
-              incomingNodes[uid] = Node(uid, sock.remoteAddress);
+              User user = await requestUID(sock.remoteAddress.host);
+              incomingNodes[user.uid] = Node(sock.remoteAddress, user);
             }
           }
         } else if (String.fromCharCodes(data).startsWith('MESSAGE')) {
           Message message = Message.fromString(String.fromCharCodes(data));
-          if (message.receiverUid != myUid)
+          if (message.receiver.uid != me.uid)
             forwardMessage(message);
           else {
-            debugPrint(message.toString());
-            text = message.message;
+            chats[message.sender] = {message.timestamp: message};
             notifyListeners();
           }
-        } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED')) {
+        } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED>')) {
           String mes = String.fromCharCodes(data).split('>')[1];
-          Message message = Message.fromString(mes);
-          //todo: deal with it
+          Message message = Message.fromAcknowledgement(mes);
+          if (message.receiver.uid != me.uid)
+            forwardMessage(message);
+          else {
+            chats[message.sender][message.timestamp].acknowledged = 1;
+            notifyListeners();
+          }
         }
       });
     });
@@ -77,18 +96,18 @@ class ClientService with ChangeNotifier {
 
   requestPeers() async {
     final Socket server = await _connectToServer();
-    server.add('ROUTING_TABLE'.codeUnits);
+    server.add('ROUTING_TABLE-${me.username}'.codeUnits);
     Uint8List data =
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
     String table = String.fromCharCodes(data);
-    myUid = int.parse(table.split('>')[0]);
-    debugPrint(myUid.toString());
+    me = User.fromString(table.split('>')[0]);
+    debugPrint(me.toString());
     if (table.split('>').length > 1) {
       table = table.split('>')[1];
       table.split(';').forEach((peer) {
         debugPrint(peer);
         Node node = Node.fromString(peer);
-        outgoingNodes[node.id] = node;
+        outgoingNodes[node.user.uid] = node;
       });
     }
     setTimer();
@@ -155,57 +174,64 @@ class ClientService with ChangeNotifier {
     P2P.navKey.currentState.pop();
   }
 
-  Future<int> requestUID(String ip) async {
+  Future<User> requestUID(String ip) async {
     final Socket server = await _connectToServer();
-    server.add('UID-$ip'.codeUnits);
+    server.add('UID_FROM_IP-$ip'.codeUnits);
     Uint8List data =
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
       return false;
     }).first;
     await server.close();
-    return int.parse(String.fromCharCodes(data));
+    return User.fromString(String.fromCharCodes(data));
   }
 
   sendMessage(Message message, InternetAddress address) async {
     try {
       final Socket peer = await Socket.connect(address.host, clientPort);
-      peer.add(message.toString().codeUnits);
+      if (message.acknowledged == 0)
+        peer.add(message.toString().codeUnits);
+      else
+        peer.add(message.acknowledgementMessage().codeUnits);
       peer.close();
     } on Exception {}
   }
 
   forwardMessage(Message message) async {
-    if (outgoingNodes.containsKey(message.receiverUid)) {
-      await sendMessage(message, outgoingNodes[message.receiverUid].ip);
-//      await sendMessage(
-//          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
-//              DateTime.now().millisecondsSinceEpoch),
-//          outgoingNodes[message.senderUid].ip);
-    } else if (incomingNodes.containsKey(message.receiverUid)) {
-      await sendMessage(message, incomingNodes[message.receiverUid].ip);
-//      await sendMessage(
-//          Message(myUid, message.senderUid, 'ACKNOWLEDGED${message.toString()}',
-//              DateTime.now().millisecondsSinceEpoch),
-//          incomingNodes[message.senderUid].ip);
+    if (outgoingNodes.containsKey(message.receiver.uid)) {
+      await sendMessage(message, outgoingNodes[message.receiver.uid].ip);
+      forwardMessage(Message.fromAcknowledgement(
+        message.acknowledgementMessage(),
+      ));
+    } else if (incomingNodes.containsKey(message.receiver.uid)) {
+      await sendMessage(message, incomingNodes[message.receiver.uid].ip);
+      forwardMessage(Message.fromAcknowledgement(
+        message.acknowledgementMessage(),
+      ));
     } else {
       Map<int, Node> allNodes = Map.from(incomingNodes);
       allNodes.addAll(outgoingNodes);
-      if (message.receiverUid > message.senderUid) {
-        int dist = message.receiverUid - message.senderUid;
+      if (message.receiver.uid > message.sender.uid) {
+        int dist = message.receiver.uid - message.sender.uid;
         int jump = math.log(dist) / math.log(2) as int;
-        await sendMessage(message, allNodes[message.senderUid + jump].ip);
+        await sendMessage(message, allNodes[message.sender.uid + jump].ip);
       } else {
-        int dist = message.senderUid - message.receiverUid;
+        int dist = message.sender.uid - message.receiver.uid;
         int jump = math.log(dist) / math.log(2) as int;
-        await sendMessage(message, allNodes[message.senderUid - jump].ip);
+        await sendMessage(message, allNodes[message.sender.uid - jump].ip);
       }
     }
   }
 
-  createMessage(String message, int receiverUID) {
+  createMessage(String message, String username) async {
     int time = DateTime.now().millisecondsSinceEpoch;
-    Message mess = Message(myUid, receiverUID, message, time);
+    final Socket server = await _connectToServer();
+    server.add('UID_FROM_USERNAME-$username'.codeUnits);
+    Uint8List data =
+        await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
+    User receiver = User.fromString(String.fromCharCodes(data));
+    server.close();
+    Message mess = Message(me, receiver, message, time);
     forwardMessage(mess);
-    chats[receiverUID] = {time: mess};
+    chats[receiver] = {time: mess};
   }
 }

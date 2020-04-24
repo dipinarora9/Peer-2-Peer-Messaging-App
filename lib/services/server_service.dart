@@ -14,34 +14,46 @@ class ServerService with ChangeNotifier {
 
   ServerService(this._serverSocket);
 
-  int getAvailableID() {
-    // check if state is not true\
+  int _getAvailableID(InternetAddress ip) {
+    // check if state is not true
     int id = 0;
+    bool flag = false;
     if (allNodes.length > 0) id = allNodes.keys.toList().last + 1;
     allNodes.values.any((v) {
-      if (v.state == false) {
-        id = v.id;
+      if (v.ip == ip) {
+        id = v.user.uid;
+        flag = true;
         return true;
       }
       return false;
     });
+
+    if (!flag)
+      allNodes.values.any((v) {
+        if (v.state == false) {
+          id = v.user.uid;
+          return true;
+        }
+        return false;
+      });
     return id;
   }
 
-  String addNode(InternetAddress ip) {
-    int id = getAvailableID(); // to be done
+  String addNode(InternetAddress ip, String username) {
+    int id = _getAvailableID(ip); // to be done
     /*
     * returns first available id from disconnected list
     * otherwise give a next new ID
     */
-    Node node = Node(id, ip);
+    User user = User(id, username);
+    Node node = Node(ip, user);
     allNodes[id] = node;
     notifyListeners();
     _lastNodeTillNow = allNodes.keys.last;
     // returns map [int: node] of outbound connections for this node---------------------
     Map<int, Node> peers = _connect(id);
-    //     123>0|192.168.0.100;1|192.168.0.101
-    String code = '$id>';
+    //     123@username>192.168.0.100|0@username;192.168.0.101|1@username2
+    String code = '$id@$username>';
     peers.forEach((k, v) {
       if (v.state == true) code += v.toString();
     });
@@ -55,15 +67,42 @@ class ServerService with ChangeNotifier {
   }
 
 //  ---------------------function to get uid from ip---------------------
-  int getUID(InternetAddress ip) {
-    int uid;
-    allNodes.forEach((k, v) {
-      if (v.ip == ip) {
-        uid = v.id;
-        return;
+  User getUID({InternetAddress ip, String username}) {
+    if (ip != null) {
+      int uid;
+      allNodes.forEach((k, v) {
+        if (v.ip == ip) {
+          uid = v.user.uid;
+          return;
+        }
+      });
+      return allNodes[uid].user;
+    } else {
+      int uid;
+      allNodes.forEach((k, v) {
+        if (v.user.username == username) {
+          uid = v.user.uid;
+          return;
+        }
+      });
+      return allNodes[uid].user;
+    }
+  }
+
+  checkUsername(String username) {
+    String username = '';
+    bool flag = true;
+    allNodes.values.any((v) {
+      if (v.user.username == username) {
+        flag = false;
+        return true;
       }
+      return false;
     });
-    return uid;
+    if (flag)
+      return 'ACCEPTED>$username';
+    else
+      return 'DENIED>$username';
   }
 
   Map<int, Node> _connect(int uid) {
