@@ -24,7 +24,51 @@ class P2P with ChangeNotifier {
 
   bool get searching => _searching;
 
-  initializer() async {
+  initializer(String num, String connectTo) async {
+    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
+    sock.timeout(Duration(seconds: 10000));
+    int myPort = sock.port;
+    List<NetworkInterface> l = await NetworkInterface.list();
+    String myIp;
+    l.forEach((address) {
+      address.addresses.any((add) {
+        if (add.type == InternetAddressType.IPv4) {
+          myIp = add.address;
+          return true;
+        }
+        return false;
+      });
+    });
+
+    debugPrint(myIp);
+    sock.send('Register,$num-$myIp;$myPort!'.codeUnits, InternetAddress(''),
+        2002); //todo: add server address
+    Datagram data;
+
+    await Future.delayed(Duration(seconds: 5));
+    data = sock.receive();
+
+    debugPrint('Registered peers are');
+    debugPrint(String.fromCharCodes(data?.data));
+//    String connectTo;
+//    String.fromCharCodes(data.data).split('\n').any((id) {
+//      if (id != '' && id != num) {
+//        connectTo = id;
+//        return true;
+//      }
+//      return false;
+//    });
+    debugPrint('sending connect request for $connectTo');
+
+    sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
+        InternetAddress(''), 2002); //todo: add server address
+    await Future.delayed(Duration(seconds: 2));
+    String peer = String.fromCharCodes(sock.receive()?.data);
+    sock.close();
+    debugPrint(peer);
+    initiateConnection(peer);
+    return;
+
     if (_serverSocket == null) {
       _searching = true;
       notifyListeners();
@@ -64,6 +108,40 @@ class P2P with ChangeNotifier {
     } else {
       Fluttertoast.showToast(msg: 'This device is already a Server');
     }
+  }
+
+  initiateConnection(String peer) async {
+    String destIp = peer.substring(0, peer.indexOf(':'));
+    int destPort =
+        int.parse(peer.substring(peer.indexOf(':') + 1, peer.indexOf('-')));
+    int natPort = int.parse(peer.substring(peer.indexOf('-') + 1));
+
+    await sender(destIp, destPort);
+    await receiver(natPort);
+  }
+
+  sender(String destIp, int destPort) async {
+    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
+    await Future.delayed(Duration(seconds: 1));
+    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
+    debugPrint('message sent');
+  }
+
+  Future<Datagram> receive(RawDatagramSocket sock) async {
+    Datagram s;
+    while (s == null) {
+      s = sock.receive();
+    }
+    return s;
+  }
+
+  receiver(int natPort) async {
+    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
+    await Future.wait([receive(sock)]).then((message) {
+      debugPrint(String.fromCharCodes(message[0]?.data));
+    });
+//    Datagram message = sock.receive();
+//    if (message == null) await Future.delayed(Duration(seconds: 2));
   }
 
   addServerListener() {
