@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
 
@@ -23,7 +24,7 @@ class ClientService with ChangeNotifier {
 
   ClientService(this._serverAddress);
 
-  requestUsername(String username) async {
+  Future<bool> requestUsername(String username) async {
     bool flag = false;
     final Socket server = await _connectToServer();
     server.add('USERNAME-$username'.codeUnits);
@@ -34,16 +35,17 @@ class ClientService with ChangeNotifier {
     if (String.fromCharCodes(data).startsWith('ACCEPTED>')) flag = true;
     server.close();
     if (flag)
-      setupIncomingServer();
+      setupIncomingServer(String.fromCharCodes(data).substring(9));
     else
       Fluttertoast.showToast(msg: 'Username already taken');
+    return flag;
   }
 
-  setupIncomingServer() async {
+  setupIncomingServer(String username) async {
     _clientSocket =
         await ServerSocket.bind('0.0.0.0', clientPort, shared: true);
     await setupListener();
-    await requestPeers();
+    await requestPeers(username);
   }
 
   setupListener() {
@@ -75,7 +77,7 @@ class ClientService with ChangeNotifier {
               chats[message.sender].chats[message.timestamp] = message;
               forwardMessage(message..status = MessageStatus.SENT);
             } else
-              allowChat(message);
+              showPopup(message);
             notifyListeners();
           }
         } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED>')) {
@@ -97,16 +99,60 @@ class ClientService with ChangeNotifier {
     });
   }
 
-  allowChat(Message message) {
-    //todo: show popup
-
-    bool accept;
+  allowChat(bool accept, Message message) {
     if (accept) {
       forwardMessage(message..status = MessageStatus.SENT);
+      chats[message.sender].allowed = true;
       chats[message.sender].chats = {message.timestamp: message};
       notifyListeners();
     } else
       forwardMessage(message..status = MessageStatus.DENY);
+  }
+
+  showPopup(Message message) {
+    return showDialog(
+      context: P2P.navKey.currentContext,
+      barrierDismissible: false,
+      builder: (context) {
+        return WillPopScope(
+          onWillPop: () {
+            return Future(() => false);
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(message.message),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(message.sender.username),
+                ),
+                Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: OutlineButton(
+                        child: Text('Allow'),
+                        onPressed: () => allowChat(true, message),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: OutlineButton(
+                        child: Text('Deny'),
+                        onPressed: () => allowChat(false, message),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<Socket> _connectToServer() async {
@@ -115,9 +161,9 @@ class ClientService with ChangeNotifier {
     return sock;
   }
 
-  requestPeers() async {
+  requestPeers(String username) async {
     final Socket server = await _connectToServer();
-    server.add('ROUTING_TABLE-${me.username}'.codeUnits);
+    server.add('ROUTING_TABLE-$username'.codeUnits);
     Uint8List data =
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
     String table = String.fromCharCodes(data);

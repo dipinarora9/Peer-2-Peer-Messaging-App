@@ -66,8 +66,8 @@ class Chat {
   Map<int, Message> _chats = {};
   set allowed(v) => _allowed = v;
   bool get allowed => _allowed;
-  Map<int, Message> get chats => _chats;
-  set chats(v) => _chats;
+  Map<int, Message> get chats => _chats ?? {};
+  set chats(v) => _chats = v;
 }
 
 enum MessageStatus { DENY, SENDING, SENT, TIMEOUT }

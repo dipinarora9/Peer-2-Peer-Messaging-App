@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
-import 'package:peer2peer/screens/client.dart';
+import 'package:peer2peer/screens/chats.dart';
 import 'package:peer2peer/screens/server.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 class P2P with ChangeNotifier {
   final int serverPort = 32465;
   final int clientPort = 23654;
-  final String mask = '192.168.43.';
+  final String mask = '192.168.0.';
   bool _searching = false;
   static ServerSocket _serverSocket;
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
@@ -119,7 +119,7 @@ class P2P with ChangeNotifier {
         } else if (String.fromCharCodes(data).startsWith('USERNAME-')) {
           //--------------------- get uid of given ip {'UID-192.65.23.155}------
           String result = _serverService
-              .checkUsername(String.fromCharCodes(data).substring(8));
+              .checkUsername(String.fromCharCodes(data).substring(9));
           sock.add(result.codeUnits);
         }
       });
@@ -139,7 +139,7 @@ class P2P with ChangeNotifier {
       return false;
   }
 
-  Future<InternetAddress> findServer({int start: 1, int end: 255}) async {
+  Future<InternetAddress> findServer({int start: 100, int end: 255}) async {
     for (int i = start; i <= end; i++) {
       try {
         final Socket sock = await Socket.connect(mask + '$i', serverPort,

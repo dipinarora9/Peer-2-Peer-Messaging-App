@@ -90,7 +90,6 @@ class ServerService with ChangeNotifier {
   }
 
   checkUsername(String username) {
-    String username = '';
     bool flag = true;
     allNodes.values.any((v) {
       if (v.user.username == username) {
