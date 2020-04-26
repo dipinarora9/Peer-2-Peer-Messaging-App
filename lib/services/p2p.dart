@@ -15,60 +15,22 @@ import 'package:provider/provider.dart';
 class P2P with ChangeNotifier {
   final int serverPort = 32465;
   final int clientPort = 23654;
+
+  /// Defaults.. will be changed later
+  /// for WIFI: 192.168.0.
+  /// for Mobile hotspot 192.168.43.
   final String mask = '192.168.0.';
   bool _searching = false;
   static ServerSocket _serverSocket;
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
   InternetAddress serverAddress;
   ServerService _serverService;
+  String te = '';
 
   bool get searching => _searching;
 
-  initializer(String num, String connectTo) async {
-    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
-    sock.timeout(Duration(seconds: 10000));
-    int myPort = sock.port;
-    List<NetworkInterface> l = await NetworkInterface.list();
-    String myIp;
-    l.forEach((address) {
-      address.addresses.any((add) {
-        if (add.type == InternetAddressType.IPv4) {
-          myIp = add.address;
-          return true;
-        }
-        return false;
-      });
-    });
-
-    debugPrint(myIp);
-    sock.send('Register,$num-$myIp;$myPort!'.codeUnits, InternetAddress(''),
-        2002); //todo: add server address
-    Datagram data;
-
-    await Future.delayed(Duration(seconds: 5));
-    data = sock.receive();
-
-    debugPrint('Registered peers are');
-    debugPrint(String.fromCharCodes(data?.data));
-//    String connectTo;
-//    String.fromCharCodes(data.data).split('\n').any((id) {
-//      if (id != '' && id != num) {
-//        connectTo = id;
-//        return true;
-//      }
-//      return false;
-//    });
-    debugPrint('sending connect request for $connectTo');
-
-    sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
-        InternetAddress(''), 2002); //todo: add server address
-    await Future.delayed(Duration(seconds: 2));
-    String peer = String.fromCharCodes(sock.receive()?.data);
-    sock.close();
-    debugPrint(peer);
-    initiateConnection(peer);
-    return;
-
+  /// Intializes the network, automatically register the user as a server or client/peer
+  initializer() async {
     if (_serverSocket == null) {
       _searching = true;
       notifyListeners();
@@ -110,6 +72,43 @@ class P2P with ChangeNotifier {
     }
   }
 
+  testingNatHolePunching(String num, String connectTo) async {
+    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
+    sock.timeout(Duration(seconds: 10000));
+    int myPort = sock.port;
+    List<NetworkInterface> l = await NetworkInterface.list();
+    String myIp;
+    l.forEach((address) {
+      address.addresses.any((add) {
+        if (add.type == InternetAddressType.IPv4) {
+          myIp = add.address;
+          return true;
+        }
+        return false;
+      });
+    });
+
+    debugPrint(myIp);
+    sock.send('Register,$num-$myIp;$myPort!'.codeUnits, InternetAddress(''),
+        2002); //todo: add server address
+    Datagram data;
+
+    await Future.delayed(Duration(seconds: 5));
+    data = sock.receive();
+
+    debugPrint('Registered peers are');
+    debugPrint(String.fromCharCodes(data?.data));
+    debugPrint('sending connect request for $connectTo');
+
+    sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
+        InternetAddress(''), 2002); //todo: add server address
+    await Future.delayed(Duration(seconds: 2));
+    String peer = String.fromCharCodes(sock.receive()?.data);
+    sock.close();
+    debugPrint(peer);
+    initiateConnection(peer);
+  }
+
   initiateConnection(String peer) async {
     String destIp = peer.substring(0, peer.indexOf(':'));
     int destPort =
@@ -137,11 +136,14 @@ class P2P with ChangeNotifier {
 
   receiver(int natPort) async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-    await Future.wait([receive(sock)]).then((message) {
-      debugPrint(String.fromCharCodes(message[0]?.data));
-    });
-//    Datagram message = sock.receive();
-//    if (message == null) await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(Duration(seconds: 2));
+    try {
+      Datagram message = sock.receive();
+      //    if (message == null) await Future.delayed(Duration(seconds: 2));
+      te = String.fromCharCodes(message?.data);
+      notifyListeners();
+      debugPrint(String.fromCharCodes(message?.data));
+    } on Exception {}
   }
 
   addServerListener() {
@@ -183,19 +185,19 @@ class P2P with ChangeNotifier {
             sock.add('NOT_DEAD'.codeUnits);
           // reply
         } else if (String.fromCharCodes(data).startsWith('UID_FROM_IP-')) {
-          //--------------------- get uid of given ip {'UID-192.65.23.155}------
+          //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
           InternetAddress ip =
               InternetAddress(String.fromCharCodes(data).substring(12));
           User user = _serverService.getUID(ip: ip);
           sock.add('$user'.codeUnits);
         } else if (String.fromCharCodes(data)
             .startsWith('UID_FROM_USERNAME-')) {
-          //--------------------- get uid of given ip {'UID-192.65.23.155}------
+          //--------------------- get uid of given ip {'UID_FROM_USERNAME-abc}------
           String username = String.fromCharCodes(data).substring(18);
           User user = _serverService.getUID(username: username);
           sock.add('$user'.codeUnits);
         } else if (String.fromCharCodes(data).startsWith('USERNAME-')) {
-          //--------------------- get uid of given ip {'UID-192.65.23.155}------
+          //--------------------- get uid of given ip {'USERNAME-abc}------
           String result = _serverService
               .checkUsername(String.fromCharCodes(data).substring(9));
           sock.add(result.codeUnits);
@@ -204,6 +206,7 @@ class P2P with ChangeNotifier {
     });
   }
 
+  // Pinging server
   Future<bool> ping(Socket sock, InternetAddress address) async {
     sock.add('PING'.codeUnits);
     Uint8List data = await sock.timeout(Duration(seconds: 1), onTimeout: (abc) {
@@ -217,6 +220,7 @@ class P2P with ChangeNotifier {
       return false;
   }
 
+  // Search for server in the LAN
   Future<InternetAddress> findServer({int start: 100, int end: 255}) async {
     for (int i = start; i <= end; i++) {
       try {
