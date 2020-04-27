@@ -1,4 +1,4 @@
-## This project is in active development. There might be some breaking changes.
+## This project is under development. There might be some breaking changes.
 
 ### This app demonstrates Peer2Peer communication over TCP.
 
