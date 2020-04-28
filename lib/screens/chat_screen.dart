@@ -13,8 +13,12 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final client = Provider.of<ClientService>(context, listen: false);
     return Scaffold(
+      appBar: AppBar(
+        title: Text(user.username),
+      ),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Consumer<ClientService>(
               builder: (_, value, __) {
@@ -24,8 +28,8 @@ class ChatScreen extends StatelessWidget {
                     return ListTile(
                       title: Text(chat.message),
                       subtitle: Text(
-                        chat.timestamp.toString(),
-                      ),
+                          DateTime.fromMillisecondsSinceEpoch(chat.timestamp)
+                              .toIso8601String()),
                       trailing: Icon(chat.status == MessageStatus.SENDING
                           ? Icons.access_time
                           : chat.status == MessageStatus.SENT
@@ -34,22 +38,36 @@ class ChatScreen extends StatelessWidget {
                     );
                   },
                   shrinkWrap: true,
+                  itemCount: value.chats[user].chats.length,
                 );
               },
             ),
-            Row(
-              children: <Widget>[
-                TextFormField(
-                  controller: _c,
-                  decoration:
-                      InputDecoration(labelText: 'Type your message here.'),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () => client.createMessage(_c.text, user.username),
-                ),
-              ],
-            ),
+            Consumer<ClientService>(builder: (_, value, __) {
+              return value.chats[user].allowed
+                  ? Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              controller: _c,
+                              decoration: InputDecoration(
+                                  labelText: 'Type your message here.'),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: () =>
+                              client.createMessage(_c.text, user.username),
+                        ),
+                      ],
+                    )
+                  : Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                          'Waiting for acceptance from the other user...'));
+            }),
           ],
         ),
       ),

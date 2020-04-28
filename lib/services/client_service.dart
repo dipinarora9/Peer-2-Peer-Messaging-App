@@ -21,6 +21,7 @@ class ClientService with ChangeNotifier {
   User me;
   Map<User, Chat> chats = {};
   String text = '';
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   ClientService(this._serverAddress);
 
@@ -73,8 +74,11 @@ class ClientService with ChangeNotifier {
           if (message.receiver.uid != me.uid)
             forwardMessage(message);
           else {
+            debugPrint(message.sender.toString());
+            debugPrint(message.receiver.toString());
             if (chats.containsKey(message.sender)) {
               chats[message.sender].chats[message.timestamp] = message;
+              notifyListeners();
               forwardMessage(message..status = MessageStatus.SENT);
             } else
               showPopup(message);
@@ -88,10 +92,12 @@ class ClientService with ChangeNotifier {
           else {
             if (message.status == MessageStatus.DENY)
               chats.remove(message.sender);
-            else if (message.status == MessageStatus.SENT)
+            else if (message.status == MessageStatus.SENT) {
+              chats[message.sender] = Chat();
               chats[message.sender].chats[message.timestamp] = message
                 ..status = message.status;
-            chats[message.sender].allowed = true;
+              chats[message.sender].allowed = true;
+            }
             notifyListeners();
           }
         }
@@ -102,52 +108,59 @@ class ClientService with ChangeNotifier {
   allowChat(bool accept, Message message) {
     if (accept) {
       forwardMessage(message..status = MessageStatus.SENT);
+      chats[message.sender] = Chat();
       chats[message.sender].allowed = true;
       chats[message.sender].chats = {message.timestamp: message};
       notifyListeners();
     } else
       forwardMessage(message..status = MessageStatus.DENY);
+    P2P.navKey.currentState.pop();
   }
 
   showPopup(Message message) {
     return showDialog(
-      context: P2P.navKey.currentContext,
+      context: this.scaffoldKey.currentState.context,
       barrierDismissible: false,
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () {
-            return Future(() => false);
-          },
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(message.message),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(message.sender.username),
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: OutlineButton(
-                        child: Text('Allow'),
-                        onPressed: () => allowChat(true, message),
+        return Dialog(
+          child: WillPopScope(
+            onWillPop: () {
+              return Future(() => false);
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(message.message),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(message.sender.username),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: OutlineButton(
+                          child: Text('Allow'),
+                          color: Colors.green,
+                          onPressed: () => allowChat(true, message),
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: OutlineButton(
-                        child: Text('Deny'),
-                        onPressed: () => allowChat(false, message),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: OutlineButton(
+                          child: Text('Deny'),
+                          color: Colors.red,
+                          onPressed: () => allowChat(false, message),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -168,6 +181,7 @@ class ClientService with ChangeNotifier {
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
     String table = String.fromCharCodes(data);
     me = User.fromString(table.split('>')[0]);
+    notifyListeners();
     debugPrint(me.toString());
     if (table.split('>').length > 1) {
       table = table.split('>')[1];
@@ -252,9 +266,10 @@ class ClientService with ChangeNotifier {
     return User.fromString(String.fromCharCodes(data));
   }
 
-  sendMessage(Message message, InternetAddress address) async {
+  _sendMessage(Message message, InternetAddress address) async {
     try {
       final Socket peer = await Socket.connect(address.host, clientPort);
+      debugPrint(message.acknowledgementMessage());
       if (message.status == MessageStatus.SENDING)
         peer.add(message.toString().codeUnits);
       else
@@ -269,20 +284,25 @@ class ClientService with ChangeNotifier {
         message.status == MessageStatus.SENDING) return;
 
     if (outgoingNodes.containsKey(message.receiver.uid)) {
-      await sendMessage(message, outgoingNodes[message.receiver.uid].ip);
+      await _sendMessage(message, outgoingNodes[message.receiver.uid].ip);
     } else if (incomingNodes.containsKey(message.receiver.uid)) {
-      await sendMessage(message, incomingNodes[message.receiver.uid].ip);
+      await _sendMessage(message, incomingNodes[message.receiver.uid].ip);
     } else {
       Map<int, Node> allNodes = Map.from(incomingNodes);
       allNodes.addAll(outgoingNodes);
-      if (message.receiver.uid > message.sender.uid) {
-        int dist = message.receiver.uid - message.sender.uid;
-        int jump = math.log(dist) / math.log(2) as int;
-        await sendMessage(message, allNodes[message.sender.uid + jump].ip);
+      if (allNodes.length > 0) {
+        if (message.receiver.uid > message.sender.uid) {
+          int dist = message.receiver.uid - message.sender.uid;
+          int jump = (math.log(dist) ~/ math.log(2)).toInt();
+          await _sendMessage(message, allNodes[message.sender.uid + jump].ip);
+        } else {
+          int dist = message.sender.uid - message.receiver.uid;
+          int jump = (math.log(dist) ~/ math.log(2)).toInt();
+          await _sendMessage(message, allNodes[message.sender.uid - jump].ip);
+        }
       } else {
-        int dist = message.sender.uid - message.receiver.uid;
-        int jump = math.log(dist) / math.log(2) as int;
-        await sendMessage(message, allNodes[message.sender.uid - jump].ip);
+        /// call server for latest routing tables
+        debugPrint('implement ');
       }
     }
   }
@@ -297,13 +317,17 @@ class ClientService with ChangeNotifier {
     int time = DateTime.now().millisecondsSinceEpoch;
     Message mess = Message(me, receiver, message, time);
     forwardMessage(mess);
-    if (!chats.containsKey(receiver))
+    if (!chats.containsKey(receiver)) {
+      chats[receiver] = Chat();
       chats[receiver].chats = {time: mess};
-    else
+    } else
       chats[receiver].chats[time] = mess;
+    notifyListeners();
     Timer(Duration(seconds: 90), () {
-      if (chats[receiver].chats[time].status == MessageStatus.SENDING)
+      if (chats[receiver].chats[time].status == MessageStatus.SENDING) {
         chats[receiver].chats[time].status = MessageStatus.TIMEOUT;
+        notifyListeners();
+      }
     });
   }
 }

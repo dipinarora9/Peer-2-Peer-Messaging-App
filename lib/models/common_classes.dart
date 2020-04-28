@@ -64,9 +64,13 @@ class User {
 class Chat {
   bool _allowed = false;
   Map<int, Message> _chats = {};
+
   set allowed(v) => _allowed = v;
+
   bool get allowed => _allowed;
+
   Map<int, Message> get chats => _chats ?? {};
+
   set chats(v) => _chats = v;
 }
 
@@ -94,7 +98,23 @@ class Message {
     _sender = User.fromString(message.split('|')[0]);
     _receiver = User.fromString(message.split('|')[1]);
     _timestamp = int.parse(message.split('|')[2]);
-    _status = MessageStatus.values[int.parse(message.split('|')[3])];
+    _status = getStatus(int.parse(message.split('|')[3]));
+  }
+
+  MessageStatus getStatus(int stat) {
+    switch (stat) {
+      case 0:
+        return MessageStatus.DENY;
+        break;
+      case 1:
+        return MessageStatus.SENDING;
+        break;
+      case 2:
+        return MessageStatus.SENT;
+        break;
+      default:
+        return MessageStatus.TIMEOUT;
+    }
   }
 
   String get message => _message;
@@ -110,7 +130,7 @@ class Message {
   set status(v) => _status = v;
 
   String acknowledgementMessage() {
-    return 'ACKNOWLEDGED>$_receiver|$_sender|$_timestamp|$_status';
+    return 'ACKNOWLEDGED>$_receiver|$_sender|$_timestamp|${_status.index}';
   }
 
   @override
