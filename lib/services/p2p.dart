@@ -90,7 +90,7 @@ class P2P with ChangeNotifier {
 
     debugPrint(myIp);
     sock.send('Register,$num-$myIp;$myPort!'.codeUnits, InternetAddress(''),
-        2002); //todo: add server address
+        2020); //todo: add server address
     Datagram data;
 
     await Future.delayed(Duration(seconds: 5));
@@ -101,7 +101,7 @@ class P2P with ChangeNotifier {
     debugPrint('sending connect request for $connectTo');
 
     sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
-        InternetAddress(''), 2002); //todo: add server address
+        InternetAddress(''), 2020); //todo: add server address
     await Future.delayed(Duration(seconds: 2));
     String peer = String.fromCharCodes(sock.receive()?.data);
     sock.close();
@@ -122,6 +122,9 @@ class P2P with ChangeNotifier {
   sender(String destIp, int destPort) async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
     await Future.delayed(Duration(seconds: 1));
+    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
+    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
+    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
     sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
     debugPrint('message sent');
   }
