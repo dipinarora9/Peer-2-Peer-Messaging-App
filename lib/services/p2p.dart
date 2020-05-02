@@ -29,7 +29,7 @@ class P2P with ChangeNotifier {
 
   bool get searching => _searching;
 
-  /// Intializes the network, automatically register the user as a server or client/peer
+  /// Initializes the network, automatically register the user as a server or client/peer
   initializer() async {
     if (_serverSocket == null) {
       _searching = true;
@@ -89,8 +89,8 @@ class P2P with ChangeNotifier {
     });
 
     debugPrint(myIp);
-    sock.send('Register,$num-$myIp;$myPort!'.codeUnits, InternetAddress(''),
-        2020); //todo: add server address
+    sock.send('Register,$num-$myIp;$myPort!'.codeUnits,
+        InternetAddress('3.6.126.194'), 2020); //todo: add server address
     Datagram data;
 
     await Future.delayed(Duration(seconds: 5));
@@ -101,7 +101,7 @@ class P2P with ChangeNotifier {
     debugPrint('sending connect request for $connectTo');
 
     sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
-        InternetAddress(''), 2020); //todo: add server address
+        InternetAddress('3.6.126.194'), 2020); //todo: add server address
     await Future.delayed(Duration(seconds: 2));
     String peer = String.fromCharCodes(sock.receive()?.data);
     sock.close();

@@ -74,8 +74,6 @@ class ClientService with ChangeNotifier {
           if (message.receiver.uid != me.uid)
             forwardMessage(message);
           else {
-            debugPrint(message.sender.toString());
-            debugPrint(message.receiver.toString());
             if (chats.containsKey(message.sender)) {
               chats[message.sender].chats[message.timestamp] = message;
               notifyListeners();
@@ -87,16 +85,16 @@ class ClientService with ChangeNotifier {
         } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED>')) {
           Message message =
               Message.fromAcknowledgement(String.fromCharCodes(data));
-          if (message.receiver.uid != me.uid)
+          if (message.sender.uid != me.uid)
             forwardMessage(message);
           else {
             if (message.status == MessageStatus.DENY)
-              chats.remove(message.sender);
+              chats.remove(message.receiver);
             else if (message.status == MessageStatus.SENT) {
-              chats[message.sender] = Chat();
-              chats[message.sender].chats[message.timestamp] = message
+              chats[message.receiver] = Chat();
+              chats[message.receiver].chats[message.timestamp] = message
                 ..status = message.status;
-              chats[message.sender].allowed = true;
+              chats[message.receiver].allowed = true;
             }
             notifyListeners();
           }
@@ -115,57 +113,6 @@ class ClientService with ChangeNotifier {
     } else
       forwardMessage(message..status = MessageStatus.DENY);
     P2P.navKey.currentState.pop();
-  }
-
-  showPopup(Message message) {
-    return showDialog(
-      context: this.scaffoldKey.currentState.context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          child: WillPopScope(
-            onWillPop: () {
-              return Future(() => false);
-            },
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(message.message),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(message.sender.username),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: OutlineButton(
-                          child: Text('Allow'),
-                          color: Colors.green,
-                          onPressed: () => allowChat(true, message),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: OutlineButton(
-                          child: Text('Deny'),
-                          color: Colors.red,
-                          onPressed: () => allowChat(false, message),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 
   Future<Socket> _connectToServer() async {
@@ -302,6 +249,7 @@ class ClientService with ChangeNotifier {
         }
       } else {
         /// call server for latest routing tables
+        /// call routing table periodically till the nodes has 8 other nodes
         debugPrint('implement ');
       }
     }
@@ -329,5 +277,56 @@ class ClientService with ChangeNotifier {
         notifyListeners();
       }
     });
+  }
+
+  showPopup(Message message) {
+    return showDialog(
+      context: this.scaffoldKey.currentState.context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          child: WillPopScope(
+            onWillPop: () {
+              return Future(() => false);
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(message.message),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(message.sender.username),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: OutlineButton(
+                          child: Text('Allow'),
+                          color: Colors.green,
+                          onPressed: () => allowChat(true, message),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: OutlineButton(
+                          child: Text('Deny'),
+                          color: Colors.red,
+                          onPressed: () => allowChat(false, message),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
