@@ -19,7 +19,7 @@ class ClientService with ChangeNotifier {
   Map<int, Node> outgoingNodes = {};
   Timer _timer;
   User me;
-  Map<User, Chat> chats = {};
+  Map<String, Chat> chats = {};
   String text = '';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -71,11 +71,17 @@ class ClientService with ChangeNotifier {
           }
         } else if (String.fromCharCodes(data).startsWith('MESSAGE>')) {
           Message message = Message.fromString(String.fromCharCodes(data));
+
+          /// A - sender
+          /// B - receiver
+          ///
+          /// A-> B
           if (message.receiver.uid != me.uid)
             forwardMessage(message);
           else {
-            if (chats.containsKey(message.sender)) {
-              chats[message.sender].chats[message.timestamp] = message;
+            if (chats.containsKey(message.sender.toString())) {
+              chats[message.sender.toString()].chats[message.timestamp] =
+                  message;
               notifyListeners();
               forwardMessage(message..status = MessageStatus.SENT);
             } else
@@ -85,16 +91,29 @@ class ClientService with ChangeNotifier {
         } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED>')) {
           Message message =
               Message.fromAcknowledgement(String.fromCharCodes(data));
-          if (message.sender.uid != me.uid)
+
+          /// B - sender
+          /// A - receiver
+          ///
+          /// A-> B
+          if (message.receiver.uid != me.uid)
             forwardMessage(message);
           else {
-            if (message.status == MessageStatus.DENY)
-              chats.remove(message.receiver);
-            else if (message.status == MessageStatus.SENT) {
-              chats[message.receiver] = Chat();
-              chats[message.receiver].chats[message.timestamp] = message
-                ..status = message.status;
-              chats[message.receiver].allowed = true;
+            if (message.status == MessageStatus.DENY) {
+//              P2P.navKey.currentState.pushAndRemoveUntil(
+//                  MaterialPageRoute(
+//                    builder: (_) => ChangeNotifierProvider.value(
+//                      child: AllChatsScreen(),
+//                      value: this,
+//                    ),
+//                  ),
+//                  (route) => route.settings.name == '/chats');
+              chats.remove(message.sender.toString());
+            } else if (message.status == MessageStatus.SENT) {
+              debugPrint(chats[message.sender.toString()].toString());
+              chats[message.sender.toString()].chats[message.timestamp].status =
+                  message.status;
+              chats[message.sender.toString()].allowed = true;
             }
             notifyListeners();
           }
@@ -104,11 +123,12 @@ class ClientService with ChangeNotifier {
   }
 
   allowChat(bool accept, Message message) {
+    debugPrint("HERE IS IT- $message");
     if (accept) {
       forwardMessage(message..status = MessageStatus.SENT);
-      chats[message.sender] = Chat();
-      chats[message.sender].allowed = true;
-      chats[message.sender].chats = {message.timestamp: message};
+      chats[message.sender.toString()] = Chat();
+      chats[message.sender.toString()].allowed = true;
+      chats[message.sender.toString()].chats = {message.timestamp: message};
       notifyListeners();
     } else
       forwardMessage(message..status = MessageStatus.DENY);
@@ -132,10 +152,11 @@ class ClientService with ChangeNotifier {
     debugPrint(me.toString());
     if (table.split('>').length > 1) {
       table = table.split('>')[1];
-      table.split(';').forEach((peer) {
+      table.split(';').forEach((peer) async {
         debugPrint(peer);
         Node node = Node.fromString(peer);
         outgoingNodes[node.user.uid] = node;
+        await pingPeer(node.user.uid);
       });
     }
     setTimer();
@@ -145,8 +166,8 @@ class ClientService with ChangeNotifier {
   setTimer() {
     if (_timer == null)
       _timer = Timer.periodic(Duration(minutes: 1), (timer) {
-        outgoingNodes.keys.forEach((uid) {
-          pingPeer(uid);
+        outgoingNodes.keys.forEach((uid) async {
+          await pingPeer(uid);
         });
       });
   }
@@ -156,6 +177,7 @@ class ClientService with ChangeNotifier {
       final Socket peer =
           await Socket.connect(outgoingNodes[uid].ip.host, clientPort);
       peer.add('PING'.codeUnits);
+      debugPrint('pinging $uid');
       Uint8List data =
           await peer.timeout(Duration(seconds: 1), onTimeout: (abc) {
         return false;
@@ -216,11 +238,14 @@ class ClientService with ChangeNotifier {
   _sendMessage(Message message, InternetAddress address) async {
     try {
       final Socket peer = await Socket.connect(address.host, clientPort);
-      debugPrint(message.acknowledgementMessage());
-      if (message.status == MessageStatus.SENDING)
+      debugPrint('Messages generated');
+      if (message.status == MessageStatus.SENDING) {
+        debugPrint(message.toString());
         peer.add(message.toString().codeUnits);
-      else
+      } else {
+        debugPrint(message.acknowledgementMessage());
         peer.add(message.acknowledgementMessage().codeUnits);
+      }
       peer.close();
     } on Exception {}
   }
@@ -230,11 +255,22 @@ class ClientService with ChangeNotifier {
             90 &&
         message.status == MessageStatus.SENDING) return;
 
-    if (outgoingNodes.containsKey(message.receiver.uid)) {
-      await _sendMessage(message, outgoingNodes[message.receiver.uid].ip);
-    } else if (incomingNodes.containsKey(message.receiver.uid)) {
-      await _sendMessage(message, incomingNodes[message.receiver.uid].ip);
+    if (outgoingNodes.containsKey(message.receiver.uid) ||
+        outgoingNodes.containsKey(message.sender.uid)) {
+      debugPrint('Message outgoing $message');
+      if (outgoingNodes.containsKey(message.receiver.uid))
+        await _sendMessage(message, outgoingNodes[message.receiver.uid].ip);
+      else
+        await _sendMessage(message, outgoingNodes[message.sender.uid].ip);
+    } else if (incomingNodes.containsKey(message.receiver.uid) ||
+        incomingNodes.containsKey(message.sender.uid)) {
+      debugPrint('Message incoming $message');
+      if (incomingNodes.containsKey(message.receiver.uid))
+        await _sendMessage(message, incomingNodes[message.receiver.uid].ip);
+      else
+        await _sendMessage(message, incomingNodes[message.sender.uid].ip);
     } else {
+      debugPrint('Message hopping $message');
       Map<int, Node> allNodes = Map.from(incomingNodes);
       allNodes.addAll(outgoingNodes);
       if (allNodes.length > 0) {
@@ -264,19 +300,26 @@ class ClientService with ChangeNotifier {
     server.close();
     int time = DateTime.now().millisecondsSinceEpoch;
     Message mess = Message(me, receiver, message, time);
-    forwardMessage(mess);
-    if (!chats.containsKey(receiver)) {
-      chats[receiver] = Chat();
-      chats[receiver].chats = {time: mess};
+    debugPrint('Message created $mess');
+    await forwardMessage(mess);
+    if (!chats.containsKey(receiver.toString())) {
+      chats[receiver.toString()] = Chat();
+      chats[receiver.toString()].chats = {time: mess};
     } else
-      chats[receiver].chats[time] = mess;
+      chats[receiver.toString()].chats[time] = mess;
     notifyListeners();
     Timer(Duration(seconds: 90), () {
-      if (chats[receiver].chats[time].status == MessageStatus.SENDING) {
-        chats[receiver].chats[time].status = MessageStatus.TIMEOUT;
+      if (chats[receiver.toString()].chats[time].status ==
+          MessageStatus.SENDING) {
+        chats[receiver.toString()].chats[time].status = MessageStatus.TIMEOUT;
         notifyListeners();
       }
     });
+  }
+
+  deleteChats() {
+    chats.clear();
+    notifyListeners();
   }
 
   showPopup(Message message) {

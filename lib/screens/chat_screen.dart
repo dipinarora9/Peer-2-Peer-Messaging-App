@@ -20,30 +20,33 @@ class ChatScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            Consumer<ClientService>(
-              builder: (_, value, __) {
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    final chat = value.chats[user].chats.values.toList()[index];
-                    return ListTile(
-                      title: Text(chat.message),
-                      subtitle: Text(
-                          DateTime.fromMillisecondsSinceEpoch(chat.timestamp)
-                              .toIso8601String()),
-                      trailing: Icon(chat.status == MessageStatus.SENDING
-                          ? Icons.access_time
-                          : chat.status == MessageStatus.SENT
-                              ? Icons.check
-                              : Icons.close),
-                    );
-                  },
-                  shrinkWrap: true,
-                  itemCount: value.chats[user].chats.length,
-                );
-              },
+            Expanded(
+              child: Consumer<ClientService>(
+                builder: (_, value, __) {
+                  return ListView.builder(
+                    itemBuilder: (context, index) {
+                      final chat = value.chats[user.toString()].chats.values
+                          .toList()[index];
+                      return ListTile(
+                        title: Text(chat.message ?? ''),
+                        subtitle: Text(
+                            DateTime.fromMillisecondsSinceEpoch(chat.timestamp)
+                                .toIso8601String()),
+                        trailing: Icon(chat.status == MessageStatus.SENDING
+                            ? Icons.access_time
+                            : chat.status == MessageStatus.SENT
+                                ? Icons.check
+                                : Icons.close),
+                      );
+                    },
+                    shrinkWrap: true,
+                    itemCount: value.chats[user.toString()].chats.length,
+                  );
+                },
+              ),
             ),
             Consumer<ClientService>(builder: (_, value, __) {
-              return value.chats[user].allowed
+              return value.chats[user.toString()].allowed
                   ? Row(
                       children: <Widget>[
                         Expanded(

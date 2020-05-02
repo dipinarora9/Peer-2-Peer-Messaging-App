@@ -19,7 +19,9 @@ class P2P with ChangeNotifier {
   /// Defaults.. will be changed later
   /// for WIFI: 192.168.0.
   /// for Mobile hotspot 192.168.43.
-  final String mask = '192.168.0.';
+  String mask = '192.168.0.';
+  int _start = 100;
+  int _end = 255;
   bool _searching = false;
   static ServerSocket _serverSocket;
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
@@ -30,7 +32,12 @@ class P2P with ChangeNotifier {
   bool get searching => _searching;
 
   /// Initializes the network, automatically register the user as a server or client/peer
-  initializer() async {
+  initializer({String ip}) async {
+    if (ip != null && ip != '') {
+      mask = ip.split(',')[0];
+      _start = int.parse(ip.split(',')[1]);
+      _end = int.parse(ip.split(',')[2]);
+    }
     if (_serverSocket == null) {
       _searching = true;
       notifyListeners();
@@ -61,7 +68,7 @@ class P2P with ChangeNotifier {
         navKey.currentState.push(
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider(
-              child: ClientScreen(),
+              child: AllChatsScreen(),
               create: (_) => ClientService(address),
             ),
           ),
@@ -89,8 +96,8 @@ class P2P with ChangeNotifier {
     });
 
     debugPrint(myIp);
-    sock.send('Register,$num-$myIp;$myPort!'.codeUnits,
-        InternetAddress('3.6.126.194'), 2020); //todo: add server address
+    sock.send('Register,$num-$myIp;$myPort!'.codeUnits, InternetAddress(''),
+        2020); //todo: add server address
     Datagram data;
 
     await Future.delayed(Duration(seconds: 5));
@@ -101,7 +108,7 @@ class P2P with ChangeNotifier {
     debugPrint('sending connect request for $connectTo');
 
     sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
-        InternetAddress('3.6.126.194'), 2020); //todo: add server address
+        InternetAddress(''), 2020); //todo: add server address
     await Future.delayed(Duration(seconds: 2));
     String peer = String.fromCharCodes(sock.receive()?.data);
     sock.close();
@@ -224,8 +231,8 @@ class P2P with ChangeNotifier {
   }
 
   // Search for server in the LAN
-  Future<InternetAddress> findServer({int start: 100, int end: 255}) async {
-    for (int i = start; i <= end; i++) {
+  Future<InternetAddress> findServer() async {
+    for (int i = _start; i <= _end; i++) {
       try {
         final Socket sock = await Socket.connect(mask + '$i', serverPort,
             timeout: Duration(milliseconds: 200));

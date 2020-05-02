@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:peer2peer/models/common_classes.dart';
 import 'package:peer2peer/screens/chat_screen.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:provider/provider.dart';
 
-class ClientScreen extends StatelessWidget {
+class AllChatsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final client = Provider.of<ClientService>(context, listen: false);
@@ -15,24 +16,25 @@ class ClientScreen extends StatelessWidget {
       key: client.scaffoldKey,
       appBar: AppBar(
         title: Consumer<ClientService>(builder: (_, value, __) {
-          return Text(value?.me?.username ?? '');
+          return Text("Chats of ${value?.me?.username}" ?? '');
         }),
-//        actions: <Widget>[
-//          IconButton(
-//            onPressed: () =>
-//                ,
-//            icon: Icon(
-//              Icons.check,
-//            ),
-//          )
-//        ],
+        actions: <Widget>[
+          IconButton(
+            onPressed: client.deleteChats,
+            icon: Icon(
+              Icons.delete,
+            ),
+          )
+        ],
       ),
       body: Center(
         child: Consumer<ClientService>(builder: (_, value, __) {
           return ListView.builder(
             itemBuilder: (context, index) {
+              final User user =
+                  User.fromString(value.chats.keys.toList()[index]);
               return ListTile(
-                title: Text(value.chats.keys.toList()[index].username ?? ''),
+                title: Text(user.username ?? ''),
                 subtitle: Text(value.chats.values
                         .toList()[index]
                         .chats
@@ -46,7 +48,7 @@ class ClientScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (_) => ChangeNotifierProvider.value(
                         value: client,
-                        child: ChatScreen(value.chats.keys.toList()[index]),
+                        child: ChatScreen(user),
                       ),
                     ),
                   );
@@ -98,7 +100,7 @@ class Dialogs {
                   color: Colors.blue,
                   onPressed: () async {
                     if (sendMessageRequest) {
-                      client.createMessage(_message.text, _username.text);
+                      await client.createMessage(_message.text, _username.text);
                       Navigator.of(context).pop();
                     } else {
                       bool result =
