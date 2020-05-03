@@ -30,8 +30,7 @@ class ChatScreen extends StatelessWidget {
                       return ListTile(
                         title: Text(chat.message ?? ''),
                         subtitle: Text(
-                            DateTime.fromMillisecondsSinceEpoch(chat.timestamp)
-                                .toIso8601String()),
+                            'at ${DateTime.fromMillisecondsSinceEpoch(chat.timestamp).toIso8601String()} by ${chat.sender.username}'),
                         trailing: Icon(chat.status == MessageStatus.SENDING
                             ? Icons.access_time
                             : chat.status == MessageStatus.SENT

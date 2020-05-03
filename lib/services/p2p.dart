@@ -28,6 +28,7 @@ class P2P with ChangeNotifier {
   InternetAddress serverAddress;
   ServerService _serverService;
   String te = '';
+  String peer = '';
 
   bool get searching => _searching;
 
@@ -110,50 +111,41 @@ class P2P with ChangeNotifier {
     sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
         InternetAddress(''), 2020); //todo: add server address
     await Future.delayed(Duration(seconds: 2));
-    String peer = String.fromCharCodes(sock.receive()?.data);
+    peer = String.fromCharCodes(sock.receive()?.data);
     sock.close();
     debugPrint(peer);
-    initiateConnection(peer);
   }
 
-  initiateConnection(String peer) async {
+  initiateConnection() async {
     String destIp = peer.substring(0, peer.indexOf(':'));
     int destPort =
         int.parse(peer.substring(peer.indexOf(':') + 1, peer.indexOf('-')));
     int natPort = int.parse(peer.substring(peer.indexOf('-') + 1));
-
+    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
     await sender(destIp, destPort);
-    await receiver(natPort);
+    await receiver(sock, destIp, destPort);
   }
 
   sender(String destIp, int destPort) async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
-    await Future.delayed(Duration(seconds: 1));
-    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
-    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
-    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
     sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
     debugPrint('message sent');
+    sock.close();
   }
 
-  Future<Datagram> receive(RawDatagramSocket sock) async {
-    Datagram s;
-    while (s == null) {
-      s = sock.receive();
+  receiver(RawDatagramSocket sock, String destIp, int destPort) async {
+    while (te == '') {
+      try {
+        await Future.delayed(Duration(seconds: 1));
+        Datagram message = sock.receive();
+        await sender(destIp, destPort);
+        te = String.fromCharCodes(message?.data);
+        notifyListeners();
+        debugPrint(String.fromCharCodes(message?.data));
+      } catch (e) {
+        debugPrint('ERRRRRRROR');
+      }
     }
-    return s;
-  }
-
-  receiver(int natPort) async {
-    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-    await Future.delayed(Duration(seconds: 2));
-    try {
-      Datagram message = sock.receive();
-      //    if (message == null) await Future.delayed(Duration(seconds: 2));
-      te = String.fromCharCodes(message?.data);
-      notifyListeners();
-      debugPrint(String.fromCharCodes(message?.data));
-    } on Exception {}
   }
 
   addServerListener() {
