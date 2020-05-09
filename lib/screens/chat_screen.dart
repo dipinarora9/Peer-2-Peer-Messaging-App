@@ -5,9 +5,7 @@ import 'package:provider/provider.dart';
 
 class ChatScreen extends StatelessWidget {
   final User user;
-
   ChatScreen(this.user);
-
   @override
   Widget build(BuildContext context) {
     final client = Provider.of<ClientService>(context, listen: false);

@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
+import 'package:peer2peer/screens/chat_screen.dart';
+import 'package:provider/provider.dart';
 
 import 'p2p.dart';
 
@@ -19,6 +21,7 @@ class ClientService with ChangeNotifier {
   Map<int, Node> outgoingNodes = {};
   Timer _timer;
   User me;
+  Encrypt myPair;
   Map<String, Chat> chats = {};
   String text = '';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -82,7 +85,7 @@ class ClientService with ChangeNotifier {
           else {
             if (chats.containsKey(message.sender.toString())) {
               chats[message.sender.toString()].chats[message.timestamp] =
-                  message;
+                  message..message=myPair.decryption(message.message);
               notifyListeners();
               forwardMessage(message..status = MessageStatus.SENT);
             } else
@@ -110,11 +113,14 @@ class ClientService with ChangeNotifier {
 //                  ),
 //                  (route) => route.settings.name == '/chats');
               chats.remove(message.sender.toString());
+            } else if (message.status == MessageStatus.ACCEPTED) {
+              chats[message.sender.toString()].key =
+                  Request.fromString(message.message).key;
+              chats[message.sender.toString()].allowed = true;
             } else if (message.status == MessageStatus.SENT) {
               debugPrint(chats[message.sender.toString()].toString());
               chats[message.sender.toString()].chats[message.timestamp].status =
                   message.status;
-              chats[message.sender.toString()].allowed = true;
             }
             notifyListeners();
           }
@@ -125,10 +131,12 @@ class ClientService with ChangeNotifier {
 
   allowChat(bool accept, Message message) {
     if (accept) {
-      forwardMessage(message..status = MessageStatus.SENT);
+      String senderKey = Request.fromString(message.message).key;
+      message..message = Request(myPair.pubKey).toString();
+      forwardMessage(message..status = MessageStatus.ACCEPTED);
       chats[message.sender.toString()] = Chat();
       chats[message.sender.toString()].allowed = true;
-      chats[message.sender.toString()].chats = {message.timestamp: message};
+      chats[message.sender.toString()].key = senderKey;
       notifyListeners();
     } else
       forwardMessage(message..status = MessageStatus.DENY);
@@ -148,6 +156,7 @@ class ClientService with ChangeNotifier {
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
     String table = String.fromCharCodes(data);
     me = User.fromString(table.split('>')[0]);
+    myPair = Encrypt();
     notifyListeners();
     debugPrint(me.toString());
     if (table.split('>').length > 1) {
@@ -290,32 +299,71 @@ class ClientService with ChangeNotifier {
     }
   }
 
-  createMessage(String username) async {
+  startNewChat(String username) async {
     final Socket server = await _connectToServer();
     server.add('UID_FROM_USERNAME-$username'.codeUnits);
     Uint8List data =
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
     User receiver = User.fromString(String.fromCharCodes(data));
     server.close();
+
+    if (chats.containsKey(receiver.toString())) {
+      openChat(receiver);
+    } else {
+      int time = DateTime.now().millisecondsSinceEpoch;
+      Message mess =
+          Message(me, receiver, Request(myPair.pubKey).toString(), time);
+      debugPrint('Message created $mess');
+      await forwardMessage(mess);
+      _appendMessage(receiver, mess, time);
+    }
+  }
+
+  _appendMessage(User receiver, Message mess, int time) {
+    if (!chats.containsKey(receiver.toString()))
+      chats[receiver.toString()] = Chat();
+    else {
+      chats[receiver.toString()].chats[time] = mess
+        ..message = myPair.decryption(mess.message);
+
+      Timer(Duration(seconds: 90), () {
+        if (chats[receiver.toString()].chats[time].status ==
+            MessageStatus.SENDING) {
+          chats[receiver.toString()].chats[time].status = MessageStatus.TIMEOUT;
+          notifyListeners();
+        }
+      });
+    }
+  }
+
+  openChat(User user) {
+    P2P.navKey.currentState.push(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: this,
+          child: ChatScreen(user),
+        ),
+      ),
+    );
+  }
+
+  createMessage(String username) async {
     int time = DateTime.now().millisecondsSinceEpoch;
-    Message mess = Message(me, receiver, chatBox.text, time);
-    chatBox.text = '';
-    notifyListeners();
+    User receiver;
+    chats.keys.any((user) {
+      if (user.endsWith('@$username')) {
+        receiver = User.fromString(user);
+        return true;
+      }
+      return false;
+    });
+    Message mess = Message(me, receiver,
+        myPair.encryption(chatBox.text, chats[receiver.toString()].key), time);
     debugPrint('Message created $mess');
     await forwardMessage(mess);
-    if (!chats.containsKey(receiver.toString())) {
-      chats[receiver.toString()] = Chat();
-      chats[receiver.toString()].chats = {time: mess};
-    } else
-      chats[receiver.toString()].chats[time] = mess;
+    chatBox.text = '';
+    _appendMessage(receiver, mess, time);
     notifyListeners();
-    Timer(Duration(seconds: 90), () {
-      if (chats[receiver.toString()].chats[time].status ==
-          MessageStatus.SENDING) {
-        chats[receiver.toString()].chats[time].status = MessageStatus.TIMEOUT;
-        notifyListeners();
-      }
-    });
   }
 
   deleteChats() {
@@ -338,11 +386,10 @@ class ClientService with ChangeNotifier {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(message.message),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(message.sender.username),
+                    child: Text(
+                      'Allow chat from user ${message.sender.username}?',
+                      textScaleFactor: 1.4,
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

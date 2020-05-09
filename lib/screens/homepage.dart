@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
   final TextEditingController _ip = TextEditingController();
+
 //  final TextEditingController a = TextEditingController();
 
   @override

@@ -1,3 +1,0 @@
-class Encryption {}
-
-class Decryption {}

@@ -10,7 +10,7 @@ dependencies:
     sdk: flutter
   cupertino_icons:
   provider:
-  crypto:
+  rsa_util:
   fluttertoast:
 
 dev_dependencies:

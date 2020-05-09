@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:rsa_util/rsa_util.dart';
+
 class Node {
   User _user;
   InternetAddress _ip;
@@ -61,25 +63,49 @@ class User {
   }
 }
 
+class Request {
+  String _key;
+
+  Request(String key) {
+    _key = key;
+  }
+
+  String get key => _key;
+
+  Request.fromString(String message) {
+    _key = message;
+  }
+
+  @override
+  String toString() {
+    return key;
+  }
+}
+
 class Chat {
   bool _allowed = false;
+  String _key;
   Map<int, Message> _chats = {};
 
   set allowed(v) => _allowed = v;
 
   bool get allowed => _allowed;
 
+  String get key => _key;
+
   Map<int, Message> get chats => _chats ?? {};
 
   set chats(v) => _chats = v;
+
+  set key(v) => _key = v;
 }
 
-enum MessageStatus { DENY, SENDING, SENT, TIMEOUT }
+enum MessageStatus { DENY, SENDING, SENT, TIMEOUT, ACCEPTED }
 
 class Message {
   User _sender;
   User _receiver;
-  String _message; // encrypted message -> Message_content
+  String _message;
   int _timestamp;
   MessageStatus _status = MessageStatus.SENDING;
 
@@ -99,6 +125,7 @@ class Message {
     _receiver = User.fromString(message.split('|')[1]);
     _timestamp = int.parse(message.split('|')[2]);
     _status = getStatus(int.parse(message.split('|')[3]));
+    if (_status == MessageStatus.ACCEPTED) _message = message.split('|')[4];
   }
 
   MessageStatus getStatus(int stat) {
@@ -129,7 +156,11 @@ class Message {
 
   set status(v) => _status = v;
 
+  set message(v) => _message = v;
+
   String acknowledgementMessage() {
+    if (_status == MessageStatus.ACCEPTED)
+      return 'ACKNOWLEDGED>$_receiver|$_sender|$_timestamp|${_status.index}|$_message';
     return 'ACKNOWLEDGED>$_receiver|$_sender|$_timestamp|${_status.index}';
   }
 
@@ -137,4 +168,23 @@ class Message {
   String toString() {
     return 'MESSAGE>$_sender|$_receiver|$_message|$_timestamp';
   }
+}
+
+class Encrypt {
+  String _publicKey;
+  String _privateKey;
+
+  Encrypt() {
+    List<String> keys = RSAUtil.generateKeys(1024);
+    _publicKey = keys[0];
+    _privateKey = keys[1];
+  }
+
+  String get pubKey => _publicKey;
+
+  String encryption(String msg, String pub) =>
+      RSAUtil.getInstance(pub, _privateKey).encryptByPublicKey(msg);
+
+  String decryption(String msg) =>
+      RSAUtil.getInstance('', _privateKey).decryptByPrivateKey(msg);
 }

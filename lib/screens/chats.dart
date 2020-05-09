@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:peer2peer/models/common_classes.dart';
-import 'package:peer2peer/screens/chat_screen.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:provider/provider.dart';
 
@@ -59,16 +58,7 @@ class AllChatsScreen extends StatelessWidget {
                         .last
                         .message ??
                     ''),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => ChangeNotifierProvider.value(
-                        value: client,
-                        child: ChatScreen(user),
-                      ),
-                    ),
-                  );
-                },
+                onTap: () => client.openChat(user),
               );
             },
             itemCount: value.chats.length,
@@ -110,12 +100,15 @@ class Dialogs {
                       decoration: InputDecoration(labelText: 'Message'),
                     ),
                   ),
-                OutlineButton(
-                  child: Text('Send'),
+                MaterialButton(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Send'),
+                  ),
                   color: Colors.blue,
                   onPressed: () async {
                     if (sendMessageRequest) {
-                      await client.createMessage(_username.text);
+                      await client.startNewChat(_username.text);
                       Navigator.of(context).pop();
                     } else {
                       bool result =
