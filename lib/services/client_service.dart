@@ -26,6 +26,7 @@ class ClientService with ChangeNotifier {
   String text = '';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController chatBox = TextEditingController();
+  final ScrollController chatController = ScrollController();
 
   ClientService(this._serverAddress);
 
@@ -85,7 +86,9 @@ class ClientService with ChangeNotifier {
           else {
             if (chats.containsKey(message.sender.toString())) {
               chats[message.sender.toString()].chats[message.timestamp] =
-                  message..message=myPair.decryption(message.message);
+                  message
+                    ..message = myPair.decryption(
+                        chats[message.sender.toString()].key, message.message);
               notifyListeners();
               forwardMessage(message..status = MessageStatus.SENT);
             } else
@@ -95,6 +98,7 @@ class ClientService with ChangeNotifier {
         } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED>')) {
           Message message =
               Message.fromAcknowledgement(String.fromCharCodes(data));
+          debugPrint(message.acknowledgementMessage());
 
           /// B - sender
           /// A - receiver
@@ -118,7 +122,6 @@ class ClientService with ChangeNotifier {
                   Request.fromString(message.message).key;
               chats[message.sender.toString()].allowed = true;
             } else if (message.status == MessageStatus.SENT) {
-              debugPrint(chats[message.sender.toString()].toString());
               chats[message.sender.toString()].chats[message.timestamp].status =
                   message.status;
             }
@@ -137,6 +140,7 @@ class ClientService with ChangeNotifier {
       chats[message.sender.toString()] = Chat();
       chats[message.sender.toString()].allowed = true;
       chats[message.sender.toString()].key = senderKey;
+      chats[message.sender.toString()].chats = <int, Message>{};
       notifyListeners();
     } else
       forwardMessage(message..status = MessageStatus.DENY);
@@ -144,7 +148,6 @@ class ClientService with ChangeNotifier {
   }
 
   Future<Socket> _connectToServer() async {
-    debugPrint(_serverAddress.host);
     final sock = await Socket.connect(_serverAddress.host, serverPort);
     return sock;
   }
@@ -300,40 +303,50 @@ class ClientService with ChangeNotifier {
   }
 
   startNewChat(String username) async {
+    if (username == me.username) {
+      Fluttertoast.showToast(msg: "Can't send message to yourself");
+      return;
+    }
     final Socket server = await _connectToServer();
     server.add('UID_FROM_USERNAME-$username'.codeUnits);
     Uint8List data =
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {}).first;
+    if (String.fromCharCodes(data) == 'null') {
+      Fluttertoast.showToast(msg: "User doesn't exist");
+      return;
+    }
     User receiver = User.fromString(String.fromCharCodes(data));
     server.close();
 
     if (chats.containsKey(receiver.toString())) {
+      P2P.navKey.currentState.pop(); //todo
       openChat(receiver);
     } else {
       int time = DateTime.now().millisecondsSinceEpoch;
       Message mess =
           Message(me, receiver, Request(myPair.pubKey).toString(), time);
-      debugPrint('Message created $mess');
       await forwardMessage(mess);
       _appendMessage(receiver, mess, time);
     }
   }
 
   _appendMessage(User receiver, Message mess, int time) {
-    if (!chats.containsKey(receiver.toString()))
+    if (!chats.containsKey(receiver.toString())) {
       chats[receiver.toString()] = Chat();
-    else {
-      chats[receiver.toString()].chats[time] = mess
-        ..message = myPair.decryption(mess.message);
+      chats[receiver.toString()].chats = <int, Message>{};
+    } else {
+      chats[receiver.toString()].chats[time] = mess;
 
       Timer(Duration(seconds: 90), () {
-        if (chats[receiver.toString()].chats[time].status ==
-            MessageStatus.SENDING) {
+        if (chats[receiver.toString()].chats[time] != null &&
+            chats[receiver.toString()].chats[time].status ==
+                MessageStatus.SENDING) {
           chats[receiver.toString()].chats[time].status = MessageStatus.TIMEOUT;
           notifyListeners();
         }
       });
     }
+    notifyListeners();
   }
 
   openChat(User user) {
@@ -357,13 +370,16 @@ class ClientService with ChangeNotifier {
       }
       return false;
     });
-    Message mess = Message(me, receiver,
-        myPair.encryption(chatBox.text, chats[receiver.toString()].key), time);
-    debugPrint('Message created $mess');
-    await forwardMessage(mess);
-    chatBox.text = '';
+    Message mess = Message(me, receiver, chatBox.text, time);
     _appendMessage(receiver, mess, time);
-    notifyListeners();
+    chatController.animateTo(chatController.position.maxScrollExtent + 100,
+        curve: Curves.easeIn, duration: Duration(milliseconds: 500));
+    Message f = Message.fromString(mess.toString());
+    await forwardMessage(f
+      ..message =
+          myPair.encryption(chats[receiver.toString()].key, chatBox.text));
+
+    chatBox.text = '';
   }
 
   deleteChats() {
@@ -396,7 +412,7 @@ class ClientService with ChangeNotifier {
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: OutlineButton(
+                        child: MaterialButton(
                           child: Text('Allow'),
                           color: Colors.green,
                           onPressed: () => allowChat(true, message),
@@ -404,7 +420,7 @@ class ClientService with ChangeNotifier {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: OutlineButton(
+                        child: MaterialButton(
                           child: Text('Deny'),
                           color: Colors.red,
                           onPressed: () => allowChat(false, message),

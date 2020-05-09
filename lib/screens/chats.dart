@@ -12,10 +12,11 @@ class AllChatsScreen extends StatelessWidget {
         Dialogs().showPopup(context, client, sendMessageRequest: false);
       });
     return Scaffold(
+      backgroundColor: Color(0xffCDEAC0),
       key: client.scaffoldKey,
       appBar: AppBar(
         title: Consumer<ClientService>(builder: (_, value, __) {
-          return Text("Chats of ${value?.me?.username}" ?? '');
+          return Text("Chats of ${value?.me?.username ?? ''}");
         }),
         actions: <Widget>[
           IconButton(
@@ -44,24 +45,24 @@ class AllChatsScreen extends StatelessWidget {
       ),
       body: Center(
         child: Consumer<ClientService>(builder: (_, value, __) {
-          return ListView.builder(
+          return ListView.separated(
             itemBuilder: (context, index) {
               final User user =
                   User.fromString(value.chats.keys.toList()[index]);
-              return ListTile(
-                title: Text(user.username ?? ''),
-                subtitle: Text(value.chats.values
-                        .toList()[index]
-                        .chats
-                        .values
-                        .toList()
-                        .last
-                        .message ??
-                    ''),
-                onTap: () => client.openChat(user),
+              final messages =
+                  value.chats.values.toList()[index].chats.values.toList();
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text(user.username ?? ''),
+                  subtitle: Text(
+                      messages.isEmpty ? '' : messages?.last?.message ?? ''),
+                  onTap: () => client.openChat(user),
+                ),
               );
             },
             itemCount: value.chats.length,
+            separatorBuilder: (_, __) => Divider(),
           );
         }),
       ),
@@ -92,20 +93,12 @@ class Dialogs {
                     decoration: InputDecoration(labelText: 'Username'),
                   ),
                 ),
-                if (sendMessageRequest)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: client.chatBox,
-                      decoration: InputDecoration(labelText: 'Message'),
-                    ),
-                  ),
                 MaterialButton(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text('Send'),
                   ),
-                  color: Colors.blue,
+                  color: Colors.lightBlueAccent,
                   onPressed: () async {
                     if (sendMessageRequest) {
                       await client.startNewChat(_username.text);

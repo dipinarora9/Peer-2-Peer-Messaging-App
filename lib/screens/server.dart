@@ -8,13 +8,17 @@ class ServerScreen extends StatelessWidget {
     final p2p = Provider.of<ServerService>(context, listen: false);
     return Scaffold(
       body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Consumer<ServerService>(builder: (_, value, __) {
               return ListView.builder(
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(value.allNodes.keys.toList()[index].toString()),
+                    trailing: Icon(value.allNodes.values.toList()[index].state
+                        ? Icons.check
+                        : Icons.not_interested),
                   );
                 },
                 itemCount: value.allNodes.length,

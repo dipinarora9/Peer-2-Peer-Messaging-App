@@ -47,7 +47,8 @@ class P2P with ChangeNotifier {
           toastLength: Toast.LENGTH_LONG);
       final InternetAddress address = await findServer();
       if (address == null) {
-        _serverSocket = await ServerSocket.bind('0.0.0.0', serverPort);
+        _serverSocket =
+            await ServerSocket.bind('0.0.0.0', serverPort, shared: true);
         _serverService = ServerService(_serverSocket);
         addServerListener();
         Fluttertoast.showToast(msg: 'Server started');
@@ -164,7 +165,7 @@ class P2P with ChangeNotifier {
           InternetAddress ip = sock.remoteAddress;
           User user = _serverService.getUID(ip: ip);
           _serverService.removeNode(user.uid);
-          // reply
+          notifyListeners();
         } else if (String.fromCharCodes(data).startsWith('DEAD-')) {
           //--------------------- change state of that ip to dead--------------
           InternetAddress ip =
@@ -185,7 +186,7 @@ class P2P with ChangeNotifier {
             sock.add('DEAD'.codeUnits);
           } else
             sock.add('NOT_DEAD'.codeUnits);
-          // reply
+          notifyListeners();
         } else if (String.fromCharCodes(data).startsWith('UID_FROM_IP-')) {
           //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
           InternetAddress ip =

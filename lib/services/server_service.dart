@@ -85,7 +85,8 @@ class ServerService with ChangeNotifier {
           return;
         }
       });
-      return allNodes[uid].user;
+      if (uid != null) return allNodes[uid].user;
+      return null;
     }
   }
 

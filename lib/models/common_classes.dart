@@ -139,6 +139,9 @@ class Message {
       case 2:
         return MessageStatus.SENT;
         break;
+      case 4:
+        return MessageStatus.ACCEPTED;
+        break;
       default:
         return MessageStatus.TIMEOUT;
     }
@@ -182,9 +185,9 @@ class Encrypt {
 
   String get pubKey => _publicKey;
 
-  String encryption(String msg, String pub) =>
+  String encryption(String pub, String msg) =>
       RSAUtil.getInstance(pub, _privateKey).encryptByPublicKey(msg);
 
-  String decryption(String msg) =>
-      RSAUtil.getInstance('', _privateKey).decryptByPrivateKey(msg);
+  String decryption(String pub, String msg) =>
+      RSAUtil.getInstance(pub, _privateKey).decryptByPrivateKey(msg);
 }
