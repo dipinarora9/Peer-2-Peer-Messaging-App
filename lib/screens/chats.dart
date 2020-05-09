@@ -27,6 +27,22 @@ class AllChatsScreen extends StatelessWidget {
           )
         ],
       ),
+      drawer: Drawer(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text('Quit network'),
+                  onTap: () => client.sendQuitRequest(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Center(
         child: Consumer<ClientService>(builder: (_, value, __) {
           return ListView.builder(
@@ -71,7 +87,6 @@ class Dialogs {
   showPopup(BuildContext context, ClientService client,
       {bool sendMessageRequest: true}) {
     TextEditingController _username = TextEditingController();
-    TextEditingController _message = TextEditingController();
     return showDialog(
       context: context,
       barrierDismissible: sendMessageRequest ? true : false,
@@ -91,7 +106,7 @@ class Dialogs {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
-                      controller: _message,
+                      controller: client.chatBox,
                       decoration: InputDecoration(labelText: 'Message'),
                     ),
                   ),
@@ -100,7 +115,7 @@ class Dialogs {
                   color: Colors.blue,
                   onPressed: () async {
                     if (sendMessageRequest) {
-                      await client.createMessage(_message.text, _username.text);
+                      await client.createMessage(_username.text);
                       Navigator.of(context).pop();
                     } else {
                       bool result =

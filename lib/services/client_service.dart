@@ -22,6 +22,7 @@ class ClientService with ChangeNotifier {
   Map<String, Chat> chats = {};
   String text = '';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final TextEditingController chatBox = TextEditingController();
 
   ClientService(this._serverAddress);
 
@@ -123,7 +124,6 @@ class ClientService with ChangeNotifier {
   }
 
   allowChat(bool accept, Message message) {
-    debugPrint("HERE IS IT- $message");
     if (accept) {
       forwardMessage(message..status = MessageStatus.SENT);
       chats[message.sender.toString()] = Chat();
@@ -194,12 +194,12 @@ class ClientService with ChangeNotifier {
       outgoingNodes[uid].state = false;
       outgoingNodes[uid].downCount++;
       if (outgoingNodes[uid].downCount > 2) {
-        sendPeerDeadRequest(uid);
+        _sendPeerDeadRequest(uid);
       }
     }
   }
 
-  sendPeerDeadRequest(int uid) async {
+  _sendPeerDeadRequest(int uid) async {
     final Socket server = await _connectToServer();
     server.add('DEAD-$uid'.codeUnits);
     Uint8List data =
@@ -215,7 +215,7 @@ class ClientService with ChangeNotifier {
     server.close();
   }
 
-  sendQuitRequest(int uid) async {
+  sendQuitRequest() async {
     final Socket server = await _connectToServer();
     server.add('QUIT'.codeUnits);
     server.close();
@@ -284,14 +284,13 @@ class ClientService with ChangeNotifier {
           await _sendMessage(message, allNodes[message.sender.uid - jump].ip);
         }
       } else {
-        /// call server for latest routing tables
-        /// call routing table periodically till the nodes has 8 other nodes
-        debugPrint('implement ');
+        await requestPeers(me.username);
+        forwardMessage(message);
       }
     }
   }
 
-  createMessage(String message, String username) async {
+  createMessage(String username) async {
     final Socket server = await _connectToServer();
     server.add('UID_FROM_USERNAME-$username'.codeUnits);
     Uint8List data =
@@ -299,7 +298,9 @@ class ClientService with ChangeNotifier {
     User receiver = User.fromString(String.fromCharCodes(data));
     server.close();
     int time = DateTime.now().millisecondsSinceEpoch;
-    Message mess = Message(me, receiver, message, time);
+    Message mess = Message(me, receiver, chatBox.text, time);
+    chatBox.text = '';
+    notifyListeners();
     debugPrint('Message created $mess');
     await forwardMessage(mess);
     if (!chats.containsKey(receiver.toString())) {
