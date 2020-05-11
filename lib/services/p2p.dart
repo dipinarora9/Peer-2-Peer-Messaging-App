@@ -28,6 +28,9 @@ class P2P with ChangeNotifier {
   InternetAddress serverAddress;
   ServerService _serverService;
   String te = '';
+  int natPort = -1;
+  String destIp = '';
+  int destPort = -1;
   String peer = '';
 
   bool get searching => _searching;
@@ -117,29 +120,39 @@ class P2P with ChangeNotifier {
     debugPrint(peer);
   }
 
-  initiateConnection() async {
-    String destIp = peer.substring(0, peer.indexOf(':'));
-    int destPort =
+  saveInfo() async {
+    destIp = peer.substring(0, peer.indexOf(':'));
+    destPort =
         int.parse(peer.substring(peer.indexOf(':') + 1, peer.indexOf('-')));
-    int natPort = int.parse(peer.substring(peer.indexOf('-') + 1));
-    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-    await sender(destIp, destPort);
-    await receiver(sock, destIp, destPort);
+    natPort = int.parse(peer.substring(peer.indexOf('-') + 1));
   }
 
-  sender(String destIp, int destPort) async {
-    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
+  sender(bool withNatPort) async {
+    RawDatagramSocket sock =
+        await RawDatagramSocket.bind('0.0.0.0', withNatPort ? natPort : 0);
     sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
     debugPrint('message sent');
     sock.close();
   }
 
-  receiver(RawDatagramSocket sock, String destIp, int destPort) async {
+  sendEmpty(bool withNatPort) async {
+    RawDatagramSocket sock =
+        await RawDatagramSocket.bind('0.0.0.0', withNatPort ? natPort : 0);
+    sock.send([], InternetAddress(destIp), destPort);
+    sock.send([], InternetAddress(destIp), destPort);
+    sock.send([], InternetAddress(destIp), destPort);
+    sock.send([], InternetAddress(destIp), destPort);
+    debugPrint('trying to punch hole');
+    sock.close();
+  }
+
+  receiver() async {
+    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
     while (te == '') {
       try {
         await Future.delayed(Duration(seconds: 1));
         Datagram message = sock.receive();
-        await sender(destIp, destPort);
+//        await sender();
         te = String.fromCharCodes(message?.data);
         notifyListeners();
         debugPrint(String.fromCharCodes(message?.data));
