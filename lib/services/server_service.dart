@@ -50,7 +50,7 @@ class ServerService with ChangeNotifier {
     allNodes[id] = node;
     notifyListeners();
     _lastNodeTillNow = allNodes.keys.last;
-    // returns map [int: node] of outbound connections for this node---------------------
+    // returns map [int: node] of outbound connections for this node
     Map<int, Node> peers = _connect(id);
     //     123@username>192.168.0.100|0@username;192.168.0.101|1@username2
     String code = '$id@$username>';
