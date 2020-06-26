@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camera/camera.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenshot/flutter_screenshot.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
 import 'package:peer2peer/screens/chats.dart';
@@ -12,9 +15,14 @@ import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
+
 class P2P with ChangeNotifier {
   final int serverPort = 32465;
   final int clientPort = 23654;
+  CameraController cameraController =
+      CameraController(cameras[0], ResolutionPreset.medium);
+  double val = 10;
 
   /// Defaults.. will be changed later
   /// for WIFI: 192.168.0.
@@ -33,6 +41,10 @@ class P2P with ChangeNotifier {
   int destPort = -1;
   String peer = '';
   int myPort = -1;
+  Uint8List frame;
+  CameraImage image;
+  Timer timer;
+  ScreenshotController ssController = ScreenshotController();
 
   bool get searching => _searching;
 
@@ -109,12 +121,12 @@ class P2P with ChangeNotifier {
     });
 
     debugPrint(myIp);
-    sock.send('Register,$num-$myIp;$myPort!'.codeUnits, InternetAddress(''),
-        2020); //todo: add server address
+    sock.send('Register,$num-$myIp;$myPort!'.codeUnits,
+        InternetAddress('13.127.251.194'), 2020); //todo: add server address
 
     await Future.delayed(Duration(seconds: 2));
     sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
-        InternetAddress(''), 2020); //todo: add server address
+        InternetAddress('13.127.251.194'), 2020); //todo: add server address
 
     sock.listen((event) {
       if (event == RawSocketEvent.read) {
@@ -124,6 +136,40 @@ class P2P with ChangeNotifier {
         debugPrint(peer);
       }
     });
+  }
+
+  setValue(double v) {
+    this.val = v;
+    notifyListeners();
+  }
+
+  startCamera() async {
+    await cameraController.initialize();
+    notifyListeners();
+  }
+
+//  captureFrames() {
+//    timer = Timer.periodic(Duration(milliseconds: 30), (f) {
+//      ssController.captureAsUint8List().then((value) {
+//        debugPrint('TIMER STARTED $value');
+//        this.frame = value;
+//        notifyListeners();
+//      });
+//    });
+////    cameraController.startImageStream((image) {
+//////      this.image = image;
+////      this.image = image;
+////      debugPrint('HERE IS IT ${image.height}');
+////      notifyListeners();
+//////      sock.send(_convertYUV420(image), InternetAddress(destIp), destPort);
+////    });
+//  }
+
+  stop() {
+    timer.cancel();
+//    cameraController.stopImageStream();
+    cameraController.dispose();
+    notifyListeners();
   }
 
   saveInfo() async {
@@ -136,10 +182,16 @@ class P2P with ChangeNotifier {
 
   sender(String message) async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-    sock.send(message != '' ? message.codeUnits : 'Empty message'.codeUnits,
-        InternetAddress(destIp), destPort);
+    sock.send('HERE IS IT - hole punched'.codeUnits, InternetAddress(destIp),
+        destPort);
+    timer = Timer.periodic(Duration(milliseconds: 30), (f) {
+      ssController.captureAsUint8List().then((value) {
+        debugPrint('TIMER STARTED $value');
+        sock.send(value, InternetAddress(destIp), destPort);
+        notifyListeners();
+      });
+    });
     debugPrint('message sent');
-    sock.close();
   }
 
   sendEmpty() async {
@@ -154,30 +206,19 @@ class P2P with ChangeNotifier {
 
   _receiver() async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-
+    int count = 0;
     sock.listen((event) {
       if (event == RawSocketEvent.read) {
         Datagram message = sock.receive();
-        if (message != null) {
-          te = String.fromCharCodes(message.data);
+        debugPrint('HERE IS IT ${message.data}');
+        if (message != null && count > 1) {
+          frame = message.data;
           notifyListeners();
-          debugPrint(String.fromCharCodes(message?.data));
+//          debugPrint(String.fromCharCodes(message?.data));
         }
+        count++;
       }
     });
-    if (natPort != myPort) {
-      RawDatagramSocket sock2 = await RawDatagramSocket.bind('0.0.0.0', myPort);
-      sock2.listen((event) {
-        if (event == RawSocketEvent.read) {
-          Datagram message = sock.receive();
-          if (message != null) {
-            te = String.fromCharCodes(message.data);
-            notifyListeners();
-            debugPrint(String.fromCharCodes(message?.data));
-          }
-        }
-      });
-    }
   }
 
   addServerListener() {

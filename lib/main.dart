@@ -1,10 +1,17 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:peer2peer/screens/homepage.dart';
 import 'package:provider/provider.dart';
 
 import 'services/p2p.dart';
 
-void main() => runApp(MyApp());
+List<CameraDescription> cameras;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -26,8 +33,8 @@ class MyApp extends StatelessWidget {
 
 /// Server :
 ///
-/// 1. unique url generate + generate record sheet against that id
-/// 2. server incoming + outgoing routing tables send (for punching)
+/// 1. unique url generate + generate record sheet against that id (dipin)
+/// 2. server incoming + outgoing routing tables send (for punching) (kaneki)
 /// 3. host needs to be updated
 /// 4. each peer should have two connections - one with server just for regularly updating its routing table..
 /// other connections will be with 19 other peers.
