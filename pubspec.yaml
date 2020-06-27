@@ -12,6 +12,8 @@ dependencies:
   provider:
   rsa_util:
   fluttertoast:
+  firebase_database:
+  connectivity:
 
 dev_dependencies:
   flutter_test:

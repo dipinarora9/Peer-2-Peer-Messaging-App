@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,6 +33,7 @@ class P2P with ChangeNotifier {
   String destIp = '';
   int destPort = -1;
   String peer = '';
+  int myPort = -1;
 
   bool get searching => _searching;
 
@@ -87,12 +89,19 @@ class P2P with ChangeNotifier {
   testingNatHolePunching(String num, String connectTo) async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
     sock.timeout(Duration(seconds: 10000));
-    int myPort = sock.port;
+    myPort = sock.port;
     List<NetworkInterface> l = await NetworkInterface.list();
     String myIp;
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    InternetAddressType addressType;
+    if (connectivityResult == ConnectivityResult.mobile) {
+      addressType = InternetAddressType.IPv6;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      addressType = InternetAddressType.IPv4;
+    }
     l.forEach((address) {
       address.addresses.any((add) {
-        if (add.type == InternetAddressType.IPv4) {
+        if (add.type == addressType) {
           myIp = add.address;
           return true;
         }
@@ -102,23 +111,20 @@ class P2P with ChangeNotifier {
 
     debugPrint(myIp);
     sock.send('Register,$num-$myIp;$myPort!'.codeUnits,
-        InternetAddress(''), 2020); //todo: add server address
-    Datagram data;
+        InternetAddress('13.127.251.194'), 2020); //todo: add server address
 
-    await Future.delayed(Duration(seconds: 5));
-    data = sock.receive();
-
-    debugPrint('Registered peers are');
-    debugPrint(String.fromCharCodes(data?.data));
-    debugPrint('sending connect request for $connectTo');
-
+    await Future.delayed(Duration(seconds: 2));
     sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
-        InternetAddress(''), 2020); //todo: add server address
-    await Future.delayed(Duration(seconds: 4));
-    peer = String.fromCharCodes(sock.receive()?.data);
-    saveInfo();
-    sock.close();
-    debugPrint(peer);
+        InternetAddress('13.127.251.194'), 2020); //todo: add server address
+
+    sock.listen((event) {
+      if (event == RawSocketEvent.read) {
+        peer = String.fromCharCodes(sock.receive()?.data);
+        saveInfo();
+        sock.close();
+        debugPrint(peer);
+      }
+    });
   }
 
   saveInfo() async {
@@ -133,7 +139,6 @@ class P2P with ChangeNotifier {
         await RawDatagramSocket.bind('0.0.0.0', withNatPort ? natPort : 0);
     sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
     debugPrint('message sent');
-    sock.close();
   }
 
   sendEmpty(bool withNatPort) async {
@@ -147,20 +152,21 @@ class P2P with ChangeNotifier {
     sock.close();
   }
 
-  receiver() async {
+  _receiver() async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-    while (te == '') {
-      try {
-        await Future.delayed(Duration(seconds: 1));
+    int count = 0;
+    sock.listen((event) {
+      if (event == RawSocketEvent.read) {
         Datagram message = sock.receive();
-//        await sender();
-        te = String.fromCharCodes(message?.data);
-        notifyListeners();
-        debugPrint(String.fromCharCodes(message?.data));
-      } catch (e) {
-        debugPrint('ERRRRRRROR');
+        debugPrint('HERE IS IT ${message.data}');
+        if (message != null && count > 1) {
+          te = String.fromCharCodes(message.data);
+          notifyListeners();
+//          debugPrint(String.fromCharCodes(message?.data));
+        }
+        count++;
       }
-    }
+    });
   }
 
   addServerListener() {
