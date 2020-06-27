@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -123,6 +124,25 @@ class ServerService with ChangeNotifier {
       distanceFromMe *= 2;
     }
     return mp;
+  }
+
+  send(int node, List<int> feed) {
+    // convert to msg and forward to node
+  }
+  generateRoutingTables(Map<int, List<int>> feed) {
+    // assume myID is given
+    int myID = 0, p = 1, x = 1;
+    for (int i = myID + p; i < feed.length; p *= 2) {
+//      if (i == myID) continue;
+      if (allNodes[i].state == true) {
+        int itemToBeSent = max(0, myID - x);
+        for (int j = myID; j > itemToBeSent; --j) {
+          // send feed[j] to ith noxde
+          send(i, feed[j]);
+        }
+        ++x;
+      }
+    }
   }
 
   closeServer() async {

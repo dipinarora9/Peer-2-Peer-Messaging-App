@@ -14,8 +14,6 @@ dependencies:
   fluttertoast:
   firebase_database:
   connectivity:
-  camera:
-  flutter_screenshot:
 
 dev_dependencies:
   flutter_test:

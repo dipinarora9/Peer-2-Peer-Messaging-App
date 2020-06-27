@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:camera/camera.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenshot/flutter_screenshot.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
 import 'package:peer2peer/screens/chats.dart';
@@ -15,14 +13,9 @@ import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
-import '../main.dart';
-
 class P2P with ChangeNotifier {
   final int serverPort = 32465;
   final int clientPort = 23654;
-  CameraController cameraController =
-      CameraController(cameras[0], ResolutionPreset.medium);
-  double val = 10;
 
   /// Defaults.. will be changed later
   /// for WIFI: 192.168.0.
@@ -41,10 +34,6 @@ class P2P with ChangeNotifier {
   int destPort = -1;
   String peer = '';
   int myPort = -1;
-  Uint8List frame;
-  CameraImage image;
-  Timer timer;
-  ScreenshotController ssController = ScreenshotController();
 
   bool get searching => _searching;
 
@@ -138,40 +127,6 @@ class P2P with ChangeNotifier {
     });
   }
 
-  setValue(double v) {
-    this.val = v;
-    notifyListeners();
-  }
-
-  startCamera() async {
-    await cameraController.initialize();
-    notifyListeners();
-  }
-
-//  captureFrames() {
-//    timer = Timer.periodic(Duration(milliseconds: 30), (f) {
-//      ssController.captureAsUint8List().then((value) {
-//        debugPrint('TIMER STARTED $value');
-//        this.frame = value;
-//        notifyListeners();
-//      });
-//    });
-////    cameraController.startImageStream((image) {
-//////      this.image = image;
-////      this.image = image;
-////      debugPrint('HERE IS IT ${image.height}');
-////      notifyListeners();
-//////      sock.send(_convertYUV420(image), InternetAddress(destIp), destPort);
-////    });
-//  }
-
-  stop() {
-    timer.cancel();
-//    cameraController.stopImageStream();
-    cameraController.dispose();
-    notifyListeners();
-  }
-
   saveInfo() async {
     destIp = peer.substring(0, peer.indexOf(':'));
     destPort =
@@ -184,13 +139,6 @@ class P2P with ChangeNotifier {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
     sock.send('HERE IS IT - hole punched'.codeUnits, InternetAddress(destIp),
         destPort);
-    timer = Timer.periodic(Duration(milliseconds: 30), (f) {
-      ssController.captureAsUint8List().then((value) {
-        debugPrint('TIMER STARTED $value');
-        sock.send(value, InternetAddress(destIp), destPort);
-        notifyListeners();
-      });
-    });
     debugPrint('message sent');
   }
 
@@ -212,7 +160,7 @@ class P2P with ChangeNotifier {
         Datagram message = sock.receive();
         debugPrint('HERE IS IT ${message.data}');
         if (message != null && count > 1) {
-          frame = message.data;
+          te = String.fromCharCodes(message.data);
           notifyListeners();
 //          debugPrint(String.fromCharCodes(message?.data));
         }
