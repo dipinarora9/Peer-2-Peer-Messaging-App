@@ -14,7 +14,7 @@ class P2P with ChangeNotifier {
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 
   String _shareLink;
-
+  String _roomKey;
   String get shareLink => _shareLink;
 
   bool get searching => _searching;
@@ -263,15 +263,37 @@ class P2P with ChangeNotifier {
         int.parse(externalIp.split(':')[1]), myIp, myPort);
   }
 
+  Future<Sockets> _createMyOffer() async {
+    SocketAddress clientOffer = await _createMySocket();
+    SocketAddress serverOffer = await _createMySocket();
+
+    return Sockets(serverOffer, clientOffer);
+  }
+
+  listenToDatabaseChanges() {
+    FirebaseDatabase.instance
+        .reference()
+        .child('rooms')
+        .child(_roomKey)
+        .onChildAdded
+        .listen((event) {
+      //todo: add in allnodes of server service
+      Sockets.fromMap(event.snapshot.value);
+    });
+  }
+
   createMeeting() async {
     DatabaseReference ref = FirebaseDatabase.instance.reference();
     ref = ref.child('rooms').push();
-    String roomKey = ref.key;
-    _createMySocket();
-    SocketAddress myOffer = await _createMySocket();
-    Map<String, dynamic> map = myOffer.toMap();
-    ref.update({'host': map});
-    map['room_id'] = roomKey;
+    _roomKey = ref.key;
+    Sockets myOffer = await _createMyOffer();
+    Map<String, dynamic> map = myOffer.server.toMap();
+    ref.update({'host': myOffer.toMap()});
+    listenToDatabaseChanges();
+    //todo: start server and client in their services
+    // todo: register client as first node
+
+    map['room_id'] = _roomKey;
     _shareLink = await _generateDynamicUrl(
         Uri.https('https://peer2peer.page.link', 'room', map));
     notifyListeners();

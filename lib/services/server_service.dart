@@ -22,7 +22,7 @@ class ServerService with ChangeNotifier {
     if (allNodes.length > 0) id = allNodes.keys.toList().last + 1;
     allNodes.values.any((v) {
       if (v.ip == ip) {
-        id = v.user.uid;
+        id = v.user.numbering;
         flag = true;
         return true;
       }
@@ -32,7 +32,7 @@ class ServerService with ChangeNotifier {
     if (!flag)
       allNodes.values.any((v) {
         if (v.state == false) {
-          id = v.user.uid;
+          id = v.user.numbering;
           return true;
         }
         return false;
@@ -73,7 +73,7 @@ class ServerService with ChangeNotifier {
       int uid;
       allNodes.forEach((k, v) {
         if (v.ip == ip) {
-          uid = v.user.uid;
+          uid = v.user.numbering;
           return;
         }
       });
@@ -82,7 +82,7 @@ class ServerService with ChangeNotifier {
       int uid;
       allNodes.forEach((k, v) {
         if (v.user.username == username) {
-          uid = v.user.uid;
+          uid = v.user.numbering;
           return;
         }
       });
@@ -112,12 +112,17 @@ class ServerService with ChangeNotifier {
     // for connecting 255 nodes only
     // cycle for outgoing
     int till = (_lastNodeTillNow + 1);
-    while (distanceFromMe + uid <= till ||
-        (distanceFromMe + uid) % till < uid) {
+    while (distanceFromMe + uid <= till) {
+      if (allNodes[uid + distanceFromMe].state == true)
+        mp[distanceFromMe + uid] =
+            allNodes[uid + distanceFromMe]; // assuming always present
+      distanceFromMe *= 2;
+    }
+    // outgoing cycle
+    while ((distanceFromMe + uid) % till < uid) {
       if (allNodes[(uid + distanceFromMe) % till].state == true)
-        mp[(distanceFromMe + uid) % till] = allNodes[
-            (uid + distanceFromMe) %
-                till]; // assuming always present
+        mp[(distanceFromMe + uid) % till] =
+            allNodes[(uid + distanceFromMe) % till]; // assuming always present
       distanceFromMe *= 2;
     }
     distanceFromMe = 1;
@@ -131,15 +136,56 @@ class ServerService with ChangeNotifier {
     while (till + uid - distanceFromMe > uid) {
       if (allNodes[uid - distanceFromMe + till].state == true)
         mp[uid - distanceFromMe + till] =
-        allNodes[uid - distanceFromMe + till]; // assuming always present
+            allNodes[uid - distanceFromMe + till]; // assuming always present
       distanceFromMe *= 2;
     }
     return mp;
   }
 
+// calculates incoming and outgoing nodes of newNode
+  smartNode(int myId, int lastNode) {
+    var outgoingNodes = [];
+    var incomingNodes = [];
+    int distance = 1, till = lastNode + 1;
+//     Outgoing Nodes
+    while (myId + distance <= lastNode) {
+      //todo: value at [myId + distance]
+      outgoingNodes.add(myId + distance);
+      distance *= 2;
+    }
+    // outgoing cycle
+    while ((myId + distance) % till < myId) {
+      //todo: value at [(myId + distance) % till]
+      outgoingNodes.add((myId + distance) % till);
+      distance *= 2;
+    }
+//    Incoming Nodes
+    distance = 1;
+    while (myId - distance >= 0) {
+      //todo: value at [myId - distance]
+      incomingNodes.add(myId - distance);
+      distance *= 2;
+    }
+    // incoming cycle
+    while (myId - distance + lastNode + 1 > myId) {
+      //todo: value at [myId - distance + _lastNodeTillNow + 1]
+      incomingNodes.add(myId - distance + lastNode + 1);
+      distance *= 2;
+    }
+  }
+
+// adds and delete incoming outgoing nodes when encounters new node in connection
+  updateRoutingTable(int myId, int newNodeId) {
+    double difference = log(newNodeId - myId) / log(e);
+    if (difference != (newNodeId - myId as double)) return;
+    // traverse in all connection
+    // discard
+  }
+
   send(int node, List<int> feed) {
     // convert to msg and forward to node
   }
+
   generateRoutingTables(Map<int, List<int>> feed) {
     // assume myID is given
     int myID = 0, p = 1, x = 1;
@@ -148,7 +194,7 @@ class ServerService with ChangeNotifier {
       if (allNodes[i].state == true) {
         int itemToBeSent = max(0, myID - x);
         for (int j = myID; j > itemToBeSent; --j) {
-          // send feed[j] to ith noxde
+          // send feed[j] to ith node
           send(i, feed[j]);
         }
         ++x;

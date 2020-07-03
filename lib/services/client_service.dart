@@ -63,7 +63,7 @@ class ClientService with ChangeNotifier {
             bool callServer = true;
             incomingNodes.values.any((peer) {
               if (peer.ip == sock.remoteAddress) {
-                incomingNodes[peer.user.uid].state = true;
+                incomingNodes[peer.user.numbering].state = true;
                 callServer = false;
                 return true;
               }
@@ -71,7 +71,7 @@ class ClientService with ChangeNotifier {
             });
             if (callServer) {
               User user = await requestUID(sock.remoteAddress.host);
-              incomingNodes[user.uid] = Node(sock.remoteAddress, user);
+              incomingNodes[user.numbering] = Node(sock.remoteAddress, user);
             }
           }
         } else if (String.fromCharCodes(data).startsWith('MESSAGE>')) {
@@ -81,7 +81,7 @@ class ClientService with ChangeNotifier {
           /// B - receiver
           ///
           /// A-> B
-          if (message.receiver.uid != me.uid)
+          if (message.receiver.numbering != me.numbering)
             forwardMessage(message);
           else {
             if (chats.containsKey(message.sender.toString())) {
@@ -104,7 +104,7 @@ class ClientService with ChangeNotifier {
           /// A - receiver
           ///
           /// A-> B
-          if (message.receiver.uid != me.uid)
+          if (message.receiver.numbering != me.numbering)
             forwardMessage(message);
           else {
             if (message.status == MessageStatus.DENY) {
@@ -167,8 +167,8 @@ class ClientService with ChangeNotifier {
       table.split(';').forEach((peer) async {
         debugPrint(peer);
         Node node = Node.fromString(peer);
-        outgoingNodes[node.user.uid] = node;
-        await pingPeer(node.user.uid);
+        outgoingNodes[node.user.numbering] = node;
+        await pingPeer(node.user.numbering);
       });
     }
     setTimer();
@@ -267,33 +267,33 @@ class ClientService with ChangeNotifier {
             90 &&
         message.status == MessageStatus.SENDING) return;
 
-    if (outgoingNodes.containsKey(message.receiver.uid) ||
-        outgoingNodes.containsKey(message.sender.uid)) {
+    if (outgoingNodes.containsKey(message.receiver.numbering) ||
+        outgoingNodes.containsKey(message.sender.numbering)) {
       debugPrint('Message outgoing $message');
-      if (outgoingNodes.containsKey(message.receiver.uid))
-        await _sendMessage(message, outgoingNodes[message.receiver.uid].ip);
+      if (outgoingNodes.containsKey(message.receiver.numbering))
+        await _sendMessage(message, outgoingNodes[message.receiver.numbering].ip);
       else
-        await _sendMessage(message, outgoingNodes[message.sender.uid].ip);
-    } else if (incomingNodes.containsKey(message.receiver.uid) ||
-        incomingNodes.containsKey(message.sender.uid)) {
+        await _sendMessage(message, outgoingNodes[message.sender.numbering].ip);
+    } else if (incomingNodes.containsKey(message.receiver.numbering) ||
+        incomingNodes.containsKey(message.sender.numbering)) {
       debugPrint('Message incoming $message');
-      if (incomingNodes.containsKey(message.receiver.uid))
-        await _sendMessage(message, incomingNodes[message.receiver.uid].ip);
+      if (incomingNodes.containsKey(message.receiver.numbering))
+        await _sendMessage(message, incomingNodes[message.receiver.numbering].ip);
       else
-        await _sendMessage(message, incomingNodes[message.sender.uid].ip);
+        await _sendMessage(message, incomingNodes[message.sender.numbering].ip);
     } else {
       debugPrint('Message hopping $message');
       Map<int, Node> allNodes = Map.from(incomingNodes);
       allNodes.addAll(outgoingNodes);
       if (allNodes.length > 0) {
-        if (message.receiver.uid > message.sender.uid) {
-          int dist = message.receiver.uid - message.sender.uid;
+        if (message.receiver.numbering > message.sender.numbering) {
+          int dist = message.receiver.numbering - message.sender.numbering;
           int jump = (math.log(dist) ~/ math.log(2)).toInt();
-          await _sendMessage(message, allNodes[message.sender.uid + jump].ip);
+          await _sendMessage(message, allNodes[message.sender.numbering + jump].ip);
         } else {
-          int dist = message.sender.uid - message.receiver.uid;
+          int dist = message.sender.numbering - message.receiver.numbering;
           int jump = (math.log(dist) ~/ math.log(2)).toInt();
-          await _sendMessage(message, allNodes[message.sender.uid - jump].ip);
+          await _sendMessage(message, allNodes[message.sender.numbering - jump].ip);
         }
       } else {
         await requestPeers(me.username);

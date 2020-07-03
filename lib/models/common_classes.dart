@@ -24,10 +24,10 @@ class SocketAddress {
   int get internalPort => _internalPort;
 
   SocketAddress.fromString(String sockAddress) {
-    _externalIp = InternetAddress(sockAddress.split(';')[0].split(':')[0]);
-    _externalPort = int.parse(sockAddress.split(';')[0].split(':')[1]);
-    _internalIp = InternetAddress(sockAddress.split(';')[1].split(':')[0]);
-    _internalPort = int.parse(sockAddress.split(';')[1].split(':')[1]);
+    _externalIp = InternetAddress(sockAddress.split(',')[0].split(':')[0]);
+    _externalPort = int.parse(sockAddress.split(',')[0].split(':')[1]);
+    _internalIp = InternetAddress(sockAddress.split(',')[1].split(':')[0]);
+    _internalPort = int.parse(sockAddress.split(',')[1].split(':')[1]);
   }
 
   SocketAddress.fromMap(Map<String, dynamic> map) {
@@ -48,19 +48,49 @@ class SocketAddress {
 
   @override
   String toString() {
-    return '$_externalIp:$_externalPort;$_internalIp:$_internalPort';
+    return '$_externalIp:$_externalPort,$_internalIp:$_internalPort';
+  }
+}
+
+class Sockets {
+  SocketAddress _server;
+  SocketAddress _client;
+
+  SocketAddress get server => _server;
+  SocketAddress get client => _client;
+  Sockets(this._server, this._client);
+
+  Sockets.fromMap(Map<String, dynamic> map) {
+    this._server = SocketAddress.fromMap(map['server']);
+    this._client = SocketAddress.fromMap(map['client']);
+  }
+  Sockets.fromString(String node) {
+    this._server = SocketAddress.fromString(node.split('|')[0]);
+    this._client = SocketAddress.fromString(node.split('|')[1]);
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = Map();
+    map['server'] = _server.toMap();
+    map['client'] = _client.toMap();
+    return map;
+  }
+
+  @override
+  String toString() {
+    return '$_server|$_client';
   }
 }
 
 class Node {
   User _user;
-  InternetAddress _ip;
+  Sockets _sockets;
   bool _state = true;
   int _downCount = 0;
 
   User get user => _user;
 
-  InternetAddress get ip => _ip;
+  Sockets get sockets => _sockets;
 
   bool get state => _state;
 
@@ -72,16 +102,16 @@ class Node {
 
   set downCount(value) => _downCount = value;
 
-  Node(this._ip, this._user);
+  Node(this._sockets, this._user);
 
   Node.fromString(String node) {
-    this._ip = InternetAddress(node.split('|')[0]);
-    this._user = User.fromString(node.split('|')[1]);
+    this._sockets = Sockets.fromString(node.split('&&')[0]);
+    this._user = User.fromString(node.split('&&')[1]);
   }
 
   @override
   toString() {
-    return '${_ip.host}|$_user;';
+    return '$_sockets&&$_user;';
   }
 }
 
@@ -90,27 +120,25 @@ class User {
   String _uid;
   String _username;
 
-  int get uid => _numbering;
+  String get uid => _uid;
+
+  int get numbering => _numbering;
 
   String get username => _username;
 
-  set uid(v) => _numbering = v;
-
-  set username(v) => _username = v;
-
-  User(int id, String username) {
-    _numbering = id;
-    _username = username;
-  }
+  User(int number, String uid, String username)
+      : _numbering = number,
+        _uid = uid,
+        _username = username;
 
   User.fromString(String s) {
     _numbering = int.parse(s.split('@')[0]);
-    _username = s.split('@')[1];
+    _uid = s.split('@')[1];
   }
 
   @override
   String toString() {
-    return '$_numbering@$_username';
+    return '$_numbering@$_uid';
   }
 }
 
