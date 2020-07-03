@@ -110,17 +110,28 @@ class ServerService with ChangeNotifier {
     Map<int, Node> mp = {};
     int distanceFromMe = 1;
     // for connecting 255 nodes only
-    while (distanceFromMe + uid <= _lastNodeTillNow) {
-      if (allNodes[uid + distanceFromMe].state == true)
-        mp[distanceFromMe + uid] =
-            allNodes[uid + distanceFromMe]; // assuming always present
+    // cycle for outgoing
+    int till = (_lastNodeTillNow + 1);
+    while (distanceFromMe + uid <= till ||
+        (distanceFromMe + uid) % till < uid) {
+      if (allNodes[(uid + distanceFromMe) % till].state == true)
+        mp[(distanceFromMe + uid) % till] = allNodes[
+            (uid + distanceFromMe) %
+                till]; // assuming always present
       distanceFromMe *= 2;
     }
     distanceFromMe = 1;
     while (uid - distanceFromMe >= 0) {
       if (allNodes[uid - distanceFromMe].state == true)
-        mp[distanceFromMe - uid] =
+        mp[uid - distanceFromMe] =
             allNodes[uid - distanceFromMe]; // assuming always present
+      distanceFromMe *= 2;
+    }
+    // cycle for incoming
+    while (till + uid - distanceFromMe > uid) {
+      if (allNodes[uid - distanceFromMe + till].state == true)
+        mp[uid - distanceFromMe + till] =
+        allNodes[uid - distanceFromMe + till]; // assuming always present
       distanceFromMe *= 2;
     }
     return mp;
