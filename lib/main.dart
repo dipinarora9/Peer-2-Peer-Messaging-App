@@ -40,3 +40,18 @@ class MyApp extends StatelessWidget {
 /// 1. Send dummy messages to incoming.
 /// 2. Send actual message to outgoing.
 /// 3. Create a separate connection with the server to update routing tables.
+
+/*
+* Creation of meeting
+*
+* Register user on firebase
+*
+* Server port
+* Client port
+*
+* database ->  create new unique room and add host details
+* generate url -> containing uuid of room and host details
+*
+* join room -> members will add their details in db and setup connection with the host at server port
+*
+* */

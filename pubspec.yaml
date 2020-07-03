@@ -14,6 +14,9 @@ dependencies:
   fluttertoast:
   firebase_database:
   connectivity:
+  firebase_dynamic_links:
+  share:
+  firebase_auth:
 
 dev_dependencies:
   flutter_test:

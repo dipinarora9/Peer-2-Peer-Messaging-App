@@ -2,6 +2,56 @@ import 'dart:io';
 
 import 'package:rsa_util/rsa_util.dart';
 
+class SocketAddress {
+  InternetAddress _externalIp;
+  int _externalPort;
+  InternetAddress _internalIp;
+  int _internalPort;
+
+  SocketAddress(
+    this._externalIp,
+    this._externalPort,
+    this._internalIp,
+    this._internalPort,
+  );
+
+  InternetAddress get externalIp => _externalIp;
+
+  int get externalPort => _externalPort;
+
+  InternetAddress get internalIp => _internalIp;
+
+  int get internalPort => _internalPort;
+
+  SocketAddress.fromString(String sockAddress) {
+    _externalIp = InternetAddress(sockAddress.split(';')[0].split(':')[0]);
+    _externalPort = int.parse(sockAddress.split(';')[0].split(':')[1]);
+    _internalIp = InternetAddress(sockAddress.split(';')[1].split(':')[0]);
+    _internalPort = int.parse(sockAddress.split(';')[1].split(':')[1]);
+  }
+
+  SocketAddress.fromMap(Map<String, dynamic> map) {
+    _externalIp = InternetAddress(map['external_ip']);
+    _externalPort = map['external_port'];
+    _internalIp = InternetAddress(map['internal_ip']);
+    _internalPort = map['internal_port'];
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = Map();
+    map['external_ip'] = _externalIp.address;
+    map['external_port'] = _externalPort;
+    map['internal_ip'] = _internalIp.address;
+    map['internal_port'] = _internalPort;
+    return map;
+  }
+
+  @override
+  String toString() {
+    return '$_externalIp:$_externalPort;$_internalIp:$_internalPort';
+  }
+}
+
 class Node {
   User _user;
   InternetAddress _ip;
@@ -36,30 +86,31 @@ class Node {
 }
 
 class User {
-  int _uid;
+  int _numbering;
+  String _uid;
   String _username;
 
-  int get uid => _uid;
+  int get uid => _numbering;
 
   String get username => _username;
 
-  set uid(v) => _uid = v;
+  set uid(v) => _numbering = v;
 
   set username(v) => _username = v;
 
   User(int id, String username) {
-    _uid = id;
+    _numbering = id;
     _username = username;
   }
 
   User.fromString(String s) {
-    _uid = int.parse(s.split('@')[0]);
+    _numbering = int.parse(s.split('@')[0]);
     _username = s.split('@')[1];
   }
 
   @override
   String toString() {
-    return '$_uid@$_username';
+    return '$_numbering@$_username';
   }
 }
 
