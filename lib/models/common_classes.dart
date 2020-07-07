@@ -2,53 +2,58 @@ import 'dart:io';
 
 import 'package:rsa_util/rsa_util.dart';
 
+class IpAddress {
+  InternetAddress _address;
+  int _port;
+
+  InternetAddress get address => _address;
+  int get port => _port;
+
+  IpAddress(this._address, this._port);
+
+  @override
+  String toString() {
+    return "$_address:$_port";
+  }
+
+  IpAddress.fromString (String ip) {
+    _address = InternetAddress(ip.split(':')[0]);
+    _port = int.parse(ip.split(':')[1]);
+  }
+}
+
 class SocketAddress {
-  InternetAddress _externalIp;
-  int _externalPort;
-  InternetAddress _internalIp;
-  int _internalPort;
+  IpAddress _external;
+  IpAddress _internal;
 
-  SocketAddress(
-    this._externalIp,
-    this._externalPort,
-    this._internalIp,
-    this._internalPort,
-  );
+  SocketAddress(this._external, this._internal);
 
-  InternetAddress get externalIp => _externalIp;
+  IpAddress get external => _external;
 
-  int get externalPort => _externalPort;
-
-  InternetAddress get internalIp => _internalIp;
-
-  int get internalPort => _internalPort;
+  IpAddress get internal => _internal;
 
   SocketAddress.fromString(String sockAddress) {
-    _externalIp = InternetAddress(sockAddress.split(',')[0].split(':')[0]);
-    _externalPort = int.parse(sockAddress.split(',')[0].split(':')[1]);
-    _internalIp = InternetAddress(sockAddress.split(',')[1].split(':')[0]);
-    _internalPort = int.parse(sockAddress.split(',')[1].split(':')[1]);
+    _external = IpAddress.fromString(sockAddress.split(',')[0]);
+    _internal = IpAddress.fromString(sockAddress.split(',')[1]);
   }
 
   SocketAddress.fromMap(Map<String, dynamic> map) {
-    _externalIp = InternetAddress(map['external_ip']);
-    _externalPort = map['external_port'];
-    _internalIp = InternetAddress(map['internal_ip']);
-    _internalPort = map['internal_port'];
+    _external = IpAddress(InternetAddress(map['external_ip']), map['external_port']);
+    _internal = IpAddress(InternetAddress(map['internal_ip']), map['internal_port']);
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = Map();
-    map['external_ip'] = _externalIp.address;
-    map['external_port'] = _externalPort;
-    map['internal_ip'] = _internalIp.address;
-    map['internal_port'] = _internalPort;
+    map['external_ip'] = _external.address;
+    map['external_port'] = _external.port;
+    map['internal_ip'] = _internal.address;
+    map['internal_port'] = internal.port;
     return map;
   }
 
   @override
   String toString() {
-    return '$_externalIp:$_externalPort,$_internalIp:$_internalPort';
+    return '$_external,$_internal';
   }
 }
 
