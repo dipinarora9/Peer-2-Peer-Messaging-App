@@ -53,5 +53,7 @@ class MyApp extends StatelessWidget {
 * generate url -> containing uuid of room and host details
 *
 * join room -> members will add their details in db and setup connection with the host at server port
-*
-* */
+
+* Server  (uid) -> routing
+* client ()-> routing table
+*/

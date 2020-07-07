@@ -13,9 +13,7 @@ import 'package:provider/provider.dart';
 import 'p2p.dart';
 
 class ClientService with ChangeNotifier {
-  final int serverPort = 32465;
-  final int clientPort = 23654;
-  static ServerSocket _clientSocket;
+  static RawDatagramSocket _clientSocket;
   InternetAddress _serverAddress;
   Map<int, Node> incomingNodes = {};
   Map<int, Node> outgoingNodes = {};
@@ -23,7 +21,8 @@ class ClientService with ChangeNotifier {
   User me;
   Encrypt myPair;
   Map<String, Chat> chats = {};
-  String text = '';
+
+//  String text = '';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController chatBox = TextEditingController();
   final ScrollController chatController = ScrollController();
@@ -48,21 +47,21 @@ class ClientService with ChangeNotifier {
   }
 
   setupIncomingServer(String username) async {
-    _clientSocket =
-        await ServerSocket.bind('0.0.0.0', clientPort, shared: true);
+    _clientSocket = await RawDatagramSocket.bind('0.0.0.0', clientPort);
     await setupListener();
     await requestPeers(username);
   }
 
   setupListener() {
-    _clientSocket.listen((sock) {
-      sock.listen((data) async {
-        if (String.fromCharCodes(data) == 'PING') {
+    _clientSocket.listen((sock) async {
+      if (sock == RawSocketEvent.read) {
+        Datagram datagram = _clientSocket.receive();
+        if (String.fromCharCodes(datagram.data) == 'PING') {
           sock.add('PONG'.codeUnits);
-          if (sock.remoteAddress != _serverAddress) {
+          if (datagram.address != _serverAddress) {
             bool callServer = true;
             incomingNodes.values.any((peer) {
-              if (peer.ip == sock.remoteAddress) {
+              if (peer.ip == datagram.address) {
                 incomingNodes[peer.user.numbering].state = true;
                 callServer = false;
                 return true;
@@ -70,12 +69,13 @@ class ClientService with ChangeNotifier {
               return false;
             });
             if (callServer) {
-              User user = await requestUID(sock.remoteAddress.host);
-              incomingNodes[user.numbering] = Node(sock.remoteAddress, user);
+              User user = await requestUID(datagram.address.host);
+              incomingNodes[user.numbering] = Node(datagram.address, user);
             }
           }
-        } else if (String.fromCharCodes(data).startsWith('MESSAGE>')) {
-          Message message = Message.fromString(String.fromCharCodes(data));
+        } else if (String.fromCharCodes(datagram.data).startsWith('MESSAGE>')) {
+          Message message =
+              Message.fromString(String.fromCharCodes(datagram.data));
 
           /// A - sender
           /// B - receiver
@@ -95,9 +95,10 @@ class ClientService with ChangeNotifier {
               showPopup(message);
             notifyListeners();
           }
-        } else if (String.fromCharCodes(data).startsWith('ACKNOWLEDGED>')) {
+        } else if (String.fromCharCodes(datagram.data)
+            .startsWith('ACKNOWLEDGED>')) {
           Message message =
-              Message.fromAcknowledgement(String.fromCharCodes(data));
+              Message.fromAcknowledgement(String.fromCharCodes(datagram.data));
           debugPrint(message.acknowledgementMessage());
 
           /// B - sender
@@ -128,7 +129,7 @@ class ClientService with ChangeNotifier {
             notifyListeners();
           }
         }
-      });
+      }
     });
   }
 
@@ -145,11 +146,6 @@ class ClientService with ChangeNotifier {
     } else
       forwardMessage(message..status = MessageStatus.DENY);
     P2P.navKey.currentState.pop();
-  }
-
-  Future<Socket> _connectToServer() async {
-    final sock = await Socket.connect(_serverAddress.host, serverPort);
-    return sock;
   }
 
   requestPeers(String username) async {
@@ -271,14 +267,16 @@ class ClientService with ChangeNotifier {
         outgoingNodes.containsKey(message.sender.numbering)) {
       debugPrint('Message outgoing $message');
       if (outgoingNodes.containsKey(message.receiver.numbering))
-        await _sendMessage(message, outgoingNodes[message.receiver.numbering].ip);
+        await _sendMessage(
+            message, outgoingNodes[message.receiver.numbering].ip);
       else
         await _sendMessage(message, outgoingNodes[message.sender.numbering].ip);
     } else if (incomingNodes.containsKey(message.receiver.numbering) ||
         incomingNodes.containsKey(message.sender.numbering)) {
       debugPrint('Message incoming $message');
       if (incomingNodes.containsKey(message.receiver.numbering))
-        await _sendMessage(message, incomingNodes[message.receiver.numbering].ip);
+        await _sendMessage(
+            message, incomingNodes[message.receiver.numbering].ip);
       else
         await _sendMessage(message, incomingNodes[message.sender.numbering].ip);
     } else {
@@ -289,11 +287,13 @@ class ClientService with ChangeNotifier {
         if (message.receiver.numbering > message.sender.numbering) {
           int dist = message.receiver.numbering - message.sender.numbering;
           int jump = (math.log(dist) ~/ math.log(2)).toInt();
-          await _sendMessage(message, allNodes[message.sender.numbering + jump].ip);
+          await _sendMessage(
+              message, allNodes[message.sender.numbering + jump].ip);
         } else {
           int dist = message.sender.numbering - message.receiver.numbering;
           int jump = (math.log(dist) ~/ math.log(2)).toInt();
-          await _sendMessage(message, allNodes[message.sender.numbering - jump].ip);
+          await _sendMessage(
+              message, allNodes[message.sender.numbering - jump].ip);
         }
       } else {
         await requestPeers(me.username);

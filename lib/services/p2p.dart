@@ -150,66 +150,6 @@ class P2P with ChangeNotifier {
 //    });
 //  }
 //
-//  addServerListener() {
-//    _serverSocket.listen((sock) {
-//      sock.listen((data) async {
-//        debugPrint("Message from client ${String.fromCharCodes(data)}");
-//        if (String.fromCharCodes(data) == "PING") {
-//          sock.add('PONG'.codeUnits);
-//        } else if (String.fromCharCodes(data).startsWith("ROUTING_TABLE-")) {
-//          String tables = _serverService.addNode(
-//              sock.remoteAddress, String.fromCharCodes(data).substring(14));
-//          sock.add(tables.codeUnits);
-//          // send routing tables
-//        } else if (String.fromCharCodes(data) == "QUIT") {
-//          //--------------------- change state of that ip who quits------------
-//          InternetAddress ip = sock.remoteAddress;
-//          User user = _serverService.getUID(ip: ip);
-//          _serverService.removeNode(user.uid);
-//          notifyListeners();
-//        } else if (String.fromCharCodes(data).startsWith('DEAD-')) {
-//          //--------------------- change state of that ip to dead--------------
-//          InternetAddress ip =
-//              InternetAddress(String.fromCharCodes(data).substring(5));
-//          User user = _serverService.getUID(ip: ip);
-//          bool dead;
-//          try {
-//            Socket _clientSock = await Socket.connect(
-//                _serverService.allNodes[user.uid].ip, clientPort);
-//            dead =
-//                await ping(_clientSock, _serverService.allNodes[user.uid].ip);
-//            _clientSock.close();
-//          } on Exception {
-//            dead = true;
-//          }
-//          if (dead) {
-//            _serverService.removeNode(user.uid);
-//            sock.add('DEAD'.codeUnits);
-//          } else
-//            sock.add('NOT_DEAD'.codeUnits);
-//          notifyListeners();
-//        } else if (String.fromCharCodes(data).startsWith('UID_FROM_IP-')) {
-//          //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
-//          InternetAddress ip =
-//              InternetAddress(String.fromCharCodes(data).substring(12));
-//          User user = _serverService.getUID(ip: ip);
-//          sock.add('$user'.codeUnits);
-//        } else if (String.fromCharCodes(data)
-//            .startsWith('UID_FROM_USERNAME-')) {
-//          //--------------------- get uid of given ip {'UID_FROM_USERNAME-abc}------
-//          String username = String.fromCharCodes(data).substring(18);
-//          User user = _serverService.getUID(username: username);
-//          sock.add('$user'.codeUnits);
-//        } else if (String.fromCharCodes(data).startsWith('USERNAME-')) {
-//          //--------------------- get uid of given ip {'USERNAME-abc}------
-//          String result = _serverService
-//              .checkUsername(String.fromCharCodes(data).substring(9));
-//          sock.add(result.codeUnits);
-//        }
-//      });
-//    });
-//  }
-//
 //  // Pinging server
 //  Future<bool> ping(Socket sock, InternetAddress address) async {
 //    sock.add('PING'.codeUnits);
