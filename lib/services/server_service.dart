@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,23 +12,25 @@ import 'p2p.dart';
 
 class ServerService with ChangeNotifier {
   Map<int, Node> allNodes = {};
-  StreamController<Datagram> _mySock;
+  StreamController<MyDatagram> _mySock = StreamController<MyDatagram>();
   final SocketAddress _serverSocket;
   int _lastNodeTillNow;
   final String _roomKey;
+  RawDatagramSocket _sock1;
+  RawDatagramSocket _sock2;
 
   ServerService(this._serverSocket, this._roomKey);
 
   listenToDatabaseChanges() async {
-    RawDatagramSocket sock1 =
-        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.externalPort);
-    RawDatagramSocket sock2 =
-        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.internalPort);
-    sock1.listen((event) {
-      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    _sock1 =
+        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.external.port);
+    _sock2 =
+        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.internal.port);
+    _sock1.listen((event) {
+      if (event == RawSocketEvent.read) _mySock.add(_sock1.receive());
     });
-    sock2.listen((event) {
-      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    _sock2.listen((event) {
+      if (event == RawSocketEvent.read) _mySock.add(_sock1.receive());
     });
     FirebaseDatabase.instance
         .reference()
@@ -40,62 +43,92 @@ class ServerService with ChangeNotifier {
     });
   }
 
+// Pinging server
+  Future<bool> ping(Socket sock, InternetAddress address) async {
+    sock.add('PING'.codeUnits);
+    Uint8List data = await sock.timeout(Duration(seconds: 1), onTimeout: (abc) {
+      return false;
+    }).first;
+    debugPrint("Message from server ${String.fromCharCodes(data)}");
+    if ('PONG' == String.fromCharCodes(data)) {
+      Fluttertoast.showToast(msg: 'Connected at host $address');
+      return true;
+    } else
+      return false;
+  }
+
   addServerListener() {
     _mySock.stream.listen((datagram) async {
       debugPrint("Message from client ${String.fromCharCodes(datagram.data)}");
       if (String.fromCharCodes(datagram.data) == "PING") {
-        sock.add('PONG'.codeUnits);
+        sendDatagramBuffer('PONG'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data)
           .startsWith("ROUTING_TABLE-")) {
-        String tables = _serverService.addNode(sock.remoteAddress,
+        String tables = addNode(datagram.address,
             String.fromCharCodes(datagram.data).substring(14));
-        sock.add(tables.codeUnits);
+        sendDatagramBuffer(tables.codeUnits, datagram);
         // send routing tables
       } else if (String.fromCharCodes(datagram.data) == "QUIT") {
         //--------------------- change state of that ip who quits------------
-        InternetAddress ip = sock.remoteAddress;
-        User user = _serverService.getUID(ip: ip);
-        _serverService.removeNode(user.uid);
+        InternetAddress ip = datagram.address;
+        User user = getUID(ip: ip);
+        removeNode(user.numbering);
         notifyListeners();
       } else if (String.fromCharCodes(datagram.data).startsWith('DEAD-')) {
         //--------------------- change state of that ip to dead--------------
         InternetAddress ip =
             InternetAddress(String.fromCharCodes(datagram.data).substring(5));
-        User user = _serverService.getUID(ip: ip);
+        User user = getUID(ip: ip);
         bool dead;
         try {
-          Socket _clientSock = await Socket.connect(
-              _serverService.allNodes[user.uid].ip, clientPort);
-          dead = await ping(_clientSock, _serverService.allNodes[user.uid].ip);
+          Socket _clientSock =
+              await Socket.connect(allNodes[user.uid].ip, clientPort);
+          dead = await ping(_clientSock, allNodes[user.uid].ip);
           _clientSock.close();
         } on Exception {
           dead = true;
         }
         if (dead) {
-          _serverService.removeNode(user.uid);
-          sock.add('DEAD'.codeUnits);
+          removeNode(user.numbering);
+          sendDatagramBuffer('DEAD'.codeUnits, datagram);
         } else
-          sock.add('NOT_DEAD'.codeUnits);
+          sendDatagramBuffer('NOT_DEAD'.codeUnits, datagram);
         notifyListeners();
-      } else if (String.fromCharCodes(datagram.data)
-          .startsWith('UID_FROM_IP-')) {
-        //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
-        InternetAddress ip =
-            InternetAddress(String.fromCharCodes(datagram.data).substring(12));
-        User user = _serverService.getUID(ip: ip);
-        sock.add('$user'.codeUnits);
-      } else if (String.fromCharCodes(data).startsWith('UID_FROM_USERNAME-')) {
-        //--------------------- get uid of given ip {'UID_FROM_USERNAME-abc}------
-        String username = String.fromCharCodes(datagram.data).substring(18);
-        User user = _serverService.getUID(username: username);
-        sock.add('$user'.codeUnits);
-      } else if (String.fromCharCodes(datagram.data).startsWith('USERNAME-')) {
-        //--------------------- get uid of given ip {'USERNAME-abc}------
-        String result = _serverService
-            .checkUsername(String.fromCharCodes(datagram.data).substring(9));
-        sock.add(result.codeUnits);
       }
+//      } else if (String.fromCharCodes(datagram.data)
+//          .startsWith('UID_FROM_IP-')) {
+//        //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
+//        InternetAddress ip =
+//            InternetAddress(String.fromCharCodes(datagram.data).substring(12));
+//        User user = getUID(ip: ip);
+//        sendDatagramBuffer('$user'.codeUnits, datagram);
+//      } else if (String.fromCharCodes(datagram.data)
+//          .startsWith('UID_FROM_USERNAME-')) {
+//        //--------------------- get uid of given ip {'UID_FROM_USERNAME-abc}------
+//        String username = String.fromCharCodes(datagram.data).substring(18);
+//        User user = getUID(username: username);
+//        sendDatagramBuffer('$user'.codeUnits, datagram);
+//      } else if (String.fromCharCodes(datagram.data).startsWith('USERNAME-')) {
+//        //--------------------- get uid of given ip {'USERNAME-abc}------
+//        String result =
+//            checkUsername(String.fromCharCodes(datagram.data).substring(9));
+//        sendDatagramBuffer(result.codeUnits, datagram);
+//      }
     });
+  }
+
+  void sendDatagramBuffer(Uint8List buffer, MyDatagram datagram) {
+    if (datagram.myPort == _sock1.port)
+      _sock1.send(buffer, datagram.address, datagram.port);
+    else
+      _sock2.send(buffer, datagram.address, datagram.port);
+  }
+
+  void sendBuffer(Uint8List buffer, SocketAddress dest) {
+    if (_serverSocket.external == dest.external)
+      _sock2.send(buffer, dest.internal.address, dest.internal.port);
+    else
+      _sock1.send(buffer, dest.external.address, dest.external.port);
   }
 
   int _getAvailableID(InternetAddress ip) {
@@ -174,20 +207,20 @@ class ServerService with ChangeNotifier {
     }
   }
 
-  checkUsername(String username) {
-    bool flag = true;
-    allNodes.values.any((v) {
-      if (v.user.username == username) {
-        flag = false;
-        return true;
-      }
-      return false;
-    });
-    if (flag)
-      return 'ACCEPTED>$username';
-    else
-      return 'DENIED>$username';
-  }
+//  checkUsername(String username) {
+//    bool flag = true;
+//    allNodes.values.any((v) {
+//      if (v.user.username == username) {
+//        flag = false;
+//        return true;
+//      }
+//      return false;
+//    });
+//    if (flag)
+//      return 'ACCEPTED>$username';
+//    else
+//      return 'DENIED>$username';
+//  }
 
   Map<int, Node> _connect(int uid) {
     Map<int, Node> mp = {};

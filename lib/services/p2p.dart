@@ -73,102 +73,7 @@ class P2P with ChangeNotifier {
 //      Fluttertoast.showToast(msg: 'This device is already a Server');
 //    }
 //  }
-
-//  testingNatHolePunching(String num, String connectTo) async {
-//    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
-//    sock.timeout(Duration(seconds: 10000));
-//    myPort = sock.port;
-//    List<NetworkInterface> l = await NetworkInterface.list();
-//    String myIp;
-//    var connectivityResult = await (Connectivity().checkConnectivity());
-//    InternetAddressType addressType;
-//    if (connectivityResult == ConnectivityResult.mobile) {
-//      addressType = InternetAddressType.IPv6;
-//    } else if (connectivityResult == ConnectivityResult.wifi) {
-//      addressType = InternetAddressType.IPv4;
-//    }
-//    l.forEach((address) {
-//      address.addresses.any((add) {
-//        if (add.type == addressType) {
-//          myIp = add.address;
-//          return true;
-//        }
-//        return false;
-//      });
-//    });
 //
-//    debugPrint(myIp);
-//    sock.send('Register,$num-$myIp;$myPort!'.codeUnits,
-//        InternetAddress('15.207.7.66'), 2020); //todo: add server address
-//
-//    await Future.delayed(Duration(seconds: 2));
-//    sock.send('Connect,$connectTo-$myIp;$myPort!'.codeUnits,
-//        InternetAddress('15.207.7.66'), 2020); //todo: add server address
-//
-//    sock.listen((event) {
-//      if (event == RawSocketEvent.read) {
-//        peer = String.fromCharCodes(sock.receive()?.data);
-//        saveInfo();
-//        sock.close();
-//        debugPrint(peer);
-//      }
-//    });
-//  }
-//
-//  saveInfo() async {
-//    destIp = peer.substring(0, peer.indexOf(':'));
-//    destPort =
-//        int.parse(peer.substring(peer.indexOf(':') + 1, peer.indexOf('-')));
-//    natPort = int.parse(peer.substring(peer.indexOf('-') + 1));
-//    _receiver();
-//  }
-//
-//  sender() async {
-//    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-//    sock.send('HELLO TO $destIp'.codeUnits, InternetAddress(destIp), destPort);
-//    debugPrint('message sent');
-//  }
-//
-//  sendEmpty(bool withNatPort) async {
-//    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-//    sock.send([], InternetAddress(destIp), destPort);
-//    sock.send([], InternetAddress(destIp), destPort);
-//    sock.send([], InternetAddress(destIp), destPort);
-//    sock.send([], InternetAddress(destIp), destPort);
-//    debugPrint('trying to punch hole');
-//    sock.close();
-//  }
-//
-//  _receiver() async {
-//    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', natPort);
-//    int count = 0;
-//    sock.listen((event) {
-//      if (event == RawSocketEvent.read) {
-//        Datagram message = sock.receive();
-//        debugPrint('HERE IS IT ${message.data}');
-//        if (message != null && count > 1) {
-//          te = String.fromCharCodes(message.data);
-//          notifyListeners();
-////          debugPrint(String.fromCharCodes(message?.data));
-//        }
-//        count++;
-//      }
-//    });
-//  }
-//
-//  // Pinging server
-//  Future<bool> ping(Socket sock, InternetAddress address) async {
-//    sock.add('PING'.codeUnits);
-//    Uint8List data = await sock.timeout(Duration(seconds: 1), onTimeout: (abc) {
-//      return false;
-//    }).first;
-//    debugPrint("Message from server ${String.fromCharCodes(data)}");
-//    if ('PONG' == String.fromCharCodes(data)) {
-//      Fluttertoast.showToast(msg: 'Connected at host $address');
-//      return true;
-//    } else
-//      return false;
-//  }
 
   joinMeetingViaUrl() async {
     PendingDynamicLinkData data =
@@ -199,9 +104,8 @@ class P2P with ChangeNotifier {
   Future<SocketAddress> _createMySocket() async {
     RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
     sock.timeout(Duration(seconds: 10000));
-    int myPort = sock.port;
     List<NetworkInterface> l = await NetworkInterface.list();
-    InternetAddress myIp;
+    IpAddress myIp;
     var connectivityResult = await (Connectivity().checkConnectivity());
     InternetAddressType addressType;
     if (connectivityResult == ConnectivityResult.mobile) {
@@ -212,17 +116,21 @@ class P2P with ChangeNotifier {
     l.forEach((address) {
       address.addresses.any((add) {
         if (add.type == addressType) {
-          myIp = add;
+          myIp = IpAddress(add, sock.port);
           return true;
         }
         return false;
       });
     });
-    String externalIp;
+
     sock.send('hey'.codeUnits, InternetAddress('15.207.7.66'), 2020);
-    externalIp = String.fromCharCodes(sock.receive().data);
-    return SocketAddress(InternetAddress(externalIp.split(':')[0]),
-        int.parse(externalIp.split(':')[1]), myIp, myPort);
+    RawSocketEvent event = await sock.first;
+    if (event == RawSocketEvent.read) {
+      IpAddress externalIp =
+          IpAddress.fromString(String.fromCharCodes(sock.receive().data));
+      return SocketAddress(externalIp, myIp);
+    } else
+      return null;
   }
 
   Future<List<SocketAddress>> _createHostOffer() async {

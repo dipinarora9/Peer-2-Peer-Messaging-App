@@ -2,24 +2,32 @@ import 'dart:io';
 
 import 'package:rsa_util/rsa_util.dart';
 
+class MyDatagram extends Datagram {
+  int _myPort;
+
+  MyDatagram(Datagram datagram, this._myPort)
+      : super(datagram.data, datagram.address, datagram.port);
+
+  int get myPort => _myPort;
+}
+
 class IpAddress {
   InternetAddress _address;
   int _port;
 
   InternetAddress get address => _address;
+
   int get port => _port;
 
   IpAddress(this._address, this._port);
 
-  @override
-  String toString() {
-    return "$_address:$_port";
-  }
-
-  IpAddress.fromString (String ip) {
+  IpAddress.fromString(String ip) {
     _address = InternetAddress(ip.split(':')[0]);
     _port = int.parse(ip.split(':')[1]);
   }
+
+  @override
+  String toString() => "$_address:$_port";
 }
 
 class SocketAddress {
@@ -32,15 +40,15 @@ class SocketAddress {
 
   IpAddress get internal => _internal;
 
-  SocketAddress.fromString(String sockAddress) {
-    _external = IpAddress.fromString(sockAddress.split(',')[0]);
-    _internal = IpAddress.fromString(sockAddress.split(',')[1]);
-  }
+  SocketAddress.fromString(String sockAddress)
+      : _external = IpAddress.fromString(sockAddress.split(',')[0]),
+        _internal = IpAddress.fromString(sockAddress.split(',')[1]);
 
-  SocketAddress.fromMap(Map<String, dynamic> map) {
-    _external = IpAddress(InternetAddress(map['external_ip']), map['external_port']);
-    _internal = IpAddress(InternetAddress(map['internal_ip']), map['internal_port']);
-  }
+  SocketAddress.fromMap(Map<String, dynamic> map)
+      : _external = IpAddress(
+            InternetAddress(map['external_ip']), map['external_port']),
+        _internal = IpAddress(
+            InternetAddress(map['internal_ip']), map['internal_port']);
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = Map();

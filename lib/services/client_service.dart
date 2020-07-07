@@ -16,13 +16,15 @@ import 'p2p.dart';
 class ClientService with ChangeNotifier {
   SocketAddress _clientSocket;
   SocketAddress _serverAddress;
-  StreamController<Datagram> _mySock;
+  StreamController<MyDatagram> _mySock = StreamController<MyDatagram>();
   Map<int, Node> incomingNodes = {};
   Map<int, Node> outgoingNodes = {};
   Timer _timer;
   User me;
   Encrypt myPair;
   Map<String, Chat> chats = {};
+  RawDatagramSocket _sock1;
+  RawDatagramSocket _sock2;
 
 //  String text = '';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -31,33 +33,35 @@ class ClientService with ChangeNotifier {
 
   ClientService(this._clientSocket, this._serverAddress);
 
-  Future<bool> requestUsername(String username) async {
-    bool flag = false;
-    final Socket server = await _connectToServer();
-    server.add('USERNAME-$username'.codeUnits);
-    Uint8List data =
-        await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
-      return false;
-    }).first;
-    if (String.fromCharCodes(data).startsWith('ACCEPTED>')) flag = true;
-    server.close();
-    if (flag)
-      setupIncomingServer(String.fromCharCodes(data).substring(9));
-    else
-      Fluttertoast.showToast(msg: 'Username already taken');
-    return flag;
-  }
+//  Future<bool> requestUsername(String username) async {
+//    bool flag = false;
+//    final Socket server = await _connectToServer();
+//    server.add('USERNAME-$username'.codeUnits);
+//    Uint8List data =
+//        await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
+//      return false;
+//    }).first;
+//    if (String.fromCharCodes(data).startsWith('ACCEPTED>')) flag = true;
+//    server.close();
+//    if (flag)
+//      setupIncomingServer(String.fromCharCodes(data).substring(9));
+//    else
+//      Fluttertoast.showToast(msg: 'Username already taken');
+//    return flag;
+//  }
 
   setupIncomingServer(String username) async {
-    RawDatagramSocket sock1 =
-        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.externalPort);
-    RawDatagramSocket sock2 =
-        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.internalPort);
-    sock1.listen((event) {
-      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    _sock1 =
+        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.external.port);
+    _sock2 =
+        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.internal.port);
+    _sock1.listen((event) {
+      if (event == RawSocketEvent.read)
+        _mySock.add(MyDatagram(_sock1.receive(), _sock1.port));
     });
-    sock2.listen((event) {
-      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    _sock2.listen((event) {
+      if (event == RawSocketEvent.read)
+        _mySock.add(MyDatagram(_sock2.receive(), _sock2.port));
     });
     await setupListener();
     await requestPeers(username);
@@ -66,22 +70,22 @@ class ClientService with ChangeNotifier {
   setupListener() {
     _mySock.stream.listen((datagram) async {
       if (String.fromCharCodes(datagram.data) == 'PING') {
-        sock.add('PONG'.codeUnits);
-        if (datagram.address != _serverAddress) {
-          bool callServer = true;
-          incomingNodes.values.any((peer) {
-            if (peer.ip == datagram.address) {
-              incomingNodes[peer.user.numbering].state = true;
-              callServer = false;
-              return true;
-            }
-            return false;
-          });
-          if (callServer) {
-            User user = await requestUID(datagram.address.host);
-            incomingNodes[user.numbering] = Node(datagram.address, user);
-          }
-        }
+        sendDatagramBuffer('PONG'.codeUnits, datagram);
+//        if (datagram.address != _serverAddress) {
+//          bool callServer = true;
+//          incomingNodes.values.any((peer) {
+//            if (peer.ip == datagram.address) {
+//              incomingNodes[peer.user.numbering].state = true;
+//              callServer = false;
+//              return true;
+//            }
+//            return false;
+//          });
+//          if (callServer) {
+//            User user = await requestUID(datagram.address.host);
+//            incomingNodes[user.numbering] = Node(datagram.address, user);
+//          }
+//        }
       } else if (String.fromCharCodes(datagram.data).startsWith('MESSAGE>')) {
         Message message =
             Message.fromString(String.fromCharCodes(datagram.data));
@@ -140,6 +144,20 @@ class ClientService with ChangeNotifier {
     });
   }
 
+  void sendDatagramBuffer(Uint8List buffer, MyDatagram datagram) {
+    if (datagram.myPort == _sock1.port)
+      _sock1.send(buffer, datagram.address, datagram.port);
+    else
+      _sock2.send(buffer, datagram.address, datagram.port);
+  }
+
+  void sendBuffer(Uint8List buffer, SocketAddress dest) {
+    if (_clientSocket.external == dest.external)
+      _sock2.send(buffer, dest.internal.address, dest.internal.port);
+    else
+      _sock1.send(buffer, dest.external.address, dest.external.port);
+  }
+
   allowChat(bool accept, Message message) {
     if (accept) {
       String senderKey = Request.fromString(message.message).key;
@@ -189,10 +207,10 @@ class ClientService with ChangeNotifier {
 
   pingPeer(uid) async {
     try {
-      final Socket peer =
-          await Socket.connect(outgoingNodes[uid].ip.host, clientPort);
-      peer.add('PING'.codeUnits);
+      sendBuffer('PING'.codeUnits, outgoingNodes[uid].socket);
       debugPrint('pinging $uid');
+
+      // todo: incorporate into listener
       Uint8List data =
           await peer.timeout(Duration(seconds: 1), onTimeout: (abc) {
         return false;
@@ -204,7 +222,6 @@ class ClientService with ChangeNotifier {
         outgoingNodes[uid].downCount++;
         outgoingNodes[uid].state = false;
       }
-      peer.close();
     } on Exception {
       outgoingNodes[uid].state = false;
       outgoingNodes[uid].downCount++;
@@ -214,9 +231,9 @@ class ClientService with ChangeNotifier {
     }
   }
 
+  //todo:  incorporate into listener
   _sendPeerDeadRequest(int uid) async {
-    final Socket server = await _connectToServer();
-    server.add('DEAD-$uid'.codeUnits);
+    sendBuffer('DEAD-$uid'.codeUnits, _serverAddress);
     Uint8List data =
         await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
       return false;
@@ -227,7 +244,6 @@ class ClientService with ChangeNotifier {
     } else if (String.fromCharCodes(data) == 'NOT_DEAD') {
       pingPeer(uid);
     }
-    server.close();
   }
 
   sendQuitRequest() async {
@@ -250,18 +266,16 @@ class ClientService with ChangeNotifier {
     return User.fromString(String.fromCharCodes(data));
   }
 
-  _sendMessage(Message message, InternetAddress address) async {
+  _sendMessage(Message message, SocketAddress dest) async {
     try {
-      final Socket peer = await Socket.connect(address.host, clientPort);
       debugPrint('Messages generated');
       if (message.status == MessageStatus.SENDING) {
         debugPrint(message.toString());
-        peer.add(message.toString().codeUnits);
+        sendBuffer(message.toString().codeUnits, dest);
       } else {
         debugPrint(message.acknowledgementMessage());
-        peer.add(message.acknowledgementMessage().codeUnits);
+        sendBuffer(message.acknowledgementMessage().codeUnits, dest);
       }
-      peer.close();
     } on Exception {}
   }
 
@@ -275,7 +289,7 @@ class ClientService with ChangeNotifier {
       debugPrint('Message outgoing $message');
       if (outgoingNodes.containsKey(message.receiver.numbering))
         await _sendMessage(
-            message, outgoingNodes[message.receiver.numbering].ip);
+            message, outgoingNodes[message.receiver.numbering].socket);
       else
         await _sendMessage(message, outgoingNodes[message.sender.numbering].ip);
     } else if (incomingNodes.containsKey(message.receiver.numbering) ||
@@ -283,9 +297,10 @@ class ClientService with ChangeNotifier {
       debugPrint('Message incoming $message');
       if (incomingNodes.containsKey(message.receiver.numbering))
         await _sendMessage(
-            message, incomingNodes[message.receiver.numbering].ip);
+            message, incomingNodes[message.receiver.numbering].socket);
       else
-        await _sendMessage(message, incomingNodes[message.sender.numbering].ip);
+        await _sendMessage(
+            message, incomingNodes[message.sender.numbering].socket);
     } else {
       debugPrint('Message hopping $message');
       Map<int, Node> allNodes = Map.from(incomingNodes);
@@ -295,12 +310,12 @@ class ClientService with ChangeNotifier {
           int dist = message.receiver.numbering - message.sender.numbering;
           int jump = (math.log(dist) ~/ math.log(2)).toInt();
           await _sendMessage(
-              message, allNodes[message.sender.numbering + jump].ip);
+              message, allNodes[message.sender.numbering + jump].socket);
         } else {
           int dist = message.sender.numbering - message.receiver.numbering;
           int jump = (math.log(dist) ~/ math.log(2)).toInt();
           await _sendMessage(
-              message, allNodes[message.sender.numbering - jump].ip);
+              message, allNodes[message.sender.numbering - jump].socket);
         }
       } else {
         await requestPeers(me.username);
