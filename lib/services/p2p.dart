@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:peer2peer/models/common_classes.dart';
+import 'package:peer2peer/services/client_service.dart';
+import 'package:peer2peer/services/server_service.dart';
 
 class P2P with ChangeNotifier {
   bool _searching = false;
@@ -15,6 +18,9 @@ class P2P with ChangeNotifier {
 
   String _shareLink;
   String _roomKey;
+  ClientService _clientService;
+  ServerService _serverService;
+
   String get shareLink => _shareLink;
 
   bool get searching => _searching;
@@ -164,14 +170,30 @@ class P2P with ChangeNotifier {
 //      return false;
 //  }
 
+  joinMeetingViaUrl() async {
+    PendingDynamicLinkData data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    _parseDynamicLinkData(data);
+  }
+
   joinMeeting(String meetingCode) async {
     PendingDynamicLinkData data = await FirebaseDynamicLinks.instance
         .getDynamicLink(Uri.https('https://peer2peer.page.link', meetingCode));
+    _parseDynamicLinkData(data);
   }
 
   _parseDynamicLinkData(PendingDynamicLinkData data) async {
     SocketAddress serverAddress =
         SocketAddress.fromMap(data.link.queryParameters);
+    SocketAddress mySocket = await _createMySocket();
+    DatabaseReference ref = FirebaseDatabase.instance.reference();
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    ref
+        .child('rooms')
+        .child(data.link.queryParameters['room_id'])
+        .child(user.uid)
+        .update(mySocket.toMap());
+    _clientService = ClientService(mySocket, serverAddress);
   }
 
   Future<SocketAddress> _createMySocket() async {
@@ -203,39 +225,31 @@ class P2P with ChangeNotifier {
         int.parse(externalIp.split(':')[1]), myIp, myPort);
   }
 
-  Future<Sockets> _createMyOffer() async {
+  Future<List<SocketAddress>> _createHostOffer() async {
     SocketAddress clientOffer = await _createMySocket();
     SocketAddress serverOffer = await _createMySocket();
 
-    return Sockets(serverOffer, clientOffer);
-  }
-
-  listenToDatabaseChanges() {
-    FirebaseDatabase.instance
-        .reference()
-        .child('rooms')
-        .child(_roomKey)
-        .onChildAdded
-        .listen((event) {
-      //todo: add in allnodes of server service
-      Sockets.fromMap(event.snapshot.value);
-    });
+    return [serverOffer, clientOffer];
   }
 
   createMeeting() async {
     DatabaseReference ref = FirebaseDatabase.instance.reference();
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
     ref = ref.child('rooms').push();
     _roomKey = ref.key;
-    Sockets myOffer = await _createMyOffer();
-    Map<String, dynamic> map = myOffer.server.toMap();
-    ref.update({'host': myOffer.toMap()});
+    List<SocketAddress> myOffer = await _createHostOffer();
+    _serverService = ServerService(myOffer[0], _roomKey);
+    _clientService = ClientService(myOffer[1], myOffer[0]);
+    Map<String, dynamic> serverMap = myOffer[0].toMap();
+    ref.update({'host': serverMap});
+    ref.update({user.uid: myOffer[1].toMap()});
     listenToDatabaseChanges();
     //todo: start server and client in their services
     // todo: register client as first node
 
-    map['room_id'] = _roomKey;
+    serverMap['room_id'] = _roomKey;
     _shareLink = await _generateDynamicUrl(
-        Uri.https('https://peer2peer.page.link', 'room', map));
+        Uri.https('https://peer2peer.page.link', 'room', serverMap));
     notifyListeners();
   }
 
@@ -254,26 +268,4 @@ class P2P with ChangeNotifier {
     final ShortDynamicLink shortLink = await parameters.buildShortLink();
     return shortLink.shortUrl.toString();
   }
-
-//  // Search for server in the LAN
-//  Future<InternetAddress> findServer() async {
-//    for (int i = _start; i <= _end; i++) {
-//      try {
-//        final Socket sock = await Socket.connect(mask + '$i', serverPort,
-//            timeout: Duration(milliseconds: 200));
-//        InternetAddress address = sock.address;
-//        Fluttertoast.showToast(msg: 'Found a server at $address, pinging');
-//        bool pong = await ping(sock, address);
-//        if (pong) {
-//          await sock.close();
-//          return address;
-//        } else
-//          continue;
-//      } on Exception {
-//        debugPrint('$mask$i is not a server');
-//        continue;
-//      }
-//    }
-//    return null;
-//  }
 }

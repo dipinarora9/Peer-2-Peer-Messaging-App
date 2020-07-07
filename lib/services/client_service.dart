@@ -13,8 +13,9 @@ import 'package:provider/provider.dart';
 import 'p2p.dart';
 
 class ClientService with ChangeNotifier {
-  static RawDatagramSocket _clientSocket;
-  InternetAddress _serverAddress;
+  SocketAddress _clientSocket;
+  SocketAddress _serverAddress;
+  StreamController<Datagram> _mySock;
   Map<int, Node> incomingNodes = {};
   Map<int, Node> outgoingNodes = {};
   Timer _timer;
@@ -27,7 +28,7 @@ class ClientService with ChangeNotifier {
   final TextEditingController chatBox = TextEditingController();
   final ScrollController chatController = ScrollController();
 
-  ClientService(this._serverAddress);
+  ClientService(this._clientSocket, this._serverAddress);
 
   Future<bool> requestUsername(String username) async {
     bool flag = false;
@@ -47,68 +48,74 @@ class ClientService with ChangeNotifier {
   }
 
   setupIncomingServer(String username) async {
-    _clientSocket = await RawDatagramSocket.bind('0.0.0.0', clientPort);
+    RawDatagramSocket sock1 =
+        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.externalPort);
+    RawDatagramSocket sock2 =
+        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.internalPort);
+    sock1.listen((event) {
+      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    });
+    sock2.listen((event) {
+      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    });
     await setupListener();
     await requestPeers(username);
   }
 
   setupListener() {
-    _clientSocket.listen((sock) async {
-      if (sock == RawSocketEvent.read) {
-        Datagram datagram = _clientSocket.receive();
-        if (String.fromCharCodes(datagram.data) == 'PING') {
-          sock.add('PONG'.codeUnits);
-          if (datagram.address != _serverAddress) {
-            bool callServer = true;
-            incomingNodes.values.any((peer) {
-              if (peer.ip == datagram.address) {
-                incomingNodes[peer.user.numbering].state = true;
-                callServer = false;
-                return true;
-              }
-              return false;
-            });
-            if (callServer) {
-              User user = await requestUID(datagram.address.host);
-              incomingNodes[user.numbering] = Node(datagram.address, user);
+    _mySock.stream.listen((datagram) async {
+      if (String.fromCharCodes(datagram.data) == 'PING') {
+        sock.add('PONG'.codeUnits);
+        if (datagram.address != _serverAddress) {
+          bool callServer = true;
+          incomingNodes.values.any((peer) {
+            if (peer.ip == datagram.address) {
+              incomingNodes[peer.user.numbering].state = true;
+              callServer = false;
+              return true;
             }
+            return false;
+          });
+          if (callServer) {
+            User user = await requestUID(datagram.address.host);
+            incomingNodes[user.numbering] = Node(datagram.address, user);
           }
-        } else if (String.fromCharCodes(datagram.data).startsWith('MESSAGE>')) {
-          Message message =
-              Message.fromString(String.fromCharCodes(datagram.data));
+        }
+      } else if (String.fromCharCodes(datagram.data).startsWith('MESSAGE>')) {
+        Message message =
+            Message.fromString(String.fromCharCodes(datagram.data));
 
-          /// A - sender
-          /// B - receiver
-          ///
-          /// A-> B
-          if (message.receiver.numbering != me.numbering)
-            forwardMessage(message);
-          else {
-            if (chats.containsKey(message.sender.toString())) {
-              chats[message.sender.toString()].chats[message.timestamp] =
-                  message
-                    ..message = myPair.decryption(
-                        chats[message.sender.toString()].key, message.message);
-              notifyListeners();
-              forwardMessage(message..status = MessageStatus.SENT);
-            } else
-              showPopup(message);
+        /// A - sender
+        /// B - receiver
+        ///
+        /// A-> B
+        if (message.receiver.numbering != me.numbering)
+          forwardMessage(message);
+        else {
+          if (chats.containsKey(message.sender.toString())) {
+            chats[message.sender.toString()].chats[message.timestamp] = message
+              ..message = myPair.decryption(
+                  chats[message.sender.toString()].key, message.message);
             notifyListeners();
-          }
-        } else if (String.fromCharCodes(datagram.data)
-            .startsWith('ACKNOWLEDGED>')) {
-          Message message =
-              Message.fromAcknowledgement(String.fromCharCodes(datagram.data));
-          debugPrint(message.acknowledgementMessage());
+            forwardMessage(message..status = MessageStatus.SENT);
+          } else
+            showPopup(message);
+          notifyListeners();
+        }
+      } else if (String.fromCharCodes(datagram.data)
+          .startsWith('ACKNOWLEDGED>')) {
+        Message message =
+            Message.fromAcknowledgement(String.fromCharCodes(datagram.data));
+        debugPrint(message.acknowledgementMessage());
 
-          /// B - sender
-          /// A - receiver
-          ///
-          /// A-> B
-          if (message.receiver.numbering != me.numbering)
-            forwardMessage(message);
-          else {
-            if (message.status == MessageStatus.DENY) {
+        /// B - sender
+        /// A - receiver
+        ///
+        /// A-> B
+        if (message.receiver.numbering != me.numbering)
+          forwardMessage(message);
+        else {
+          if (message.status == MessageStatus.DENY) {
 //              P2P.navKey.currentState.pushAndRemoveUntil(
 //                  MaterialPageRoute(
 //                    builder: (_) => ChangeNotifierProvider.value(
@@ -117,17 +124,16 @@ class ClientService with ChangeNotifier {
 //                    ),
 //                  ),
 //                  (route) => route.settings.name == '/chats');
-              chats.remove(message.sender.toString());
-            } else if (message.status == MessageStatus.ACCEPTED) {
-              chats[message.sender.toString()].key =
-                  Request.fromString(message.message).key;
-              chats[message.sender.toString()].allowed = true;
-            } else if (message.status == MessageStatus.SENT) {
-              chats[message.sender.toString()].chats[message.timestamp].status =
-                  message.status;
-            }
-            notifyListeners();
+            chats.remove(message.sender.toString());
+          } else if (message.status == MessageStatus.ACCEPTED) {
+            chats[message.sender.toString()].key =
+                Request.fromString(message.message).key;
+            chats[message.sender.toString()].allowed = true;
+          } else if (message.status == MessageStatus.SENT) {
+            chats[message.sender.toString()].chats[message.timestamp].status =
+                message.status;
           }
+          notifyListeners();
         }
       }
     });
@@ -435,5 +441,21 @@ class ClientService with ChangeNotifier {
         );
       },
     );
+  }
+
+  broadcastMessage(Map<int, List<int>> feed) {
+    // assume myID is given
+    int myID = 0, p = 1, x = 1;
+    for (int i = myID + p; i < feed.length; p *= 2) {
+//      if (i == myID) continue;
+      if (allNodes[i].state == true) {
+        int itemToBeSent = max(0, myID - x);
+        for (int j = myID; j > itemToBeSent; --j) {
+          // send feed[j] to ith node
+          send(i, feed[j]);
+        }
+        ++x;
+      }
+    }
   }
 }

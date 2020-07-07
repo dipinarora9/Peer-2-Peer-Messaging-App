@@ -52,45 +52,15 @@ class SocketAddress {
   }
 }
 
-class Sockets {
-  SocketAddress _server;
-  SocketAddress _client;
-
-  SocketAddress get server => _server;
-  SocketAddress get client => _client;
-  Sockets(this._server, this._client);
-
-  Sockets.fromMap(Map<String, dynamic> map) {
-    this._server = SocketAddress.fromMap(map['server']);
-    this._client = SocketAddress.fromMap(map['client']);
-  }
-  Sockets.fromString(String node) {
-    this._server = SocketAddress.fromString(node.split('|')[0]);
-    this._client = SocketAddress.fromString(node.split('|')[1]);
-  }
-
-  Map<String, dynamic> toMap() {
-    Map<String, dynamic> map = Map();
-    map['server'] = _server.toMap();
-    map['client'] = _client.toMap();
-    return map;
-  }
-
-  @override
-  String toString() {
-    return '$_server|$_client';
-  }
-}
-
 class Node {
   User _user;
-  Sockets _sockets;
+  SocketAddress _socket;
   bool _state = true;
   int _downCount = 0;
 
   User get user => _user;
 
-  Sockets get sockets => _sockets;
+  SocketAddress get socket => _socket;
 
   bool get state => _state;
 
@@ -102,16 +72,16 @@ class Node {
 
   set downCount(value) => _downCount = value;
 
-  Node(this._sockets, this._user);
+  Node(this._socket, this._user);
 
   Node.fromString(String node) {
-    this._sockets = Sockets.fromString(node.split('&&')[0]);
+    this._socket = SocketAddress.fromString(node.split('&&')[0]);
     this._user = User.fromString(node.split('&&')[1]);
   }
 
   @override
   toString() {
-    return '$_sockets&&$_user;';
+    return '$_socket&&$_user;';
   }
 }
 

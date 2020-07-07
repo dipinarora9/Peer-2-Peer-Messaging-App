@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
@@ -9,72 +11,93 @@ import 'p2p.dart';
 
 class ServerService with ChangeNotifier {
   Map<int, Node> allNodes = {};
-
-  final RawDatagramSocket _serverSocket;
+  StreamController<Datagram> _mySock;
+  final SocketAddress _serverSocket;
   int _lastNodeTillNow;
+  final String _roomKey;
 
-  ServerService(this._serverSocket);
+  ServerService(this._serverSocket, this._roomKey);
 
-//  addServerListener() {
-//    _serverSocket.listen((sock) {
-//      sock.listen((data) async {
-//        debugPrint("Message from client ${String.fromCharCodes(data)}");
-//        if (String.fromCharCodes(data) == "PING") {
-//          sock.add('PONG'.codeUnits);
-//        } else if (String.fromCharCodes(data).startsWith("ROUTING_TABLE-")) {
-//          String tables = _serverService.addNode(
-//              sock.remoteAddress, String.fromCharCodes(data).substring(14));
-//          sock.add(tables.codeUnits);
-//          // send routing tables
-//        } else if (String.fromCharCodes(data) == "QUIT") {
-//          //--------------------- change state of that ip who quits------------
-//          InternetAddress ip = sock.remoteAddress;
-//          User user = _serverService.getUID(ip: ip);
-//          _serverService.removeNode(user.uid);
-//          notifyListeners();
-//        } else if (String.fromCharCodes(data).startsWith('DEAD-')) {
-//          //--------------------- change state of that ip to dead--------------
-//          InternetAddress ip =
-//              InternetAddress(String.fromCharCodes(data).substring(5));
-//          User user = _serverService.getUID(ip: ip);
-//          bool dead;
-//          try {
-//            Socket _clientSock = await Socket.connect(
-//                _serverService.allNodes[user.uid].ip, clientPort);
-//            dead =
-//                await ping(_clientSock, _serverService.allNodes[user.uid].ip);
-//            _clientSock.close();
-//          } on Exception {
-//            dead = true;
-//          }
-//          if (dead) {
-//            _serverService.removeNode(user.uid);
-//            sock.add('DEAD'.codeUnits);
-//          } else
-//            sock.add('NOT_DEAD'.codeUnits);
-//          notifyListeners();
-//        } else if (String.fromCharCodes(data).startsWith('UID_FROM_IP-')) {
-//          //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
-//          InternetAddress ip =
-//              InternetAddress(String.fromCharCodes(data).substring(12));
-//          User user = _serverService.getUID(ip: ip);
-//          sock.add('$user'.codeUnits);
-//        } else if (String.fromCharCodes(data)
-//            .startsWith('UID_FROM_USERNAME-')) {
-//          //--------------------- get uid of given ip {'UID_FROM_USERNAME-abc}------
-//          String username = String.fromCharCodes(data).substring(18);
-//          User user = _serverService.getUID(username: username);
-//          sock.add('$user'.codeUnits);
-//        } else if (String.fromCharCodes(data).startsWith('USERNAME-')) {
-//          //--------------------- get uid of given ip {'USERNAME-abc}------
-//          String result = _serverService
-//              .checkUsername(String.fromCharCodes(data).substring(9));
-//          sock.add(result.codeUnits);
-//        }
-//      });
-//    });
-//  }
-//
+  listenToDatabaseChanges() async {
+    RawDatagramSocket sock1 =
+        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.externalPort);
+    RawDatagramSocket sock2 =
+        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.internalPort);
+    sock1.listen((event) {
+      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    });
+    sock2.listen((event) {
+      if (event == RawSocketEvent.read) _mySock.add(sock1.receive());
+    });
+    FirebaseDatabase.instance
+        .reference()
+        .child('rooms')
+        .child(_roomKey)
+        .onChildAdded
+        .listen((event) {
+      //todo: add in allnodes of server service
+      SocketAddress.fromMap(event.snapshot.value);
+    });
+  }
+
+  addServerListener() {
+    _mySock.stream.listen((datagram) async {
+      debugPrint("Message from client ${String.fromCharCodes(datagram.data)}");
+      if (String.fromCharCodes(datagram.data) == "PING") {
+        sock.add('PONG'.codeUnits);
+      } else if (String.fromCharCodes(datagram.data)
+          .startsWith("ROUTING_TABLE-")) {
+        String tables = _serverService.addNode(sock.remoteAddress,
+            String.fromCharCodes(datagram.data).substring(14));
+        sock.add(tables.codeUnits);
+        // send routing tables
+      } else if (String.fromCharCodes(datagram.data) == "QUIT") {
+        //--------------------- change state of that ip who quits------------
+        InternetAddress ip = sock.remoteAddress;
+        User user = _serverService.getUID(ip: ip);
+        _serverService.removeNode(user.uid);
+        notifyListeners();
+      } else if (String.fromCharCodes(datagram.data).startsWith('DEAD-')) {
+        //--------------------- change state of that ip to dead--------------
+        InternetAddress ip =
+            InternetAddress(String.fromCharCodes(datagram.data).substring(5));
+        User user = _serverService.getUID(ip: ip);
+        bool dead;
+        try {
+          Socket _clientSock = await Socket.connect(
+              _serverService.allNodes[user.uid].ip, clientPort);
+          dead = await ping(_clientSock, _serverService.allNodes[user.uid].ip);
+          _clientSock.close();
+        } on Exception {
+          dead = true;
+        }
+        if (dead) {
+          _serverService.removeNode(user.uid);
+          sock.add('DEAD'.codeUnits);
+        } else
+          sock.add('NOT_DEAD'.codeUnits);
+        notifyListeners();
+      } else if (String.fromCharCodes(datagram.data)
+          .startsWith('UID_FROM_IP-')) {
+        //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
+        InternetAddress ip =
+            InternetAddress(String.fromCharCodes(datagram.data).substring(12));
+        User user = _serverService.getUID(ip: ip);
+        sock.add('$user'.codeUnits);
+      } else if (String.fromCharCodes(data).startsWith('UID_FROM_USERNAME-')) {
+        //--------------------- get uid of given ip {'UID_FROM_USERNAME-abc}------
+        String username = String.fromCharCodes(datagram.data).substring(18);
+        User user = _serverService.getUID(username: username);
+        sock.add('$user'.codeUnits);
+      } else if (String.fromCharCodes(datagram.data).startsWith('USERNAME-')) {
+        //--------------------- get uid of given ip {'USERNAME-abc}------
+        String result = _serverService
+            .checkUsername(String.fromCharCodes(datagram.data).substring(9));
+        sock.add(result.codeUnits);
+      }
+    });
+  }
+
   int _getAvailableID(InternetAddress ip) {
     // check if state is not true
     int id = 0;
@@ -244,22 +267,6 @@ class ServerService with ChangeNotifier {
 
   send(int node, List<int> feed) {
     // convert to msg and forward to node
-  }
-
-  generateRoutingTables(Map<int, List<int>> feed) {
-    // assume myID is given
-    int myID = 0, p = 1, x = 1;
-    for (int i = myID + p; i < feed.length; p *= 2) {
-//      if (i == myID) continue;
-      if (allNodes[i].state == true) {
-        int itemToBeSent = max(0, myID - x);
-        for (int j = myID; j > itemToBeSent; --j) {
-          // send feed[j] to ith node
-          send(i, feed[j]);
-        }
-        ++x;
-      }
-    }
   }
 
   closeServer() async {
