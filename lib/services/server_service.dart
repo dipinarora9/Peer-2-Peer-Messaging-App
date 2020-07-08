@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:firebase_database/firebase_database.dart';
@@ -18,6 +17,7 @@ class ServerService with ChangeNotifier {
   final String _roomKey;
   RawDatagramSocket _sock1;
   RawDatagramSocket _sock2;
+  Map<String, List<MyDatagram>> _deadBacklog = {};
 
   ServerService(this._serverSocket, this._roomKey);
 
@@ -40,63 +40,51 @@ class ServerService with ChangeNotifier {
         .child(_roomKey)
         .onChildAdded
         .listen((event) {
-      //todo: create uid & add node
-      SocketAddress.fromMap(event.snapshot.value);
+      SocketAddress address = SocketAddress.fromMap(event.snapshot.value);
+      addNode(address, event.snapshot.key, event.snapshot.value['username']);
+      //todo: punching hole
     });
-  }
-
-// Pinging server
-  Future<bool> ping(Socket sock, InternetAddress address) async {
-    sock.add('PING'.codeUnits);
-    Uint8List data = await sock.timeout(Duration(seconds: 1), onTimeout: (abc) {
-      return false;
-    }).first;
-    debugPrint("Message from server ${String.fromCharCodes(data)}");
-    if ('PONG' == String.fromCharCodes(data)) {
-      Fluttertoast.showToast(msg: 'Connected at host $address');
-      return true;
-    } else
-      return false;
   }
 
   addServerListener() {
     _mySock.stream.listen((datagram) async {
       debugPrint("Message from client ${String.fromCharCodes(datagram.data)}");
       if (String.fromCharCodes(datagram.data) == "PING") {
-        sendDatagramBuffer('PONG'.codeUnits, datagram);
-      } else if (String.fromCharCodes(datagram.data)
-          .startsWith("ROUTING_TABLE-")) {
-        String tables = addNode(datagram.address,
-            String.fromCharCodes(datagram.data).substring(14));
-        sendDatagramBuffer(tables.codeUnits, datagram);
-        // send routing tables
-      } else if (String.fromCharCodes(datagram.data) == "QUIT") {
-        //--------------------- change state of that ip who quits------------
-        InternetAddress ip = datagram.address;
-        User user = getUID(ip: ip);
-        removeNode(user.numbering);
-        notifyListeners();
-      } else if (String.fromCharCodes(datagram.data).startsWith('DEAD-')) {
-        //--------------------- change state of that ip to dead--------------
-        InternetAddress ip =
-            InternetAddress(String.fromCharCodes(datagram.data).substring(5));
-        User user = getUID(ip: ip);
-        bool dead;
-        try {
-          Socket _clientSock =
-              await Socket.connect(allNodes[user.uid].ip, clientPort);
-          dead = await ping(_clientSock, allNodes[user.uid].ip);
-          _clientSock.close();
-        } on Exception {
-          dead = true;
+        sendDatagramBuffer('PONG>HOST'.codeUnits, datagram);
+      } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
+        String uid = String.fromCharCodes(datagram.data).split('>')[1];
+        if (_deadBacklog.containsKey(uid)) {
+          _deadBacklog[uid].forEach((node) {
+            sendDatagramBuffer('NOT_DEAD>$uid'.codeUnits, node);
+          });
+          allNodes[uid].downCount = 0;
+          allNodes[uid].state = true;
         }
-        if (dead) {
-          removeNode(user.numbering);
-          sendDatagramBuffer('DEAD'.codeUnits, datagram);
-        } else
-          sendDatagramBuffer('NOT_DEAD'.codeUnits, datagram);
+      } else if (String.fromCharCodes(datagram.data)
+          .startsWith("ROUTING_TABLE>")) {
+        String uid = String.fromCharCodes(datagram.data).split('>')[1];
+        String tables = generateRoutingTable(uid);
+        sendDatagramBuffer(tables.codeUnits, datagram);
+      } else if (String.fromCharCodes(datagram.data).startsWith('QUIT>')) {
+        int numbering =
+            int.parse(String.fromCharCodes(datagram.data).split('>')[1]);
+        removeNode(numbering);
         notifyListeners();
-      }
+      } else if (String.fromCharCodes(datagram.data).startsWith('DEAD>')) {
+        String uid = String.fromCharCodes(datagram.data).split('>')[1];
+        int numbering = _getNumbering(uid);
+        allNodes[numbering].state = false;
+        sendBuffer('PING'.codeUnits, allNodes[numbering].socket);
+        _deadBacklog[uid].add(datagram);
+        Timer.periodic(Duration(seconds: 1), (timer) {
+          if (!allNodes[numbering].state) {
+            removeNode(numbering);
+            sendDatagramBuffer('DEAD>$uid'.codeUnits, datagram);
+            notifyListeners();
+          }
+          timer.cancel();
+        });
+
 //      } else if (String.fromCharCodes(datagram.data)
 //          .startsWith('UID_FROM_IP-')) {
 //        //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
@@ -116,6 +104,7 @@ class ServerService with ChangeNotifier {
 //            checkUsername(String.fromCharCodes(datagram.data).substring(9));
 //        sendDatagramBuffer(result.codeUnits, datagram);
 //      }
+      }
     });
   }
 
@@ -159,7 +148,7 @@ class ServerService with ChangeNotifier {
     return id;
   }
 
-  String addNode(SocketAddress ip, String uid, String username) {
+  addNode(SocketAddress ip, String uid, String username) {
     int id = _getAvailableID(ip); // to be done
     /*
     * returns first available id from disconnected list
@@ -170,10 +159,14 @@ class ServerService with ChangeNotifier {
     allNodes[id] = node;
     notifyListeners();
     _lastNodeTillNow = allNodes.keys.last;
+  }
+
+  generateRoutingTable(String uid) {
+    int number = _getNumbering(uid);
     // returns map [int: node] of outbound connections for this node
-    Map<int, Node> peers = _connect(id);
+    Map<int, Node> peers = _connect(number);
     //     123>192.168.0.100|0@uid;192.168.0.101|1@uid&&&&
-    String code = '$id>';
+    String code = '$number>';
     peers.forEach((k, v) {
       if (v.state == true) code += v.toString();
     });
@@ -210,20 +203,17 @@ class ServerService with ChangeNotifier {
 //    }
 //  }
 
-//  checkUsername(String username) {
-//    bool flag = true;
-//    allNodes.values.any((v) {
-//      if (v.user.username == username) {
-//        flag = false;
-//        return true;
-//      }
-//      return false;
-//    });
-//    if (flag)
-//      return 'ACCEPTED>$username';
-//    else
-//      return 'DENIED>$username';
-//  }
+  int _getNumbering(String uid) {
+    int numbering;
+    allNodes.values.any((v) {
+      if (v.user.uid == uid) {
+        numbering = v.user.numbering;
+        return true;
+      }
+      return false;
+    });
+    return numbering;
+  }
 
   List<Map<int, Node>> _connect(int uid) {
     Map<int, Node> outgoing = {};
@@ -263,7 +253,8 @@ class ServerService with ChangeNotifier {
   }
 
   closeServer() async {
-    await _serverSocket.close();
+    _sock1.close();
+    _sock2.close();
     Fluttertoast.showToast(msg: 'Socket closed');
     notifyListeners();
     P2P.navKey.currentState.pop();

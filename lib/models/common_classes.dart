@@ -117,11 +117,12 @@ class User {
   User.fromString(String s) {
     _numbering = int.parse(s.split('@')[0]);
     _uid = s.split('@')[1];
+    _username = s.split('@')[2];
   }
 
   @override
   String toString() {
-    return '$_numbering@$_uid';
+    return '$_numbering@$_uid@$_username';
   }
 }
 
@@ -165,25 +166,29 @@ class Chat {
 enum MessageStatus { DENY, SENDING, SENT, TIMEOUT, ACCEPTED }
 
 class BroadcastMessage {
+  User _sender;
   String _message;
   int _timestamp;
 
-  BroadcastMessage(this._message)
+  BroadcastMessage(this._sender, this._message)
       : _timestamp = DateTime.now().millisecondsSinceEpoch;
 
   String get message => _message;
+
+  User get sender => _sender;
 
   int get timestamp => _timestamp;
 
   BroadcastMessage.fromString(String message) {
     message = message.split('>')[1];
-    _message = message.split('|')[0];
-    _timestamp = int.parse(message.split('|')[1]);
+    _sender = User.fromString(message.split('|')[0]);
+    _message = message.split('|')[1];
+    _timestamp = int.parse(message.split('|')[2]);
   }
 
   @override
   String toString() {
-    return 'BROADCAST>$_message|$_timestamp';
+    return 'BROADCAST>$_sender|$_message|$_timestamp';
   }
 }
 
