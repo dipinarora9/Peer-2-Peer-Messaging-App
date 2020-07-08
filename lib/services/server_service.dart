@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
 
@@ -19,6 +20,7 @@ class ServerService with ChangeNotifier {
   RawDatagramSocket _sock2;
   Map<String, List<MyDatagram>> _deadBacklog = {};
 
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   ServerService(this._serverSocket, this._roomKey);
 
   listenToDatabaseChanges() async {
@@ -39,10 +41,13 @@ class ServerService with ChangeNotifier {
         .child('rooms')
         .child(_roomKey)
         .onChildAdded
-        .listen((event) {
+        .listen((event) async {
       SocketAddress address = SocketAddress.fromMap(event.snapshot.value);
-      addNode(address, event.snapshot.key, event.snapshot.value['username']);
-      //todo: punching hole
+      bool result = await showPopup(event.snapshot.value['username']);
+      if (result) {
+        addNode(address, event.snapshot.key, event.snapshot.value['username']);
+        //todo: punching hole
+      }
     });
   }
 
@@ -59,6 +64,8 @@ class ServerService with ChangeNotifier {
           });
           allNodes[uid].downCount = 0;
           allNodes[uid].state = true;
+          _deadBacklog.remove(uid);
+          //todo: inform [uid] routing peers
         }
       } else if (String.fromCharCodes(datagram.data)
           .startsWith("ROUTING_TABLE>")) {
@@ -164,10 +171,14 @@ class ServerService with ChangeNotifier {
   generateRoutingTable(String uid) {
     int number = _getNumbering(uid);
     // returns map [int: node] of outbound connections for this node
-    Map<int, Node> peers = _connect(number);
+    List<Map<int, Node>> peers = _connect(number);
     //     123>192.168.0.100|0@uid;192.168.0.101|1@uid&&&&
     String code = '$number>';
-    peers.forEach((k, v) {
+    peers[0].forEach((k, v) {
+      if (v.state == true) code += v.toString();
+    });
+    code += '&&&&';
+    peers[1].forEach((k, v) {
       if (v.state == true) code += v.toString();
     });
     // removes semicolon at end of code
@@ -175,7 +186,6 @@ class ServerService with ChangeNotifier {
   }
 
   removeNode(int id) {
-    // updating state of this node as dead {false}---------------------
     allNodes[id].state = false;
   }
 
@@ -219,37 +229,34 @@ class ServerService with ChangeNotifier {
     Map<int, Node> outgoing = {};
     Map<int, Node> incoming = {};
     int distanceFromMe = 1;
-    // for connecting 255 nodes only
     // cycle for outgoing
-    int till = (_lastNodeTillNow + 1);
+    int till = _lastNodeTillNow + 1;
     while (distanceFromMe + uid <= till) {
       if (allNodes[uid + distanceFromMe].state == true)
-        outgoing[distanceFromMe + uid] =
-            allNodes[uid + distanceFromMe]; // assuming always present
+        outgoing[distanceFromMe + uid] = allNodes[uid + distanceFromMe];
       distanceFromMe *= 2;
     }
     // outgoing cycle
     while ((distanceFromMe + uid) - till < uid) {
       if (allNodes[(uid + distanceFromMe) % till].state == true)
         outgoing[(distanceFromMe + uid) % till] =
-            allNodes[(uid + distanceFromMe) % till]; // assuming always present
+            allNodes[(uid + distanceFromMe) % till];
       distanceFromMe *= 2;
     }
     distanceFromMe = 1;
     while (uid - distanceFromMe >= 0) {
       if (allNodes[uid - distanceFromMe].state == true)
-        incoming[uid - distanceFromMe] =
-            allNodes[uid - distanceFromMe]; // assuming always present
+        incoming[uid - distanceFromMe] = allNodes[uid - distanceFromMe];
       distanceFromMe *= 2;
     }
     // cycle for incoming
     while (till + uid - distanceFromMe > uid) {
       if (allNodes[uid - distanceFromMe + till].state == true)
         incoming[uid - distanceFromMe + till] =
-            allNodes[uid - distanceFromMe + till]; // assuming always present
+            allNodes[uid - distanceFromMe + till];
       distanceFromMe *= 2;
     }
-    return [outgoing, incoming];
+    return [incoming, outgoing];
   }
 
   closeServer() async {
@@ -258,5 +265,55 @@ class ServerService with ChangeNotifier {
     Fluttertoast.showToast(msg: 'Socket closed');
     notifyListeners();
     P2P.navKey.currentState.pop();
+  }
+
+  showPopup(String message) {
+    return showDialog(
+      context: this.scaffoldKey.currentState.context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          child: WillPopScope(
+            onWillPop: () {
+              return Future(() => false);
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Allow chat from $message?',
+                      textScaleFactor: 1.4,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MaterialButton(
+                          child: Text('Allow'),
+                          color: Colors.green,
+                          onPressed: () => P2P.navKey.currentState.pop(true),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MaterialButton(
+                          child: Text('Deny'),
+                          color: Colors.red,
+                          onPressed: () => P2P.navKey.currentState.pop(true),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

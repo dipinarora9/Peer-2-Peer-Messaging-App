@@ -26,13 +26,19 @@ class ClientService with ChangeNotifier {
   RawDatagramSocket _sock1;
   RawDatagramSocket _sock2;
   Map<String, BroadcastMessage> _broadcastChat = {};
+  final List<String> actions = ['Share Link'];
+  final String _meetingId;
 
-//  String text = '';
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  Map<String, BroadcastMessage> get broadcastChat => _broadcastChat;
   final TextEditingController chatBox = TextEditingController();
   final ScrollController chatController = ScrollController();
+  String get meetingId => _meetingId;
 
-  ClientService(this._clientSocket, this._serverAddress);
+  ClientService(this._clientSocket, this._serverAddress, this._meetingId);
+
+  jumpToPageEnd() {
+    chatController.jumpTo(chatController.position.maxScrollExtent + 100);
+  }
 
 //  Future<bool> requestUsername(String username) async {
 //    bool flag = false;
@@ -53,9 +59,9 @@ class ClientService with ChangeNotifier {
 
   setupIncomingServer() async {
     _sock1 =
-    await RawDatagramSocket.bind('0.0.0.0', _clientSocket.external.port);
+        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.external.port);
     _sock2 =
-    await RawDatagramSocket.bind('0.0.0.0', _clientSocket.internal.port);
+        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.internal.port);
     _sock1.listen((event) {
       if (event == RawSocketEvent.read)
         _mySock.add(MyDatagram(_sock1.receive(), _sock1.port));
@@ -66,13 +72,13 @@ class ClientService with ChangeNotifier {
     });
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     await setupListener();
-    sendBuffer('ROUTING_TABLE>${user.uid}'.codeUnits, _serverAddress);
+    _sendBuffer('ROUTING_TABLE>${user.uid}'.codeUnits, _serverAddress);
   }
 
   setupListener() {
     _mySock.stream.listen((datagram) async {
       if (String.fromCharCodes(datagram.data) == 'PING') {
-        sendDatagramBuffer('PONG>${me.uid}'.codeUnits, datagram);
+        _sendDatagramBuffer('PONG>${me.uid}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
         if (uid != 'HOST') {
@@ -81,7 +87,7 @@ class ClientService with ChangeNotifier {
         }
       } else if (String.fromCharCodes(datagram.data).startsWith('MESSAGE>')) {
         Message message =
-        Message.fromString(String.fromCharCodes(datagram.data));
+            Message.fromString(String.fromCharCodes(datagram.data));
 
         /// A - sender
         /// B - receiver
@@ -96,13 +102,14 @@ class ClientService with ChangeNotifier {
                   chats[message.sender.toString()].key, message.message);
             notifyListeners();
             forwardMessage(message..status = MessageStatus.SENT);
-          } else
-            showPopup(message);
+          } else {
+            //todo: check
+          }
           notifyListeners();
         }
       } else if (String.fromCharCodes(datagram.data).startsWith('BROADCAST>')) {
         BroadcastMessage message =
-        BroadcastMessage.fromString(String.fromCharCodes(datagram.data));
+            BroadcastMessage.fromString(String.fromCharCodes(datagram.data));
         _broadcastChat['${message.timestamp}-${message.sender}'] = message;
         notifyListeners();
         _broadcastMessage(message);
@@ -113,9 +120,7 @@ class ClientService with ChangeNotifier {
         myPair = Encrypt();
         notifyListeners();
         debugPrint(me.toString());
-        if (table
-            .split('>')
-            .length > 1) {
+        if (table.split('>').length > 1) {
           table = table.split('>')[1];
           String incomingTable = table.split('&&&&')[0];
           incomingTable.split(';').forEach((peer) async {
@@ -136,7 +141,7 @@ class ClientService with ChangeNotifier {
       } else if (String.fromCharCodes(datagram.data)
           .startsWith('ACKNOWLEDGED>')) {
         Message message =
-        Message.fromAcknowledgement(String.fromCharCodes(datagram.data));
+            Message.fromAcknowledgement(String.fromCharCodes(datagram.data));
         debugPrint(message.acknowledgementMessage());
 
         /// B - sender
@@ -158,9 +163,7 @@ class ClientService with ChangeNotifier {
             chats.remove(message.sender.toString());
           } else if (message.status == MessageStatus.ACCEPTED) {
             chats[message.sender.toString()].key =
-                Request
-                    .fromString(message.message)
-                    .key;
+                Request.fromString(message.message).key;
             chats[message.sender.toString()].allowed = true;
           } else if (message.status == MessageStatus.SENT) {
             chats[message.sender.toString()].chats[message.timestamp].status =
@@ -178,14 +181,14 @@ class ClientService with ChangeNotifier {
     });
   }
 
-  void sendDatagramBuffer(Uint8List buffer, MyDatagram datagram) {
+  void _sendDatagramBuffer(Uint8List buffer, MyDatagram datagram) {
     if (datagram.myPort == _sock1.port)
       _sock1.send(buffer, datagram.address, datagram.port);
     else
       _sock2.send(buffer, datagram.address, datagram.port);
   }
 
-  void sendBuffer(Uint8List buffer, SocketAddress dest) {
+  void _sendBuffer(Uint8List buffer, SocketAddress dest) {
     if (_clientSocket.external == dest.external)
       _sock2.send(buffer, dest.internal.address, dest.internal.port);
     else
@@ -194,9 +197,7 @@ class ClientService with ChangeNotifier {
 
   allowChat(bool accept, Message message) {
     if (accept) {
-      String senderKey = Request
-          .fromString(message.message)
-          .key;
+      String senderKey = Request.fromString(message.message).key;
       message..message = Request(myPair.pubKey).toString();
       forwardMessage(message..status = MessageStatus.ACCEPTED);
       chats[message.sender.toString()] = Chat();
@@ -220,16 +221,16 @@ class ClientService with ChangeNotifier {
 
   pingPeer(uid) async {
     if (!outgoingNodes[uid].state && outgoingNodes[uid].downCount > 2) {
-      sendBuffer('DEAD>$uid'.codeUnits, _serverAddress);
+      _sendBuffer('DEAD>$uid'.codeUnits, _serverAddress);
       return;
     }
     outgoingNodes[uid].downCount++;
     outgoingNodes[uid].state = false;
-    sendBuffer('PING'.codeUnits, outgoingNodes[uid].socket);
+    _sendBuffer('PING'.codeUnits, outgoingNodes[uid].socket);
   }
 
   sendQuitRequest() async {
-    sendBuffer('QUIT>${me.numbering}'.codeUnits, _serverAddress);
+    _sendBuffer('QUIT>${me.numbering}'.codeUnits, _serverAddress);
     _timer.cancel();
     _sock1.close();
     _sock2.close();
@@ -252,23 +253,17 @@ class ClientService with ChangeNotifier {
       debugPrint('Messages generated');
       if (message.status == MessageStatus.SENDING) {
         debugPrint(message.toString());
-        sendBuffer(message
-            .toString()
-            .codeUnits, dest);
+        _sendBuffer(message.toString().codeUnits, dest);
       } else {
         debugPrint(message.acknowledgementMessage());
-        sendBuffer(message
-            .acknowledgementMessage()
-            .codeUnits, dest);
+        _sendBuffer(message.acknowledgementMessage().codeUnits, dest);
       }
     } on Exception {}
   }
 
   forwardMessage(Message message) async {
-    if ((message.timestamp - DateTime
-        .now()
-        .millisecondsSinceEpoch).abs() >
-        90 &&
+    if ((message.timestamp - DateTime.now().millisecondsSinceEpoch).abs() >
+            90 &&
         message.status == MessageStatus.SENDING) return;
 
     if (outgoingNodes.containsKey(message.receiver.numbering) ||
@@ -306,7 +301,7 @@ class ClientService with ChangeNotifier {
               message, allNodes[message.sender.numbering - jump].socket);
         }
       } else {
-        sendBuffer('ROUTING_TABLE>${me.uid}'.codeUnits, _serverAddress);
+        _sendBuffer('ROUTING_TABLE>${me.uid}'.codeUnits, _serverAddress);
         forwardMessage(message);
       }
     }
@@ -362,19 +357,16 @@ class ClientService with ChangeNotifier {
   openChat(User user) {
     P2P.navKey.currentState.push(
       MaterialPageRoute(
-        builder: (_) =>
-            ChangeNotifierProvider.value(
-              value: this,
-              child: ChatScreen(user),
-            ),
+        builder: (_) => ChangeNotifierProvider.value(
+          value: this,
+          child: ChatScreen(user),
+        ),
       ),
     );
   }
 
   createMessage(String username) async {
-    int time = DateTime
-        .now()
-        .millisecondsSinceEpoch;
+    int time = DateTime.now().millisecondsSinceEpoch;
     User receiver;
     chats.keys.any((user) {
       if (user.endsWith('@$username')) {
@@ -390,7 +382,7 @@ class ClientService with ChangeNotifier {
     Message f = Message.fromString(mess.toString());
     await forwardMessage(f
       ..message =
-      myPair.encryption(chats[receiver.toString()].key, chatBox.text));
+          myPair.encryption(chats[receiver.toString()].key, chatBox.text));
 
     chatBox.text = '';
   }
@@ -398,56 +390,6 @@ class ClientService with ChangeNotifier {
   deleteChats() {
     chats.clear();
     notifyListeners();
-  }
-
-  showPopup(Message message) {
-    return showDialog(
-      context: this.scaffoldKey.currentState.context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          child: WillPopScope(
-            onWillPop: () {
-              return Future(() => false);
-            },
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Allow chat from user ${message.sender.username}?',
-                      textScaleFactor: 1.4,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MaterialButton(
-                          child: Text('Allow'),
-                          color: Colors.green,
-                          onPressed: () => allowChat(true, message),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MaterialButton(
-                          child: Text('Deny'),
-                          color: Colors.red,
-                          onPressed: () => allowChat(false, message),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 
   bool areNodesConnected(int node1, int node2, int last) {
@@ -497,8 +439,8 @@ class ClientService with ChangeNotifier {
 
   getUserData(int number) {}
 
-  createBroadcastMessage(String message) {
-    BroadcastMessage mess = BroadcastMessage(me, message);
+  createBroadcastMessage() {
+    BroadcastMessage mess = BroadcastMessage(me, chatBox.text);
     _broadcastChat['${mess.timestamp}-${mess.sender}'] = mess;
     _broadcastMessage(mess);
   }
@@ -507,14 +449,42 @@ class ClientService with ChangeNotifier {
 // sendBuffer(feed.toString().codeUnits, node.socket);
     int senderId = feed.sender.numbering;
     int x = 0;
-    int p = 1;
-    for (int i = me.numbering + p; i + p < outgoingNodes) {
-      if (outgoingNodes[i].state) {
-        // send feed[j] to ith node
-        sendBuffer(feed
-            .toString()
-            .codeUnits, node.socket);
-        ++x;
+    bool flag = true;
+    int p = 1, last = 100;
+    // position of sender
+    for (int i = me.numbering; i - p >= 0; p *= 2) {
+      if (i - p == senderId) {
+        flag = false;
+        break;
+      }
+      if (incomingNodes[i - p].state) ++x;
+    }
+    // cycle
+    if (flag)
+      for (int i = me.numbering + last; i - p >= 0; p *= 2) {
+        if (i - p == senderId) break;
+        if (incomingNodes[i - p].state) ++x;
+      }
+    flag = false;
+    p = 1;
+    // broadcasting message
+    for (int i = me.numbering; i + p < last; p *= 2) {
+      if (outgoingNodes[i + p].state) {
+        if (x <= 0)
+          _sendBuffer(feed.toString().codeUnits, outgoingNodes[i + p].socket);
+        else
+          --x;
+      }
+    }
+    // cycle
+    for (int i = me.numbering - last;
+        i + p < me.numbering && i + p < last;
+        p *= 2) {
+      if (outgoingNodes[i + p].state) {
+        if (x <= 0)
+          _sendBuffer(feed.toString().codeUnits, outgoingNodes[i + p].socket);
+        else
+          --x;
       }
     }
   }
