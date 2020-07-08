@@ -461,36 +461,48 @@ class ClientService with ChangeNotifier {
     );
   }
 
+  bool areNodesConnected(int node1, int node2, int last) {
+//    if (node1 == node2)
+//      return false;
+    if (node2 < node1) {
+      node2 += last;
+    }
+    // checking if number is in powers of 2
+    double distance =
+        log(node2 - node1) / log(2); // converting number to log base 2
+    return distance % 1 == 0; // checking for integer value
+  }
+
 // calculates incoming and outgoing nodes of newNode
   List updateRoutingTable(int lastNode) {
-    int distance = 1, till = lastNode + 1;
     //todo:  update only peers whose numbering is smaller than me
     int myId = me.numbering;
-
-//     Outgoing Nodes
-    while (myId + distance <= lastNode) {
-      //todo: value at [myId + distance]
-      outgoingNodes.add(myId + distance);
-      distance *= 2;
-    }
-    // outgoing cycle
-    while ((myId + distance) % till < myId) {
-      //todo: value at [(myId + distance) % till]
-      outgoingNodes.add((myId + distance) % till);
-      distance *= 2;
-    }
-//    Incoming Nodes
-    distance = 1;
-    while (myId - distance >= 0) {
-      //todo: value at [myId - distance]
-      incomingNodes.add(myId - distance);
-      distance *= 2;
-    }
-    // incoming cycle
-    while (myId - distance + lastNode + 1 > myId) {
-      //todo: value at [myId - distance + _lastNodeTillNow + 1]
-      incomingNodes.add(myId - distance + lastNode + 1);
-      distance *= 2;
+    for (int number = 0; number <= lastNode; ++number) {
+      if (myId == number) continue;
+      // Outgoing Nodes
+      if (areNodesConnected(myId, number, lastNode + 1)) {
+        // check if don't exist in connection
+        if (outgoingNodes.containsKey(number) == false) {
+          outgoingNodes[number] = getUserData(number);
+        }
+      } else {
+        // remove if present
+        if (outgoingNodes.containsKey(number)) {
+          outgoingNodes.remove(number);
+        }
+      }
+      // Incoming Nodes
+      if (areNodesConnected(number, myId, lastNode + 1)) {
+        // check if don't exist in connection
+        if (incomingNodes.containsKey(number) == false) {
+          incomingNodes[number] = getUserData(number);
+        }
+      } else {
+        // remove if present
+        if (incomingNodes.containsKey(number)) {
+          incomingNodes.remove(number);
+        }
+      }
     }
   }
 
@@ -502,14 +514,17 @@ class ClientService with ChangeNotifier {
     _broadcastMessage({me.numbering: mess});
   }
 
-  _broadcastMessage(Map<int, BroadcastMessage> feed) {
-    int x = 1;
-    for (Node node in outgoingNodes.values) {
-      if (node.state == true) {
-        for (int j = me.numbering, k = 0; j >= 0 && k < x; --j, ++k) {
-          // send feed[j] to ith node
-          sendBuffer(feed[j].toString().codeUnits, node.socket);
-        }
+  _broadcastMessage(BroadcastMessage feed) {
+// sendBuffer(feed.toString().codeUnits, node.socket);
+    int senderId = feed.sender.numbering;
+    int x = 0;
+    int p = 1;
+    for (int i = me.numbering + p; i + p < outgoingNodes) {
+      if (outgoingNodes[i].state) {
+        // send feed[j] to ith node
+        sendBuffer(feed
+            .toString()
+            .codeUnits, node.socket);
         ++x;
       }
     }

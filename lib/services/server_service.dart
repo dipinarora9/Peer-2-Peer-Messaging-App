@@ -225,40 +225,41 @@ class ServerService with ChangeNotifier {
 //      return 'DENIED>$username';
 //  }
 
-  Map<int, Node> _connect(int uid) {
-    Map<int, Node> mp = {};
+  List<Map<int, Node>> _connect(int uid) {
+    Map<int, Node> outgoing = {};
+    Map<int, Node> incoming = {};
     int distanceFromMe = 1;
     // for connecting 255 nodes only
     // cycle for outgoing
     int till = (_lastNodeTillNow + 1);
     while (distanceFromMe + uid <= till) {
       if (allNodes[uid + distanceFromMe].state == true)
-        mp[distanceFromMe + uid] =
+        outgoing[distanceFromMe + uid] =
             allNodes[uid + distanceFromMe]; // assuming always present
       distanceFromMe *= 2;
     }
     // outgoing cycle
-    while ((distanceFromMe + uid) % till < uid) {
+    while ((distanceFromMe + uid) - till < uid) {
       if (allNodes[(uid + distanceFromMe) % till].state == true)
-        mp[(distanceFromMe + uid) % till] =
+        outgoing[(distanceFromMe + uid) % till] =
             allNodes[(uid + distanceFromMe) % till]; // assuming always present
       distanceFromMe *= 2;
     }
     distanceFromMe = 1;
     while (uid - distanceFromMe >= 0) {
       if (allNodes[uid - distanceFromMe].state == true)
-        mp[uid - distanceFromMe] =
+        incoming[uid - distanceFromMe] =
             allNodes[uid - distanceFromMe]; // assuming always present
       distanceFromMe *= 2;
     }
     // cycle for incoming
     while (till + uid - distanceFromMe > uid) {
       if (allNodes[uid - distanceFromMe + till].state == true)
-        mp[uid - distanceFromMe + till] =
+        incoming[uid - distanceFromMe + till] =
             allNodes[uid - distanceFromMe + till]; // assuming always present
       distanceFromMe *= 2;
     }
-    return mp;
+    return [outgoing, incoming];
   }
 
   closeServer() async {
