@@ -25,6 +25,7 @@ class ClientService with ChangeNotifier {
   Map<String, Chat> chats = {};
   RawDatagramSocket _sock1;
   RawDatagramSocket _sock2;
+  Map<int, BroadcastMessage> _broadcastChat = {};
 
 //  String text = '';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -207,7 +208,7 @@ class ClientService with ChangeNotifier {
 
   pingPeer(uid) async {
     try {
-      sendBuffer('PING'.codeUnits, outgoingNodes[uid].socket);
+      sendBuffer('PING>${me.uid}'.codeUnits, outgoingNodes[uid].socket);
       debugPrint('pinging $uid');
 
       // todo: incorporate into listener
@@ -291,7 +292,8 @@ class ClientService with ChangeNotifier {
         await _sendMessage(
             message, outgoingNodes[message.receiver.numbering].socket);
       else
-        await _sendMessage(message, outgoingNodes[message.sender.numbering].ip);
+        await _sendMessage(
+            message, outgoingNodes[message.sender.numbering].socket);
     } else if (incomingNodes.containsKey(message.receiver.numbering) ||
         incomingNodes.containsKey(message.sender.numbering)) {
       debugPrint('Message incoming $message');
@@ -459,16 +461,54 @@ class ClientService with ChangeNotifier {
     );
   }
 
-  broadcastMessage(Map<int, List<int>> feed) {
-    // assume myID is given
-    int myID = 0, p = 1, x = 1;
-    for (int i = myID + p; i < feed.length; p *= 2) {
-//      if (i == myID) continue;
-      if (allNodes[i].state == true) {
-        int itemToBeSent = max(0, myID - x);
-        for (int j = myID; j > itemToBeSent; --j) {
+// calculates incoming and outgoing nodes of newNode
+  List updateRoutingTable(int lastNode) {
+    int distance = 1, till = lastNode + 1;
+    //todo:  update only peers whose numbering is smaller than me
+    int myId = me.numbering;
+
+//     Outgoing Nodes
+    while (myId + distance <= lastNode) {
+      //todo: value at [myId + distance]
+      outgoingNodes.add(myId + distance);
+      distance *= 2;
+    }
+    // outgoing cycle
+    while ((myId + distance) % till < myId) {
+      //todo: value at [(myId + distance) % till]
+      outgoingNodes.add((myId + distance) % till);
+      distance *= 2;
+    }
+//    Incoming Nodes
+    distance = 1;
+    while (myId - distance >= 0) {
+      //todo: value at [myId - distance]
+      incomingNodes.add(myId - distance);
+      distance *= 2;
+    }
+    // incoming cycle
+    while (myId - distance + lastNode + 1 > myId) {
+      //todo: value at [myId - distance + _lastNodeTillNow + 1]
+      incomingNodes.add(myId - distance + lastNode + 1);
+      distance *= 2;
+    }
+  }
+
+  getUserData(int number) {}
+
+  createBroadcastMessage(String message) {
+    BroadcastMessage mess = BroadcastMessage(message);
+    _broadcastChat[mess.timestamp] = mess;
+    _broadcastMessage({me.numbering: mess});
+  }
+
+  _broadcastMessage(Map<int, BroadcastMessage> feed) {
+    int x = 1;
+    for (Node node in outgoingNodes.values) {
+      if (node.state == true) {
+        for (int j = me.numbering, k = 0; j >= 0 && k < x; --j, ++k) {
           // send feed[j] to ith node
-          send(i, feed[j]);
+          sendBuffer(feed[j].toString().codeUnits, node.socket);
         }
         ++x;
       }

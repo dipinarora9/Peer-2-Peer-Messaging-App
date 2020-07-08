@@ -27,10 +27,12 @@ class ServerService with ChangeNotifier {
     _sock2 =
         await RawDatagramSocket.bind('0.0.0.0', _serverSocket.internal.port);
     _sock1.listen((event) {
-      if (event == RawSocketEvent.read) _mySock.add(_sock1.receive());
+      if (event == RawSocketEvent.read)
+        _mySock.add(MyDatagram(_sock1.receive(), _sock1.port));
     });
     _sock2.listen((event) {
-      if (event == RawSocketEvent.read) _mySock.add(_sock1.receive());
+      if (event == RawSocketEvent.read)
+        _mySock.add(MyDatagram(_sock2.receive(), _sock2.port));
     });
     FirebaseDatabase.instance
         .reference()
@@ -38,7 +40,7 @@ class ServerService with ChangeNotifier {
         .child(_roomKey)
         .onChildAdded
         .listen((event) {
-      //todo: add in allnodes of server service
+      //todo: create uid & add node
       SocketAddress.fromMap(event.snapshot.value);
     });
   }
@@ -131,13 +133,14 @@ class ServerService with ChangeNotifier {
       _sock1.send(buffer, dest.external.address, dest.external.port);
   }
 
-  int _getAvailableID(InternetAddress ip) {
+  int _getAvailableID(SocketAddress address) {
     // check if state is not true
     int id = 0;
     bool flag = false;
     if (allNodes.length > 0) id = allNodes.keys.toList().last + 1;
     allNodes.values.any((v) {
-      if (v.ip == ip) {
+      // todo:  test equals
+      if (v.socket == address) {
         id = v.user.numbering;
         flag = true;
         return true;
@@ -156,21 +159,21 @@ class ServerService with ChangeNotifier {
     return id;
   }
 
-  String addNode(InternetAddress ip, String username) {
+  String addNode(SocketAddress ip, String uid, String username) {
     int id = _getAvailableID(ip); // to be done
     /*
     * returns first available id from disconnected list
     * otherwise give a next new ID
     */
-    User user = User(id, username);
+    User user = User(id, uid, username);
     Node node = Node(ip, user);
     allNodes[id] = node;
     notifyListeners();
     _lastNodeTillNow = allNodes.keys.last;
     // returns map [int: node] of outbound connections for this node
     Map<int, Node> peers = _connect(id);
-    //     123@username>192.168.0.100|0@username;192.168.0.101|1@username2
-    String code = '$id@$username>';
+    //     123>192.168.0.100|0@uid;192.168.0.101|1@uid&&&&
+    String code = '$id>';
     peers.forEach((k, v) {
       if (v.state == true) code += v.toString();
     });
@@ -183,29 +186,29 @@ class ServerService with ChangeNotifier {
     allNodes[id].state = false;
   }
 
-//  ---------------------function to get uid from ip---------------------
-  User getUID({InternetAddress ip, String username}) {
-    if (ip != null) {
-      int uid;
-      allNodes.forEach((k, v) {
-        if (v.ip == ip) {
-          uid = v.user.numbering;
-          return;
-        }
-      });
-      return allNodes[uid].user;
-    } else {
-      int uid;
-      allNodes.forEach((k, v) {
-        if (v.user.username == username) {
-          uid = v.user.numbering;
-          return;
-        }
-      });
-      if (uid != null) return allNodes[uid].user;
-      return null;
-    }
-  }
+////  ---------------------function to get uid from ip---------------------
+//  User getUID({InternetAddress ip, String username}) {
+//    if (ip != null) {
+//      int uid;
+//      allNodes.forEach((k, v) {
+//        if (v.ip == ip) {
+//          uid = v.user.numbering;
+//          return;
+//        }
+//      });
+//      return allNodes[uid].user;
+//    } else {
+//      int uid;
+//      allNodes.forEach((k, v) {
+//        if (v.user.username == username) {
+//          uid = v.user.numbering;
+//          return;
+//        }
+//      });
+//      if (uid != null) return allNodes[uid].user;
+//      return null;
+//    }
+//  }
 
 //  checkUsername(String username) {
 //    bool flag = true;
@@ -256,50 +259,6 @@ class ServerService with ChangeNotifier {
       distanceFromMe *= 2;
     }
     return mp;
-  }
-
-// calculates incoming and outgoing nodes of newNode
-  smartNode(int myId, int lastNode) {
-    var outgoingNodes = [];
-    var incomingNodes = [];
-    int distance = 1, till = lastNode + 1;
-//     Outgoing Nodes
-    while (myId + distance <= lastNode) {
-      //todo: value at [myId + distance]
-      outgoingNodes.add(myId + distance);
-      distance *= 2;
-    }
-    // outgoing cycle
-    while ((myId + distance) % till < myId) {
-      //todo: value at [(myId + distance) % till]
-      outgoingNodes.add((myId + distance) % till);
-      distance *= 2;
-    }
-//    Incoming Nodes
-    distance = 1;
-    while (myId - distance >= 0) {
-      //todo: value at [myId - distance]
-      incomingNodes.add(myId - distance);
-      distance *= 2;
-    }
-    // incoming cycle
-    while (myId - distance + lastNode + 1 > myId) {
-      //todo: value at [myId - distance + _lastNodeTillNow + 1]
-      incomingNodes.add(myId - distance + lastNode + 1);
-      distance *= 2;
-    }
-  }
-
-// adds and delete incoming outgoing nodes when encounters new node in connection
-  updateRoutingTable(int myId, int newNodeId) {
-    double difference = log(newNodeId - myId) / log(e);
-    if (difference != (newNodeId - myId as double)) return;
-    // traverse in all connection
-    // discard
-  }
-
-  send(int node, List<int> feed) {
-    // convert to msg and forward to node
   }
 
   closeServer() async {

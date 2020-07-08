@@ -151,7 +151,6 @@ class P2P with ChangeNotifier {
     Map<String, dynamic> serverMap = myOffer[0].toMap();
     ref.update({'host': serverMap});
     ref.update({user.uid: myOffer[1].toMap()});
-    listenToDatabaseChanges();
     //todo: start server and client in their services
     // todo: register client as first node
 
