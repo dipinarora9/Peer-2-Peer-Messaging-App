@@ -44,17 +44,26 @@ class SocketAddress {
       : _external = IpAddress.fromString(sockAddress.split(',')[0]),
         _internal = IpAddress.fromString(sockAddress.split(',')[1]);
 
-  SocketAddress.fromMap(Map<String, dynamic> map)
-      : _external = IpAddress(
-            InternetAddress(map['external_ip']), map['external_port']),
-        _internal = IpAddress(
-            InternetAddress(map['internal_ip']), map['internal_port']);
+  SocketAddress.fromMap(Map<dynamic, dynamic> map) {
+    _external = IpAddress(
+      InternetAddress(map['external_ip']),
+      map['external_port'].runtimeType == int
+          ? map['external_port']
+          : int.parse(map['external_port']),
+    );
+    _internal = IpAddress(
+      InternetAddress(map['internal_ip']),
+      map['internal_port'].runtimeType == int
+          ? map['internal_port']
+          : int.parse(map['internal_port']),
+    );
+  }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = Map();
-    map['external_ip'] = _external.address;
+    map['external_ip'] = _external.address.address;
     map['external_port'] = _external.port;
-    map['internal_ip'] = _internal.address;
+    map['internal_ip'] = _internal.address.address;
     map['internal_port'] = internal.port;
     return map;
   }
@@ -88,13 +97,13 @@ class Node {
   Node(this._socket, this._user);
 
   Node.fromString(String node) {
-    this._socket = SocketAddress.fromString(node.split('&&')[0]);
-    this._user = User.fromString(node.split('&&')[1]);
+    this._socket = SocketAddress.fromString(node.split('^&^&')[0]);
+    this._user = User.fromString(node.split('^&^&')[1]);
   }
 
   @override
   toString() {
-    return '$_socket&&$_user;';
+    return '$_socket^&^&$_user;';
   }
 }
 

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:peer2peer/services/client_service.dart';
+import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
 class BroadcastChat extends StatelessWidget {
+  final bool _server;
+  BroadcastChat(this._server);
+
   @override
   Widget build(BuildContext context) {
     final client = Provider.of<ClientService>(context, listen: false);
     return Scaffold(
+      key: _server
+          ? Provider.of<ServerService>(context, listen: false).scaffoldKey
+          : null,
       backgroundColor: Color(0xffCDEAC0),
       appBar: AppBar(
         title: Text('Meeting id - ${client.meetingId}'),
@@ -25,7 +32,7 @@ class BroadcastChat extends StatelessWidget {
             },
             onSelected: (item) async {
               if (item == client.actions[0]) {
-                Dialogs().showPopup(context, client.meetingId);
+                Share.share('https://peer2peer.page.link/${client.meetingId}');
               }
             },
           ),
@@ -124,32 +131,6 @@ class BroadcastChat extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class Dialogs {
-  showPopup(BuildContext context, String message) {
-    return showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) {
-        return Dialog(
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () => Share.share(message),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(message),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

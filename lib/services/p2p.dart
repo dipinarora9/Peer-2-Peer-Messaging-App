@@ -77,34 +77,41 @@ class P2P with ChangeNotifier {
 //
 
   joinMeetingViaUrl() async {
-    FirebaseAuth.instance.signInAnonymously();
+    AuthResult user = await FirebaseAuth.instance.signInAnonymously();
     PendingDynamicLinkData data =
         await FirebaseDynamicLinks.instance.getInitialLink();
-    _parseDynamicLinkData(data);
+    _parseDynamicLinkData(data, user.user, '');
   }
 
   joinMeeting() async {
-    FirebaseAuth.instance.signInAnonymously();
+    AuthResult user = await FirebaseAuth.instance.signInAnonymously();
     PendingDynamicLinkData data = await FirebaseDynamicLinks.instance
-        .getDynamicLink(
-            Uri.https('https://peer2peer.page.link', meetingId.text));
-    _parseDynamicLinkData(data);
+        .getDynamicLink(Uri.https('peer2peer.page.link', meetingId.text));
+    _parseDynamicLinkData(data, user.user, meetingId.text);
   }
 
-  _parseDynamicLinkData(PendingDynamicLinkData data) async {
+  _parseDynamicLinkData(
+      PendingDynamicLinkData data, FirebaseUser user, String meetingId) async {
     SocketAddress serverAddress =
         SocketAddress.fromMap(data.link.queryParameters);
     SocketAddress mySocket = await _createMySocket();
     DatabaseReference ref = FirebaseDatabase.instance.reference();
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    Map<String, dynamic> clientMap = mySocket.toMap();
+    clientMap['username'] = name.text;
     ref
         .child('rooms')
         .child(data.link.queryParameters['room_id'])
         .child(user.uid)
-        .update(mySocket.toMap());
-
-    //todo: do something
-    _clientService = ClientService(mySocket, serverAddress, '');
+        .update(clientMap);
+    _clientService = ClientService(mySocket, serverAddress, meetingId);
+    navKey.currentState.push(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: _clientService..initialize(),
+          child: BroadcastChat(false),
+        ),
+      ),
+    );
   }
 
   Future<SocketAddress> _createMySocket() async {
@@ -130,10 +137,15 @@ class P2P with ChangeNotifier {
     });
 
     sock.send('hey'.codeUnits, InternetAddress('15.207.7.66'), 2020);
-    RawSocketEvent event = await sock.first;
+    RawSocketEvent event = RawSocketEvent.read;
     if (event == RawSocketEvent.read) {
+      Datagram datagram;
+      while (datagram == null) {
+        await Future.delayed(Duration(milliseconds: 100));
+        datagram = sock.receive();
+      }
       IpAddress externalIp =
-          IpAddress.fromString(String.fromCharCodes(sock.receive().data));
+          IpAddress.fromString(String.fromCharCodes(datagram.data));
       return SocketAddress(externalIp, myIp);
     } else
       return null;
@@ -155,26 +167,28 @@ class P2P with ChangeNotifier {
     _serverService = ServerService(myOffer[0], _roomKey);
     Map<String, dynamic> serverMap = myOffer[0].toMap();
     Map<String, dynamic> clientMap = myOffer[1].toMap();
-    ref.update({'host': serverMap});
+    ref.child('host').set(serverMap);
     clientMap['username'] = name.text;
-    ref.update({user.user.uid: clientMap});
-    serverMap['room_id'] = _roomKey;
+    ref.child(user.user.uid).update(clientMap);
+    Map<String, String> linkMap = {};
+    serverMap.forEach((key, value) => linkMap[key] = value.toString());
+    linkMap['room_id'] = _roomKey;
     String shareLink = await _generateDynamicUrl(
-        Uri.https('https://peer2peer.page.link', 'room', serverMap));
+        Uri.https('peer2peer.page.link', 'room', linkMap));
     _clientService =
         ClientService(myOffer[1], myOffer[0], shareLink.split('/').last);
     navKey.currentState.push(
       MaterialPageRoute(
         builder: (_) => MultiProvider(
           providers: [
-            ChangeNotifierProvider(
-              create: (_) => _clientService..jumpToPageEnd(),
+            ChangeNotifierProvider.value(
+              value: _clientService..initialize(),
             ),
-            ChangeNotifierProvider(
-              create: (_) => _serverService,
+            ChangeNotifierProvider.value(
+              value: _serverService..initialize(),
             ),
           ],
-          child: BroadcastChat(),
+          child: BroadcastChat(true),
         ),
       ),
     );
@@ -191,7 +205,6 @@ class P2P with ChangeNotifier {
         shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
       ),
     );
-
     final ShortDynamicLink shortLink = await parameters.buildShortLink();
     return shortLink.shortUrl.toString();
   }

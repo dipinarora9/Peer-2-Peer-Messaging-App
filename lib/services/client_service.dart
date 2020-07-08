@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +14,8 @@ class ClientService with ChangeNotifier {
   SocketAddress _clientSocket;
   SocketAddress _serverAddress;
   StreamController<MyDatagram> _mySock = StreamController<MyDatagram>();
-  Map<int, Node> incomingNodes = {};
-  Map<int, Node> outgoingNodes = {};
+  Map<int, Node> _incomingNodes = {};
+  Map<int, Node> _outgoingNodes = {};
   Timer _timer;
   User me;
   Encrypt myPair;
@@ -36,28 +34,7 @@ class ClientService with ChangeNotifier {
 
   ClientService(this._clientSocket, this._serverAddress, this._meetingId);
 
-  jumpToPageEnd() {
-    chatController.jumpTo(chatController.position.maxScrollExtent + 100);
-  }
-
-//  Future<bool> requestUsername(String username) async {
-//    bool flag = false;
-//    final Socket server = await _connectToServer();
-//    server.add('USERNAME-$username'.codeUnits);
-//    Uint8List data =
-//        await server.timeout(Duration(seconds: 1), onTimeout: (abc) {
-//      return false;
-//    }).first;
-//    if (String.fromCharCodes(data).startsWith('ACCEPTED>')) flag = true;
-//    server.close();
-//    if (flag)
-//      setupIncomingServer(String.fromCharCodes(data).substring(9));
-//    else
-//      Fluttertoast.showToast(msg: 'Username already taken');
-//    return flag;
-//  }
-
-  setupIncomingServer() async {
+  initialize() async {
     _sock1 =
         await RawDatagramSocket.bind('0.0.0.0', _clientSocket.external.port);
     _sock2 =
@@ -71,19 +48,21 @@ class ClientService with ChangeNotifier {
         _mySock.add(MyDatagram(_sock2.receive(), _sock2.port));
     });
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    await setupListener();
+    _setupListener();
+    debugPrint('sending routing table request');
     _sendBuffer('ROUTING_TABLE>${user.uid}'.codeUnits, _serverAddress);
+    chatController.jumpTo(chatController.position.maxScrollExtent + 100);
   }
 
-  setupListener() {
+  _setupListener() {
     _mySock.stream.listen((datagram) async {
       if (String.fromCharCodes(datagram.data) == 'PING') {
         _sendDatagramBuffer('PONG>${me.uid}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
         if (uid != 'HOST') {
-          outgoingNodes[uid].downCount = 0;
-          outgoingNodes[uid].state = true;
+          _outgoingNodes[uid].downCount = 0;
+          _outgoingNodes[uid].state = true;
         }
       } else if (String.fromCharCodes(datagram.data).startsWith('MESSAGE>')) {
         Message message =
@@ -113,6 +92,14 @@ class ClientService with ChangeNotifier {
         _broadcastChat['${message.timestamp}-${message.sender}'] = message;
         notifyListeners();
         _broadcastMessage(message);
+      } else if (String.fromCharCodes(datagram.data).startsWith('UPDATE_')) {
+        Node user =
+            Node.fromString(String.fromCharCodes(datagram.data).split('>')[1]);
+        if (String.fromCharCodes(datagram.data)
+            .split('>')[0]
+            .startsWith('UPDATE_INCOMING')) _sendDummy(user.socket);
+        _updateRoutingTable(int.parse(
+            String.fromCharCodes(datagram.data).split('>')[0].split('_').last));
       } else if (String.fromCharCodes(datagram.data)
           .startsWith('ROUTING_TABLE>')) {
         String table = String.fromCharCodes(datagram.data);
@@ -126,14 +113,14 @@ class ClientService with ChangeNotifier {
           incomingTable.split(';').forEach((peer) async {
             debugPrint(peer);
             Node node = Node.fromString(peer);
-            incomingNodes[node.user.numbering] = node;
-            await pingPeer(node.user.numbering);
+            _incomingNodes[node.user.numbering] = node;
+            _sendDummy(node.socket);
           });
           String outgoingTable = table.split('&&&&')[1];
           outgoingTable.split(';').forEach((peer) async {
             debugPrint(peer);
             Node node = Node.fromString(peer);
-            outgoingNodes[node.user.numbering] = node;
+            _outgoingNodes[node.user.numbering] = node;
             await pingPeer(node.user.numbering);
           });
         }
@@ -171,24 +158,46 @@ class ClientService with ChangeNotifier {
           }
           notifyListeners();
         }
-      } else if (String.fromCharCodes(datagram.data).startsWith('DEAD>')) {
-        String uid = String.fromCharCodes(datagram.data).split('>')[1];
-        outgoingNodes.remove(uid);
+      } else if (String.fromCharCodes(datagram.data).startsWith('DEAD_')) {
+        User deadUser =
+            User.fromString(String.fromCharCodes(datagram.data).split('>')[1]);
+        _outgoingNodes.remove(deadUser.uid);
+        _updateRoutingTable(
+            int.parse(String.fromCharCodes(datagram.data)
+                .split('>')[0]
+                .split('_')[1]),
+            dead: deadUser.numbering);
       } else if (String.fromCharCodes(datagram.data).startsWith('NOT_DEAD>')) {
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
         pingPeer(uid);
+      } else if (String.fromCharCodes(datagram.data).startsWith('USER_')) {
+        Node node =
+            Node.fromString(String.fromCharCodes(datagram.data).split('>')[1]);
+        if (String.fromCharCodes(datagram.data)
+            .split('>')[0]
+            .startsWith('USER_INCOMING'))
+          _incomingNodes[node.user.numbering] = node;
+        else
+          _outgoingNodes[node.user.numbering] = node;
       }
     });
   }
 
-  void _sendDatagramBuffer(Uint8List buffer, MyDatagram datagram) {
+  void _sendDummy(SocketAddress dest) {
+    _sendBuffer([], dest);
+    _sendBuffer([], dest);
+    _sendBuffer([], dest);
+    _sendBuffer([], dest);
+  }
+
+  void _sendDatagramBuffer(List<int> buffer, MyDatagram datagram) {
     if (datagram.myPort == _sock1.port)
       _sock1.send(buffer, datagram.address, datagram.port);
     else
       _sock2.send(buffer, datagram.address, datagram.port);
   }
 
-  void _sendBuffer(Uint8List buffer, SocketAddress dest) {
+  void _sendBuffer(List<int> buffer, SocketAddress dest) {
     if (_clientSocket.external == dest.external)
       _sock2.send(buffer, dest.internal.address, dest.internal.port);
     else
@@ -213,20 +222,20 @@ class ClientService with ChangeNotifier {
   setTimer() {
     if (_timer == null)
       _timer = Timer.periodic(Duration(minutes: 1), (timer) {
-        outgoingNodes.keys.forEach((uid) async {
+        _outgoingNodes.keys.forEach((uid) async {
           await pingPeer(uid);
         });
       });
   }
 
   pingPeer(uid) async {
-    if (!outgoingNodes[uid].state && outgoingNodes[uid].downCount > 2) {
+    if (!_outgoingNodes[uid].state && _outgoingNodes[uid].downCount > 2) {
       _sendBuffer('DEAD>$uid'.codeUnits, _serverAddress);
       return;
     }
-    outgoingNodes[uid].downCount++;
-    outgoingNodes[uid].state = false;
-    _sendBuffer('PING'.codeUnits, outgoingNodes[uid].socket);
+    _outgoingNodes[uid].downCount++;
+    _outgoingNodes[uid].state = false;
+    _sendBuffer('PING'.codeUnits, _outgoingNodes[uid].socket);
   }
 
   sendQuitRequest() async {
@@ -266,28 +275,28 @@ class ClientService with ChangeNotifier {
             90 &&
         message.status == MessageStatus.SENDING) return;
 
-    if (outgoingNodes.containsKey(message.receiver.numbering) ||
-        outgoingNodes.containsKey(message.sender.numbering)) {
+    if (_outgoingNodes.containsKey(message.receiver.numbering) ||
+        _outgoingNodes.containsKey(message.sender.numbering)) {
       debugPrint('Message outgoing $message');
-      if (outgoingNodes.containsKey(message.receiver.numbering))
+      if (_outgoingNodes.containsKey(message.receiver.numbering))
         await _sendMessage(
-            message, outgoingNodes[message.receiver.numbering].socket);
+            message, _outgoingNodes[message.receiver.numbering].socket);
       else
         await _sendMessage(
-            message, outgoingNodes[message.sender.numbering].socket);
-    } else if (incomingNodes.containsKey(message.receiver.numbering) ||
-        incomingNodes.containsKey(message.sender.numbering)) {
+            message, _outgoingNodes[message.sender.numbering].socket);
+    } else if (_incomingNodes.containsKey(message.receiver.numbering) ||
+        _incomingNodes.containsKey(message.sender.numbering)) {
       debugPrint('Message incoming $message');
-      if (incomingNodes.containsKey(message.receiver.numbering))
+      if (_incomingNodes.containsKey(message.receiver.numbering))
         await _sendMessage(
-            message, incomingNodes[message.receiver.numbering].socket);
+            message, _incomingNodes[message.receiver.numbering].socket);
       else
         await _sendMessage(
-            message, incomingNodes[message.sender.numbering].socket);
+            message, _incomingNodes[message.sender.numbering].socket);
     } else {
       debugPrint('Message hopping $message');
-      Map<int, Node> allNodes = Map.from(incomingNodes);
-      allNodes.addAll(outgoingNodes);
+      Map<int, Node> allNodes = Map.from(_incomingNodes);
+      allNodes.addAll(_outgoingNodes);
       if (allNodes.length > 0) {
         if (message.receiver.numbering > message.sender.numbering) {
           int dist = message.receiver.numbering - message.sender.numbering;
@@ -399,49 +408,47 @@ class ClientService with ChangeNotifier {
       node2 += last;
     }
     // checking if number is in powers of 2
-    double distance =
-        log(node2 - node1) / log(2); // converting number to log base 2
+    double distance = math.log(node2 - node1) /
+        math.log(2); // converting number to log base 2
     return distance % 1 == 0; // checking for integer value
   }
 
 // calculates incoming and outgoing nodes of newNode
-  void updateRoutingTable(int lastNode) {
+  void _updateRoutingTable(int lastNode, {int dead}) {
     //todo:  update only peers whose numbering is smaller than me
+    // todo: deletion updates
     int myId = me.numbering;
     for (int number = 0; number <= lastNode; ++number) {
       if (myId == number) continue;
       // Outgoing Nodes
       if (areNodesConnected(myId, number, lastNode + 1)) {
         // check if don't exist in connection
-        if (outgoingNodes.containsKey(number) == false) {
-          outgoingNodes[number] = getUserData(number);
+        if (!_outgoingNodes.containsKey(number)) {
+          _sendBuffer('GET_OUTGOING>$number'.codeUnits, _serverAddress);
         }
       } else {
-        // remove if present
-        if (outgoingNodes.containsKey(number)) {
-          outgoingNodes.remove(number);
+        if (_outgoingNodes.containsKey(number)) {
+          _outgoingNodes.remove(number);
         }
       }
       // Incoming Nodes
       if (areNodesConnected(number, myId, lastNode + 1)) {
         // check if don't exist in connection
-        if (incomingNodes.containsKey(number) == false) {
-          incomingNodes[number] = getUserData(number);
+        if (!_incomingNodes.containsKey(number)) {
+          _sendBuffer('GET_INCOMING>$number'.codeUnits, _serverAddress);
         }
       } else {
-        // remove if present
-        if (incomingNodes.containsKey(number)) {
-          incomingNodes.remove(number);
+        if (_incomingNodes.containsKey(number)) {
+          _incomingNodes.remove(number);
         }
       }
     }
   }
 
-  getUserData(int number) {}
-
   createBroadcastMessage() {
     BroadcastMessage mess = BroadcastMessage(me, chatBox.text);
     _broadcastChat['${mess.timestamp}-${mess.sender}'] = mess;
+    chatBox.clear();
     _broadcastMessage(mess);
   }
 
@@ -457,21 +464,21 @@ class ClientService with ChangeNotifier {
         flag = false;
         break;
       }
-      if (incomingNodes[i - p].state) ++x;
+      if (_incomingNodes[i - p].state) ++x;
     }
     // cycle
     if (flag)
       for (int i = me.numbering + last; i - p >= 0; p *= 2) {
         if (i - p == senderId) break;
-        if (incomingNodes[i - p].state) ++x;
+        if (_incomingNodes[i - p].state) ++x;
       }
     flag = false;
     p = 1;
     // broadcasting message
     for (int i = me.numbering; i + p < last; p *= 2) {
-      if (outgoingNodes[i + p].state) {
+      if (_outgoingNodes[i + p].state) {
         if (x <= 0)
-          _sendBuffer(feed.toString().codeUnits, outgoingNodes[i + p].socket);
+          _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
         else
           --x;
       }
@@ -480,9 +487,9 @@ class ClientService with ChangeNotifier {
     for (int i = me.numbering - last;
         i + p < me.numbering && i + p < last;
         p *= 2) {
-      if (outgoingNodes[i + p].state) {
+      if (_outgoingNodes[i + p].state) {
         if (x <= 0)
-          _sendBuffer(feed.toString().codeUnits, outgoingNodes[i + p].socket);
+          _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
         else
           --x;
       }

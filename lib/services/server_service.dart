@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
@@ -24,7 +22,23 @@ class ServerService with ChangeNotifier {
 
   ServerService(this._serverSocket, this._roomKey);
 
-  listenToDatabaseChanges() async {
+  initialize() async {
+    FirebaseDatabase.instance
+        .reference()
+        .child('rooms')
+        .child(_roomKey)
+        .onChildAdded
+        .listen((event) async {
+      if (event.snapshot.key != 'host') {
+        SocketAddress address = SocketAddress.fromMap(event.snapshot.value);
+        bool result = await showPopup(event.snapshot.value['username']);
+        if (result) {
+          _addNode(
+              address, event.snapshot.key, event.snapshot.value['username']);
+          _sendDummy(address);
+        }
+      }
+    });
     _sock1 =
         await RawDatagramSocket.bind('0.0.0.0', _serverSocket.external.port);
     _sock2 =
@@ -37,58 +51,61 @@ class ServerService with ChangeNotifier {
       if (event == RawSocketEvent.read)
         _mySock.add(MyDatagram(_sock2.receive(), _sock2.port));
     });
-    FirebaseDatabase.instance
-        .reference()
-        .child('rooms')
-        .child(_roomKey)
-        .onChildAdded
-        .listen((event) async {
-      SocketAddress address = SocketAddress.fromMap(event.snapshot.value);
-      bool result = await showPopup(event.snapshot.value['username']);
-      if (result) {
-        addNode(address, event.snapshot.key, event.snapshot.value['username']);
-        //todo: punching hole
-      }
-    });
+    _setupListener();
   }
 
-  addServerListener() {
+  _setupListener() {
     _mySock.stream.listen((datagram) async {
       debugPrint("Message from client ${String.fromCharCodes(datagram.data)}");
       if (String.fromCharCodes(datagram.data) == "PING") {
-        sendDatagramBuffer('PONG>HOST'.codeUnits, datagram);
+        _sendDatagramBuffer('PONG>HOST'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
         if (_deadBacklog.containsKey(uid)) {
           _deadBacklog[uid].forEach((node) {
-            sendDatagramBuffer('NOT_DEAD>$uid'.codeUnits, node);
+            _sendDatagramBuffer('NOT_DEAD>$uid'.codeUnits, node);
           });
-          allNodes[uid].downCount = 0;
-          allNodes[uid].state = true;
+          User user = _getUser(uid);
+          allNodes[user.numbering].downCount = 0;
+          allNodes[user.numbering].state = true;
           _deadBacklog.remove(uid);
           //todo: inform [uid] routing peers
         }
       } else if (String.fromCharCodes(datagram.data)
           .startsWith("ROUTING_TABLE>")) {
+        debugPrint('HERE IS IT routing table $datagram');
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
-        String tables = generateRoutingTable(uid);
-        sendDatagramBuffer(tables.codeUnits, datagram);
+        String tables = _generateRoutingTable(uid);
+        _sendDatagramBuffer(tables.codeUnits, datagram);
+      } else if (String.fromCharCodes(datagram.data).startsWith('GET_')) {
+        int numbering =
+            int.parse(String.fromCharCodes(datagram.data).split('>')[1]);
+        if (String.fromCharCodes(datagram.data)
+            .split('>')[0]
+            .startsWith('GET_INCOMING'))
+          _sendDatagramBuffer(
+              'USER_INCOMING>${allNodes[numbering]}'.codeUnits, datagram);
+        else
+          _sendDatagramBuffer(
+              'USER_OUTGOING>${allNodes[numbering]}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('QUIT>')) {
         int numbering =
             int.parse(String.fromCharCodes(datagram.data).split('>')[1]);
-        removeNode(numbering);
+        _generateRoutingTable(allNodes[numbering].user.uid,
+            sendDeadStatus: true);
+        _removeNode(numbering);
         notifyListeners();
       } else if (String.fromCharCodes(datagram.data).startsWith('DEAD>')) {
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
-        int numbering = _getNumbering(uid);
-        allNodes[numbering].state = false;
-        sendBuffer('PING'.codeUnits, allNodes[numbering].socket);
+        User user = _getUser(uid);
+        allNodes[user.numbering].state = false;
+        _sendBuffer('PING'.codeUnits, allNodes[user.numbering].socket);
         _deadBacklog[uid].add(datagram);
         Timer.periodic(Duration(seconds: 1), (timer) {
-          if (!allNodes[numbering].state) {
-            removeNode(numbering);
-            sendDatagramBuffer('DEAD>$uid'.codeUnits, datagram);
-            notifyListeners();
+          if (!allNodes[user.numbering].state) {
+            _generateRoutingTable(user.uid, sendDeadStatus: true);
+            _removeNode(user.numbering);
+            _sendDatagramBuffer('DEAD>$uid'.codeUnits, datagram);
           }
           timer.cancel();
         });
@@ -116,14 +133,22 @@ class ServerService with ChangeNotifier {
     });
   }
 
-  void sendDatagramBuffer(Uint8List buffer, MyDatagram datagram) {
+  void _sendDummy(SocketAddress dest) {
+    debugPrint('sending dummy message to $dest');
+    _sendBuffer([], dest);
+    _sendBuffer([], dest);
+    _sendBuffer([], dest);
+    _sendBuffer([], dest);
+  }
+
+  void _sendDatagramBuffer(List<int> buffer, MyDatagram datagram) {
     if (datagram.myPort == _sock1.port)
       _sock1.send(buffer, datagram.address, datagram.port);
     else
       _sock2.send(buffer, datagram.address, datagram.port);
   }
 
-  void sendBuffer(Uint8List buffer, SocketAddress dest) {
+  void _sendBuffer(List<int> buffer, SocketAddress dest) {
     if (_serverSocket.external == dest.external)
       _sock2.send(buffer, dest.internal.address, dest.internal.port);
     else
@@ -156,7 +181,7 @@ class ServerService with ChangeNotifier {
     return id;
   }
 
-  addNode(SocketAddress ip, String uid, String username) {
+  _addNode(SocketAddress ip, String uid, String username) {
     int id = _getAvailableID(ip); // to be done
     /*
     * returns first available id from disconnected list
@@ -169,24 +194,38 @@ class ServerService with ChangeNotifier {
     _lastNodeTillNow = allNodes.keys.last;
   }
 
-  generateRoutingTable(String uid) {
-    int number = _getNumbering(uid);
+  _generateRoutingTable(String uid, {sendDeadStatus: false}) {
+    User user = _getUser(uid);
     // returns map [int: node] of outbound connections for this node
-    List<Map<int, Node>> peers = _connect(number);
+    List<Map<int, Node>> peers = _connect(user.numbering);
     //     123>192.168.0.100|0@uid;192.168.0.101|1@uid&&&&
-    String code = '$number>';
+    String code = '$user>';
     peers[0].forEach((k, v) {
-      if (v.state == true) code += v.toString();
+      if (v.state == true) {
+        code += v.toString();
+        if (sendDeadStatus)
+          _sendBuffer('DEAD_$_lastNodeTillNow>${v.user}'.codeUnits, v.socket);
+        else
+          _sendBuffer(
+              'UPDATE_OUTGOING_$_lastNodeTillNow>$v'.codeUnits, v.socket);
+      }
     });
     code += '&&&&';
     peers[1].forEach((k, v) {
-      if (v.state == true) code += v.toString();
+      if (v.state == true) {
+        code += v.toString();
+        if (sendDeadStatus)
+          _sendBuffer('DEAD_$_lastNodeTillNow>${v.user}'.codeUnits, v.socket);
+        else
+          _sendBuffer(
+              'UPDATE_INCOMING_$_lastNodeTillNow>$v'.codeUnits, v.socket);
+      }
     });
     // removes semicolon at end of code
     return code.substring(0, code.length - 1);
   }
 
-  removeNode(int id) {
+  _removeNode(int id) {
     allNodes[id].state = false;
   }
 
@@ -214,16 +253,16 @@ class ServerService with ChangeNotifier {
 //    }
 //  }
 
-  int _getNumbering(String uid) {
-    int numbering;
+  User _getUser(String uid) {
+    User user;
     allNodes.values.any((v) {
       if (v.user.uid == uid) {
-        numbering = v.user.numbering;
+        user = v.user;
         return true;
       }
       return false;
     });
-    return numbering;
+    return user;
   }
 
   List<Map<int, Node>> _connect(int uid) {
@@ -304,7 +343,7 @@ class ServerService with ChangeNotifier {
                         child: MaterialButton(
                           child: Text('Deny'),
                           color: Colors.red,
-                          onPressed: () => P2P.navKey.currentState.pop(true),
+                          onPressed: () => P2P.navKey.currentState.pop(false),
                         ),
                       ),
                     ],

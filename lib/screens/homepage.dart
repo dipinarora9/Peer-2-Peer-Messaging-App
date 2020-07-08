@@ -50,7 +50,7 @@ class HomePage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Create meeting',
+                      'Join meeting',
                       textScaleFactor: 1.1,
                     ),
                   ),
