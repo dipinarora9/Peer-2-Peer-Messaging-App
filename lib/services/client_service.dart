@@ -5,10 +5,9 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:peer2peer/models/common_classes.dart';
-import 'package:peer2peer/screens/chat_screen.dart';
+import 'package:peer2peer/screens/private_chat.dart';
 import 'package:provider/provider.dart';
 
 import 'p2p.dart';
@@ -32,6 +31,7 @@ class ClientService with ChangeNotifier {
   Map<String, BroadcastMessage> get broadcastChat => _broadcastChat;
   final TextEditingController chatBox = TextEditingController();
   final ScrollController chatController = ScrollController();
+
   String get meetingId => _meetingId;
 
   ClientService(this._clientSocket, this._serverAddress, this._meetingId);
@@ -359,7 +359,7 @@ class ClientService with ChangeNotifier {
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider.value(
           value: this,
-          child: ChatScreen(user),
+          child: PrivateChat(user),
         ),
       ),
     );
@@ -405,7 +405,7 @@ class ClientService with ChangeNotifier {
   }
 
 // calculates incoming and outgoing nodes of newNode
-  List updateRoutingTable(int lastNode) {
+  void updateRoutingTable(int lastNode) {
     //todo:  update only peers whose numbering is smaller than me
     int myId = me.numbering;
     for (int number = 0; number <= lastNode; ++number) {

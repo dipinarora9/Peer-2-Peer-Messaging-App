@@ -21,6 +21,7 @@ class ServerService with ChangeNotifier {
   Map<String, List<MyDatagram>> _deadBacklog = {};
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   ServerService(this._serverSocket, this._roomKey);
 
   listenToDatabaseChanges() async {

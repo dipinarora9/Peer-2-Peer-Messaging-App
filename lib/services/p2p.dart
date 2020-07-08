@@ -8,20 +8,21 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:peer2peer/models/common_classes.dart';
+import 'package:peer2peer/screens/broadcast_chat.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
+import 'package:provider/provider.dart';
 
 class P2P with ChangeNotifier {
   bool _searching = false;
 
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 
-  String _shareLink;
   String _roomKey;
   ClientService _clientService;
   ServerService _serverService;
-
-  String get shareLink => _shareLink;
+  final TextEditingController meetingId = TextEditingController();
+  final TextEditingController name = TextEditingController();
 
   bool get searching => _searching;
 
@@ -76,14 +77,17 @@ class P2P with ChangeNotifier {
 //
 
   joinMeetingViaUrl() async {
+    FirebaseAuth.instance.signInAnonymously();
     PendingDynamicLinkData data =
         await FirebaseDynamicLinks.instance.getInitialLink();
     _parseDynamicLinkData(data);
   }
 
-  joinMeeting(String meetingCode) async {
+  joinMeeting() async {
+    FirebaseAuth.instance.signInAnonymously();
     PendingDynamicLinkData data = await FirebaseDynamicLinks.instance
-        .getDynamicLink(Uri.https('https://peer2peer.page.link', meetingCode));
+        .getDynamicLink(
+            Uri.https('https://peer2peer.page.link', meetingId.text));
     _parseDynamicLinkData(data);
   }
 
@@ -98,7 +102,9 @@ class P2P with ChangeNotifier {
         .child(data.link.queryParameters['room_id'])
         .child(user.uid)
         .update(mySocket.toMap());
-    _clientService = ClientService(mySocket, serverAddress);
+
+    //todo: do something
+    _clientService = ClientService(mySocket, serverAddress, '');
   }
 
   Future<SocketAddress> _createMySocket() async {
@@ -142,22 +148,36 @@ class P2P with ChangeNotifier {
 
   createMeeting() async {
     DatabaseReference ref = FirebaseDatabase.instance.reference();
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    AuthResult user = await FirebaseAuth.instance.signInAnonymously();
     ref = ref.child('rooms').push();
     _roomKey = ref.key;
     List<SocketAddress> myOffer = await _createHostOffer();
     _serverService = ServerService(myOffer[0], _roomKey);
-    _clientService = ClientService(myOffer[1], myOffer[0]);
     Map<String, dynamic> serverMap = myOffer[0].toMap();
+    Map<String, dynamic> clientMap = myOffer[1].toMap();
     ref.update({'host': serverMap});
-    ref.update({user.uid: myOffer[1].toMap()});
-    //todo: start server and client in their services
-    // todo: register client as first node
-
+    clientMap['username'] = name.text;
+    ref.update({user.user.uid: clientMap});
     serverMap['room_id'] = _roomKey;
-    _shareLink = await _generateDynamicUrl(
+    String shareLink = await _generateDynamicUrl(
         Uri.https('https://peer2peer.page.link', 'room', serverMap));
-    notifyListeners();
+    _clientService =
+        ClientService(myOffer[1], myOffer[0], shareLink.split('/').last);
+    navKey.currentState.push(
+      MaterialPageRoute(
+        builder: (_) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (_) => _clientService..jumpToPageEnd(),
+            ),
+            ChangeNotifierProvider(
+              create: (_) => _serverService,
+            ),
+          ],
+          child: BroadcastChat(),
+        ),
+      ),
+    );
   }
 
   Future<String> _generateDynamicUrl(Uri uri) async {

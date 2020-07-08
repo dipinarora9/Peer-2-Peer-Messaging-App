@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:peer2peer/models/common_classes.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
-class ChatScreen extends StatelessWidget {
-  final User user;
-  int i = 0;
-  ChatScreen(this.user);
-
+class BroadcastChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final client = Provider.of<ClientService>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (i == 0)
-        client.chatController
-            .jumpTo(client.chatController.position.maxScrollExtent + 100);
-      i++;
-    });
     return Scaffold(
       backgroundColor: Color(0xffCDEAC0),
       appBar: AppBar(
-        title: Text(user.username),
+        title: Text('Meeting id - ${client.meetingId}'),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            itemBuilder: (context) {
+              return client.actions
+                  .map(
+                    (action) => PopupMenuItem(
+                      child: Text(action),
+                      value: action,
+                    ),
+                  )
+                  .toList();
+            },
+            onSelected: (item) async {
+              if (item == client.actions[0]) {
+                Dialogs().showPopup(context, client.meetingId);
+              }
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -32,8 +41,7 @@ class ChatScreen extends StatelessWidget {
                   return ListView.builder(
                     controller: client.chatController,
                     itemBuilder: (context, index) {
-                      final chat = value.chats[user.toString()].chats.values
-                          .toList()[index];
+                      final chat = value.broadcastChat.values.toList()[index];
                       return Row(
                         children: <Widget>[
                           if (chat.sender.username == value.me.username)
@@ -49,7 +57,10 @@ class ChatScreen extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.all(15.0)
                                         .copyWith(bottom: 0),
-                                    child: Text(chat.message ?? ''),
+                                    child: Text(value.broadcastChat.values
+                                            .toList()[index]
+                                            .message ??
+                                        ''),
                                   ),
                                   Row(
                                     children: <Widget>[
@@ -57,15 +68,6 @@ class ChatScreen extends StatelessWidget {
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
                                             '${DateTime.fromMillisecondsSinceEpoch(chat.timestamp).hour}:${DateTime.fromMillisecondsSinceEpoch(chat.timestamp).minute}'),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Icon(chat.status ==
-                                                MessageStatus.SENDING
-                                            ? Icons.access_time
-                                            : chat.status == MessageStatus.SENT
-                                                ? Icons.check
-                                                : Icons.close),
                                       ),
                                     ],
                                     mainAxisAlignment: MainAxisAlignment.end,
@@ -90,47 +92,64 @@ class ChatScreen extends StatelessWidget {
                       );
                     },
                     shrinkWrap: true,
-                    itemCount: value.chats[user.toString()].chats.length,
+                    itemCount: value.broadcastChat.length,
                   );
                 },
               ),
             ),
-            Consumer<ClientService>(builder: (_, value, __) {
-              return value.chats[user.toString()].allowed
-                  ? Container(
-                      color: Color(0xffAECFDF).withOpacity(0.8),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: value.chatBox,
-                                decoration: InputDecoration(
-                                    labelText: 'Type your message here'),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.send,
-                              color: Colors.blue..withOpacity(0.8),
-                            ),
-                            onPressed: () =>
-                                client.createMessage(user.username),
-                          ),
-                        ],
+            Container(
+              color: Color(0xffAECFDF).withOpacity(0.8),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: client.chatBox,
+                        decoration: InputDecoration(
+                            labelText: 'Type your message here'),
                       ),
-                    )
-                  : Padding(
-                      padding: EdgeInsets.all(20),
-                      child:
-                          Text('Waiting for acceptance from the other user...'),
-                    );
-            }),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: Colors.blue..withOpacity(0.8),
+                    ),
+                    onPressed: () => client.createBroadcastMessage(),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class Dialogs {
+  showPopup(BuildContext context, String message) {
+    return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () => Share.share(message),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(message),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
