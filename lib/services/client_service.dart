@@ -417,13 +417,18 @@ class ClientService with ChangeNotifier {
   void _updateRoutingTable(int lastNode, {int dead}) {
     //todo:  update only peers whose numbering is smaller than me
     // todo: deletion updates
-    int myId = me.numbering;
+    int myId = me.numbering, outgoingDeadCount = 0, incomingDeadCount = 0;
     for (int number = 0; number <= lastNode; ++number) {
       if (myId == number) continue;
       // Outgoing Nodes
-      if (areNodesConnected(myId, number, lastNode + 1)) {
+      if (areNodesConnected(myId, number - outgoingDeadCount, lastNode + 1)) {
+        // checking if state if false
+        if (_outgoingNodes[number].state == false) {
+          _outgoingNodes.remove(number);
+          ++outgoingDeadCount;
+        }
         // check if don't exist in connection
-        if (!_outgoingNodes.containsKey(number)) {
+        else if (!_outgoingNodes.containsKey(number)) {
           _sendBuffer('GET_OUTGOING>$number'.codeUnits, _serverAddress);
         }
       } else {
@@ -432,9 +437,13 @@ class ClientService with ChangeNotifier {
         }
       }
       // Incoming Nodes
-      if (areNodesConnected(number, myId, lastNode + 1)) {
+      if (areNodesConnected(number + incomingDeadCount, myId, lastNode + 1)) {
+        if (_incomingNodes[number].state == false) {
+          _incomingNodes.remove(number);
+          ++incomingDeadCount;
+        }
         // check if don't exist in connection
-        if (!_incomingNodes.containsKey(number)) {
+        else if (!_incomingNodes.containsKey(number)) {
           _sendBuffer('GET_INCOMING>$number'.codeUnits, _serverAddress);
         }
       } else {
