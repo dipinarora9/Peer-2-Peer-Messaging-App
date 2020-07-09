@@ -63,8 +63,7 @@ class P2P with ChangeNotifier {
         .child('rooms')
         .child(data.link.queryParameters['room_id'])
         .child(user.uid)
-        .child('allowed')
-        .onValue
+        .onChildAdded
         .listen((event) {
       if (event.snapshot.value == true) {
         navKey.currentState.push(
@@ -75,7 +74,7 @@ class P2P with ChangeNotifier {
             ),
           ),
         );
-      } else {
+      } else if (event.snapshot.value == false) {
         Fluttertoast.showToast(msg: 'The host denied your entrance');
         _loading = false;
         notifyListeners();
@@ -153,7 +152,8 @@ class P2P with ChangeNotifier {
         builder: (_) => MultiProvider(
           providers: [
             ChangeNotifierProvider.value(
-              value: _serverService..initialize(user.user.uid),
+              value: _serverService
+                ..initialize(myOffer[1], user.user.uid, name.text),
             ),
             ChangeNotifierProvider.value(
               value: _clientService..initialize(user.user.uid),

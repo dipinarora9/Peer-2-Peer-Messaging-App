@@ -12,7 +12,7 @@ class MyDatagram extends Datagram {
 
   @override
   String toString() {
-    return '$_myPort ${super.toString()}';
+    return 'my port: $_myPort, ${String.fromCharCodes(super.data)} from ${super.address.address}:${super.port}';
   }
 }
 
@@ -32,7 +32,7 @@ class IpAddress {
   }
 
   @override
-  String toString() => "$_address:$_port";
+  String toString() => "${address.address}:$_port";
 }
 
 class SocketAddress {

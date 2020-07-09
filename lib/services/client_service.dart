@@ -24,6 +24,7 @@ class ClientService with ChangeNotifier {
   Map<String, BroadcastMessage> _broadcastChat = {};
   final List<String> actions = ['Share Link'];
   final String _meetingId;
+  int _lastNodeTillNow = 0;
 
   Map<String, BroadcastMessage> get broadcastChat => _broadcastChat;
   final TextEditingController chatBox = TextEditingController();
@@ -53,20 +54,21 @@ class ClientService with ChangeNotifier {
       }
     });
     _setupListener();
-    debugPrint('HERE IS IT sending request at ${DateTime.now()}');
     _sendBuffer('ROUTING_TABLE>$uid'.codeUnits, _serverAddress);
     chatController.jumpTo(chatController.position.maxScrollExtent + 100);
   }
 
   _setupListener() {
     _mySock.stream.listen((datagram) async {
+      debugPrint('got a message $datagram');
       if (String.fromCharCodes(datagram.data) == 'PING') {
-        _sendDatagramBuffer('PONG>${me.uid}'.codeUnits, datagram);
+        _sendDatagramBuffer('PONG>${me.numbering}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
-        String uid = String.fromCharCodes(datagram.data).split('>')[1];
-        if (uid != 'HOST') {
-          _outgoingNodes[uid].downCount = 0;
-          _outgoingNodes[uid].state = true;
+        int numbering =
+            int.parse(String.fromCharCodes(datagram.data).split('>')[1]);
+        if (numbering != -1) {
+          _outgoingNodes[numbering].downCount = 0;
+          _outgoingNodes[numbering].state = true;
         }
       } else if (String.fromCharCodes(datagram.data).startsWith('MESSAGE>')) {
         Message message =
@@ -105,27 +107,29 @@ class ClientService with ChangeNotifier {
         _updateRoutingTable(int.parse(
             String.fromCharCodes(datagram.data).split('>')[0].split('_').last));
       } else if (String.fromCharCodes(datagram.data)
-          .startsWith('ROUTING_TABLE>')) {
+          .startsWith('ROUTING_TABLE_')) {
         String table = String.fromCharCodes(datagram.data);
-        me = User.fromString(table.split('>')[0]);
+        _lastNodeTillNow = int.parse(table.split('>')[0].split('_').last);
+        me = User.fromString(table.split('>')[1]);
         myPair = Encrypt();
         notifyListeners();
-        debugPrint(me.toString());
-        if (table.split('>').length > 1) {
-          table = table.split('>')[1];
+        if (table.split('>').length > 2) {
+          table = table.split('>')[2];
           String incomingTable = table.split('&&&&')[0];
-          incomingTable.split(';').forEach((peer) async {
-            debugPrint(peer);
-            Node node = Node.fromString(peer);
-            _incomingNodes[node.user.numbering] = node;
-            _sendDummy(node.socket);
+          incomingTable.split(';').forEach((peer) {
+            if (peer != '') {
+              Node node = Node.fromString(peer);
+              _incomingNodes[node.user.numbering] = node;
+              _sendDummy(node.socket);
+            }
           });
           String outgoingTable = table.split('&&&&')[1];
           outgoingTable.split(';').forEach((peer) async {
-            debugPrint(peer);
-            Node node = Node.fromString(peer);
-            _outgoingNodes[node.user.numbering] = node;
-            await pingPeer(node.user.numbering);
+            if (peer != '') {
+              Node node = Node.fromString(peer);
+              _outgoingNodes[node.user.numbering] = node;
+              await pingPeer(node.user.numbering);
+            }
           });
         }
         setTimer();
@@ -202,13 +206,10 @@ class ClientService with ChangeNotifier {
   }
 
   void _sendBuffer(List<int> buffer, SocketAddress dest) {
-    if (_clientSocket.external.address == dest.external.address) {
-      debugPrint('behind same nat');
+    if (_clientSocket.external.address == dest.external.address)
       _sock2.send(buffer, dest.internal.address, dest.internal.port);
-    } else {
-      debugPrint('behind different nat $_clientSocket $dest');
+    else
       _sock1.send(buffer, dest.external.address, dest.external.port);
-    }
   }
 
   allowChat(bool accept, Message message) {
@@ -422,6 +423,7 @@ class ClientService with ChangeNotifier {
 
 // calculates incoming and outgoing nodes of newNode
   void _updateRoutingTable(int lastNode, {int dead}) {
+    _lastNodeTillNow = lastNode;
     // todo:  update only peers whose numbering is smaller than me
     // todo: deletion updates
     int myId = me.numbering, outgoingDeadCount = 0, incomingDeadCount = 0;
@@ -464,6 +466,7 @@ class ClientService with ChangeNotifier {
   createBroadcastMessage() {
     BroadcastMessage mess = BroadcastMessage(me, chatBox.text);
     _broadcastChat['${mess.timestamp}-${mess.sender}'] = mess;
+    notifyListeners();
     chatBox.clear();
     _broadcastMessage(mess);
   }
@@ -473,7 +476,7 @@ class ClientService with ChangeNotifier {
     int senderId = feed.sender.numbering;
     int x = 0;
     bool flag = true;
-    int p = 1, last = 100;
+    int p = 1, last = _lastNodeTillNow;
     // position of sender
     for (int i = me.numbering; i - p >= 0; p *= 2) {
       if (i - p == senderId) {
