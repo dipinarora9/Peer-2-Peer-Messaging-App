@@ -415,7 +415,7 @@ class ClientService with ChangeNotifier {
 
 // calculates incoming and outgoing nodes of newNode
   void _updateRoutingTable(int lastNode, {int dead}) {
-    //todo:  update only peers whose numbering is smaller than me
+    // todo:  update only peers whose numbering is smaller than me
     // todo: deletion updates
     int myId = me.numbering, outgoingDeadCount = 0, incomingDeadCount = 0;
     for (int number = 0; number <= lastNode; ++number) {
@@ -423,8 +423,8 @@ class ClientService with ChangeNotifier {
       // Outgoing Nodes
       if (areNodesConnected(myId, number - outgoingDeadCount, lastNode + 1)) {
         // checking if state if false
-        if (_outgoingNodes[number].state == false) {
-          _outgoingNodes.remove(number);
+        if (number == dead) {
+          if (_outgoingNodes.containsKey(number)) _outgoingNodes.remove(number);
           ++outgoingDeadCount;
         }
         // check if don't exist in connection
@@ -438,8 +438,8 @@ class ClientService with ChangeNotifier {
       }
       // Incoming Nodes
       if (areNodesConnected(number + incomingDeadCount, myId, lastNode + 1)) {
-        if (_incomingNodes[number].state == false) {
-          _incomingNodes.remove(number);
+        if (number == dead) {
+          if (_incomingNodes.containsKey(number)) _incomingNodes.remove(number);
           ++incomingDeadCount;
         }
         // check if don't exist in connection
