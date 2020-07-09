@@ -9,6 +9,11 @@ class MyDatagram extends Datagram {
       : super(datagram.data, datagram.address, datagram.port);
 
   int get myPort => _myPort;
+
+  @override
+  String toString() {
+    return '$_myPort ${super.toString()}';
+  }
 }
 
 class IpAddress {

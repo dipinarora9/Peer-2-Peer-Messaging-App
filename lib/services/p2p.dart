@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
 import 'package:peer2peer/screens/broadcast_chat.dart';
 import 'package:peer2peer/services/client_service.dart';
@@ -14,7 +15,7 @@ import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 
 class P2P with ChangeNotifier {
-  bool _searching = false;
+  bool _loading = false;
 
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 
@@ -24,59 +25,11 @@ class P2P with ChangeNotifier {
   final TextEditingController meetingId = TextEditingController();
   final TextEditingController name = TextEditingController();
 
-  bool get searching => _searching;
-
-//  /// Initializes the network, automatically register the user as a server or client/peer
-//  initializer({String ip}) async {
-//    if (ip != null && ip != '') {
-//      mask = ip.split(',')[0];
-//      _start = int.parse(ip.split(',')[1]);
-//      _end = int.parse(ip.split(',')[2]);
-//    }
-//    if (_serverSocket == null) {
-//      _searching = true;
-//      notifyListeners();
-//      Fluttertoast.showToast(
-//          msg: 'Checking if server is already available, please wait.',
-//          toastLength: Toast.LENGTH_LONG);
-//      final InternetAddress address = await findServer();
-//      if (address == null) {
-//        _serverSocket =
-//            await ServerSocket.bind('0.0.0.0', serverPort, shared: true);
-//        _serverService = ServerService(_serverSocket);
-//        addServerListener();
-//        Fluttertoast.showToast(msg: 'Server started');
-//        _searching = false;
-//
-//        navKey.currentState.push(
-//          MaterialPageRoute(
-//            builder: (_) => ChangeNotifierProvider(
-//              child: ServerScreen(),
-//              create: (_) => _serverService,
-//            ),
-//          ),
-//        );
-//      } else {
-//        _searching = false;
-//        notifyListeners();
-//        Fluttertoast.showToast(msg: 'Server already available');
-//        debugPrint('Server already available');
-//        navKey.currentState.push(
-//          MaterialPageRoute(
-//            builder: (_) => ChangeNotifierProvider(
-//              child: AllChatsScreen(),
-//              create: (_) => ClientService(address),
-//            ),
-//          ),
-//        );
-//      }
-//    } else {
-//      Fluttertoast.showToast(msg: 'This device is already a Server');
-//    }
-//  }
-//
+  bool get loading => _loading;
 
   joinMeetingViaUrl() async {
+    _loading = true;
+    notifyListeners();
     AuthResult user = await FirebaseAuth.instance.signInAnonymously();
     PendingDynamicLinkData data =
         await FirebaseDynamicLinks.instance.getInitialLink();
@@ -84,6 +37,8 @@ class P2P with ChangeNotifier {
   }
 
   joinMeeting() async {
+    _loading = true;
+    notifyListeners();
     AuthResult user = await FirebaseAuth.instance.signInAnonymously();
     PendingDynamicLinkData data = await FirebaseDynamicLinks.instance
         .getDynamicLink(Uri.https('peer2peer.page.link', meetingId.text));
@@ -104,19 +59,33 @@ class P2P with ChangeNotifier {
         .child(user.uid)
         .update(clientMap);
     _clientService = ClientService(mySocket, serverAddress, meetingId);
-    navKey.currentState.push(
-      MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider.value(
-          value: _clientService..initialize(),
-          child: BroadcastChat(false),
-        ),
-      ),
-    );
+    ref
+        .child('rooms')
+        .child(data.link.queryParameters['room_id'])
+        .child(user.uid)
+        .child('allowed')
+        .onValue
+        .listen((event) {
+      if (event.snapshot.value == true) {
+        navKey.currentState.push(
+          MaterialPageRoute(
+            builder: (_) => ChangeNotifierProvider.value(
+              value: _clientService..initialize(user.uid),
+              child: BroadcastChat(false),
+            ),
+          ),
+        );
+      } else {
+        Fluttertoast.showToast(msg: 'The host denied your entrance');
+        _loading = false;
+        notifyListeners();
+      }
+    });
   }
 
   Future<SocketAddress> _createMySocket() async {
-    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0);
-    sock.timeout(Duration(seconds: 10000));
+    RawDatagramSocket sock = await RawDatagramSocket.bind('0.0.0.0', 0,
+        reuseAddress: true, ttl: 255);
     List<NetworkInterface> l = await NetworkInterface.list();
     IpAddress myIp;
     var connectivityResult = await (Connectivity().checkConnectivity());
@@ -159,6 +128,8 @@ class P2P with ChangeNotifier {
   }
 
   createMeeting() async {
+    _loading = true;
+    notifyListeners();
     DatabaseReference ref = FirebaseDatabase.instance.reference();
     AuthResult user = await FirebaseAuth.instance.signInAnonymously();
     ref = ref.child('rooms').push();
@@ -182,10 +153,10 @@ class P2P with ChangeNotifier {
         builder: (_) => MultiProvider(
           providers: [
             ChangeNotifierProvider.value(
-              value: _clientService..initialize(),
+              value: _serverService..initialize(user.user.uid),
             ),
             ChangeNotifierProvider.value(
-              value: _serverService..initialize(),
+              value: _clientService..initialize(user.user.uid),
             ),
           ],
           child: BroadcastChat(true),

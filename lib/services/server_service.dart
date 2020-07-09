@@ -22,7 +22,7 @@ class ServerService with ChangeNotifier {
 
   ServerService(this._serverSocket, this._roomKey);
 
-  initialize() async {
+  initialize(String uid) async {
     FirebaseDatabase.instance
         .reference()
         .child('rooms')
@@ -31,18 +31,38 @@ class ServerService with ChangeNotifier {
         .listen((event) async {
       if (event.snapshot.key != 'host') {
         SocketAddress address = SocketAddress.fromMap(event.snapshot.value);
-        bool result = await showPopup(event.snapshot.value['username']);
-        if (result) {
+        if (event.snapshot.key != uid) {
+          bool result = await showPopup(event.snapshot.value['username']);
+          if (result) {
+            _addNode(
+                address, event.snapshot.key, event.snapshot.value['username']);
+            _sendDummy(address);
+            FirebaseDatabase.instance
+                .reference()
+                .child('rooms')
+                .child(_roomKey)
+                .child(event.snapshot.key)
+                .child('allowed')
+                .set(true);
+          } else
+            FirebaseDatabase.instance
+                .reference()
+                .child('rooms')
+                .child(_roomKey)
+                .child(event.snapshot.key)
+                .child('allowed')
+                .set(false);
+        } else
           _addNode(
               address, event.snapshot.key, event.snapshot.value['username']);
-          _sendDummy(address);
-        }
       }
     });
-    _sock1 =
-        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.external.port);
-    _sock2 =
-        await RawDatagramSocket.bind('0.0.0.0', _serverSocket.internal.port);
+    _sock1 = await RawDatagramSocket.bind(
+        '0.0.0.0', _serverSocket.external.port,
+        reuseAddress: true, ttl: 255);
+    _sock2 = await RawDatagramSocket.bind(
+        '0.0.0.0', _serverSocket.internal.port,
+        reuseAddress: true, ttl: 255);
     _sock1.listen((event) {
       if (event == RawSocketEvent.read)
         _mySock.add(MyDatagram(_sock1.receive(), _sock1.port));
@@ -73,7 +93,7 @@ class ServerService with ChangeNotifier {
         }
       } else if (String.fromCharCodes(datagram.data)
           .startsWith("ROUTING_TABLE>")) {
-        debugPrint('HERE IS IT routing table $datagram');
+        debugPrint('HERE IS IT routing table request from $datagram');
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
         String tables = _generateRoutingTable(uid);
         _sendDatagramBuffer(tables.codeUnits, datagram);
@@ -134,7 +154,7 @@ class ServerService with ChangeNotifier {
   }
 
   void _sendDummy(SocketAddress dest) {
-    debugPrint('sending dummy message to $dest');
+    debugPrint('sending dummy message to $dest on ${DateTime.now()}');
     _sendBuffer([], dest);
     _sendBuffer([], dest);
     _sendBuffer([], dest);
@@ -149,10 +169,13 @@ class ServerService with ChangeNotifier {
   }
 
   void _sendBuffer(List<int> buffer, SocketAddress dest) {
-    if (_serverSocket.external == dest.external)
+    if (_serverSocket.external.address == dest.external.address) {
+      debugPrint('behind same nat');
       _sock2.send(buffer, dest.internal.address, dest.internal.port);
-    else
+    } else {
+      debugPrint('behind different nat');
       _sock1.send(buffer, dest.external.address, dest.external.port);
+    }
   }
 
   int _getAvailableID(SocketAddress address) {
@@ -182,7 +205,7 @@ class ServerService with ChangeNotifier {
   }
 
   _addNode(SocketAddress ip, String uid, String username) {
-    int id = _getAvailableID(ip); // to be done
+    int id = _getAvailableID(ip);
     /*
     * returns first available id from disconnected list
     * otherwise give a next new ID

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:peer2peer/models/common_classes.dart';
 import 'package:peer2peer/screens/private_chat.dart';
@@ -34,23 +33,28 @@ class ClientService with ChangeNotifier {
 
   ClientService(this._clientSocket, this._serverAddress, this._meetingId);
 
-  initialize() async {
-    _sock1 =
-        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.external.port);
-    _sock2 =
-        await RawDatagramSocket.bind('0.0.0.0', _clientSocket.internal.port);
+  initialize(String uid) async {
+    _sock1 = await RawDatagramSocket.bind(
+        '0.0.0.0', _clientSocket.external.port,
+        reuseAddress: true, ttl: 255);
+    _sock2 = await RawDatagramSocket.bind(
+        '0.0.0.0', _clientSocket.internal.port,
+        reuseAddress: true, ttl: 255);
     _sock1.listen((event) {
-      if (event == RawSocketEvent.read)
-        _mySock.add(MyDatagram(_sock1.receive(), _sock1.port));
+      if (event == RawSocketEvent.read) {
+        Datagram datagram = _sock1.receive();
+        if (datagram != null) _mySock.add(MyDatagram(datagram, _sock1.port));
+      }
     });
     _sock2.listen((event) {
-      if (event == RawSocketEvent.read)
-        _mySock.add(MyDatagram(_sock2.receive(), _sock2.port));
+      if (event == RawSocketEvent.read) {
+        Datagram datagram = _sock2.receive();
+        if (datagram != null) _mySock.add(MyDatagram(datagram, _sock2.port));
+      }
     });
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
     _setupListener();
-    debugPrint('sending routing table request');
-    _sendBuffer('ROUTING_TABLE>${user.uid}'.codeUnits, _serverAddress);
+    debugPrint('HERE IS IT sending request at ${DateTime.now()}');
+    _sendBuffer('ROUTING_TABLE>$uid'.codeUnits, _serverAddress);
     chatController.jumpTo(chatController.position.maxScrollExtent + 100);
   }
 
@@ -198,10 +202,13 @@ class ClientService with ChangeNotifier {
   }
 
   void _sendBuffer(List<int> buffer, SocketAddress dest) {
-    if (_clientSocket.external == dest.external)
+    if (_clientSocket.external.address == dest.external.address) {
+      debugPrint('behind same nat');
       _sock2.send(buffer, dest.internal.address, dest.internal.port);
-    else
+    } else {
+      debugPrint('behind different nat $_clientSocket $dest');
       _sock1.send(buffer, dest.external.address, dest.external.port);
+    }
   }
 
   allowChat(bool accept, Message message) {

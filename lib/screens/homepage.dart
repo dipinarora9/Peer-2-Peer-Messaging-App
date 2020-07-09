@@ -10,59 +10,67 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('P2P Implementation'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: p2p.name,
-                  decoration: InputDecoration(labelText: 'Name'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: RaisedButton(
-                  child: Padding(
+      body: Consumer<P2P>(
+          builder: (_, value, child) {
+            if (value.loading)
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            return child;
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: <Widget>[
+                  Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Create meeting',
-                      textScaleFactor: 1.1,
+                    child: TextFormField(
+                      controller: p2p.name,
+                      decoration: InputDecoration(labelText: 'Name'),
                     ),
                   ),
-                  elevation: 20,
-                  onPressed: () => p2p.createMeeting(),
-                  color: Color(0xff59C9A5),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: p2p.meetingId,
-                  decoration: InputDecoration(labelText: 'Meeting id'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: RaisedButton(
-                  child: Padding(
+                  Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Join meeting',
-                      textScaleFactor: 1.1,
+                    child: RaisedButton(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Create meeting',
+                          textScaleFactor: 1.1,
+                        ),
+                      ),
+                      elevation: 20,
+                      onPressed: () => p2p.createMeeting(),
+                      color: Color(0xff59C9A5),
                     ),
                   ),
-                  elevation: 20,
-                  onPressed: () => p2p.joinMeeting(),
-                  color: Color(0xff59C9A5),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: p2p.meetingId,
+                      decoration: InputDecoration(labelText: 'Meeting id'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Join meeting',
+                          textScaleFactor: 1.1,
+                        ),
+                      ),
+                      elevation: 20,
+                      onPressed: () => p2p.joinMeeting(),
+                      color: Color(0xff59C9A5),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
+          )),
     );
   }
 }
