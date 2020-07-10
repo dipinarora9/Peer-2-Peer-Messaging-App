@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
@@ -6,6 +7,7 @@ import 'package:share/share.dart';
 
 class BroadcastChat extends StatelessWidget {
   final bool _server;
+
   BroadcastChat(this._server);
 
   @override
@@ -30,10 +32,31 @@ class BroadcastChat extends StatelessWidget {
                   )
                   .toList();
             },
-            onSelected: (item) async {
-              if (item == client.actions[0]) {
+            onSelected: (item) {
+              if (item == client.actions[0])
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(client.me.toString()),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              else if (item == client.actions[1])
                 Share.share('https://peer2peer.page.link/${client.meetingId}');
-              }
+              else
+                client.sendQuitRequest();
             },
           ),
         ],
@@ -74,7 +97,12 @@ class BroadcastChat extends StatelessWidget {
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                            '${DateTime.fromMillisecondsSinceEpoch(chat.timestamp).hour}:${DateTime.fromMillisecondsSinceEpoch(chat.timestamp).minute}'),
+                                            'by ${value.broadcastChat.values.toList()[index].sender.username}'),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                            'at ${DateTime.fromMillisecondsSinceEpoch(chat.timestamp).hour}:${DateTime.fromMillisecondsSinceEpoch(chat.timestamp).minute}'),
                                       ),
                                     ],
                                     mainAxisAlignment: MainAxisAlignment.end,

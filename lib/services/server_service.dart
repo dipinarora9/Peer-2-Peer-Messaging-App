@@ -33,27 +33,29 @@ class ServerService with ChangeNotifier {
       if (event.snapshot.key != 'host') {
         SocketAddress address = SocketAddress.fromMap(event.snapshot.value);
         if (event.snapshot.key != uid) {
-          bool result = await showPopup(event.snapshot.value['username']);
-          if (result) {
-            debugPrint('${event.snapshot.key} $address');
-            _addNode(
-                address, event.snapshot.key, event.snapshot.value['username']);
-            _sendDummy(address);
-            FirebaseDatabase.instance
-                .reference()
-                .child('rooms')
-                .child(_roomKey)
-                .child(event.snapshot.key)
-                .child('allowed')
-                .set(true);
-          } else
-            FirebaseDatabase.instance
-                .reference()
-                .child('rooms')
-                .child(_roomKey)
-                .child(event.snapshot.key)
-                .child('allowed')
-                .set(false);
+          if (!event.snapshot.value.containsKey('allowed')) {
+            bool result = await showPopup(event.snapshot.value['username']);
+            if (result) {
+              debugPrint('${event.snapshot.key} $address');
+              _addNode(address, event.snapshot.key,
+                  event.snapshot.value['username']);
+              _sendDummy(address);
+              FirebaseDatabase.instance
+                  .reference()
+                  .child('rooms')
+                  .child(_roomKey)
+                  .child(event.snapshot.key)
+                  .child('allowed')
+                  .set(true);
+            } else
+              FirebaseDatabase.instance
+                  .reference()
+                  .child('rooms')
+                  .child(_roomKey)
+                  .child(event.snapshot.key)
+                  .child('allowed')
+                  .set(false);
+          }
         }
       }
     });

@@ -22,7 +22,7 @@ class ClientService with ChangeNotifier {
   RawDatagramSocket _sock1;
   RawDatagramSocket _sock2;
   Map<String, BroadcastMessage> _broadcastChat = {};
-  final List<String> actions = ['Share Link'];
+  final List<String> actions = ['Debug Info', 'Share Link', 'Quit'];
   final String _meetingId;
   int _lastNodeTillNow = 0;
 
@@ -97,6 +97,8 @@ class ClientService with ChangeNotifier {
             BroadcastMessage.fromString(String.fromCharCodes(datagram.data));
         _broadcastChat['${message.timestamp}-${message.sender}'] = message;
         notifyListeners();
+        chatController.animateTo(chatController.position.maxScrollExtent + 150,
+            curve: Curves.easeIn, duration: Duration(milliseconds: 200));
         _broadcastMessage(message);
       } else if (String.fromCharCodes(datagram.data).startsWith('UPDATE_')) {
         Node user =
@@ -394,8 +396,8 @@ class ClientService with ChangeNotifier {
     });
     Message mess = Message(me, receiver, chatBox.text, time);
     _appendMessage(receiver, mess, time);
-    chatController.animateTo(chatController.position.maxScrollExtent + 100,
-        curve: Curves.easeIn, duration: Duration(milliseconds: 500));
+    chatController.animateTo(chatController.position.maxScrollExtent + 150,
+        curve: Curves.easeIn, duration: Duration(milliseconds: 200));
     Message f = Message.fromString(mess.toString());
     await forwardMessage(f
       ..message =
@@ -467,49 +469,61 @@ class ClientService with ChangeNotifier {
     BroadcastMessage mess = BroadcastMessage(me, chatBox.text);
     _broadcastChat['${mess.timestamp}-${mess.sender}'] = mess;
     notifyListeners();
+    chatController.animateTo(chatController.position.maxScrollExtent + 150,
+        curve: Curves.easeIn, duration: Duration(milliseconds: 200));
     chatBox.clear();
     _broadcastMessage(mess);
   }
 
   _broadcastMessage(BroadcastMessage feed) {
-// sendBuffer(feed.toString().codeUnits, node.socket);
+//    for (var y in _outgoingNodes.keys) debugPrint(y.toString());
+//    for (var y in _incomingNodes.keys) debugPrint(y.toString());
     int senderId = feed.sender.numbering;
     int x = 0;
     bool flag = true;
     int p = 1, last = _lastNodeTillNow;
     // position of sender
-    for (int i = me.numbering; i - p >= 0; p *= 2) {
-      if (i - p == senderId) {
-        flag = false;
-        break;
-      }
-      if (_incomingNodes[i - p].state) ++x;
-    }
-    // cycle
-    if (flag)
-      for (int i = me.numbering + last; i - p >= 0; p *= 2) {
-        if (i - p == senderId) break;
+    debugPrint('$_incomingNodes');
+    if (me.numbering != senderId) {
+      for (int i = me.numbering; i - p >= 0; p *= 2) {
+        if (i - p == senderId) {
+          flag = false;
+          break;
+        }
         if (_incomingNodes[i - p].state) ++x;
       }
-    flag = false;
+      // cycle
+      if (flag)
+        for (int i = me.numbering + last + 1; i - p >= 0; p *= 2) {
+          debugPrint('here ${i - p}');
+          if (i - p == senderId) break;
+//          debugPrint('nuller: ${i - p}');
+          if (_incomingNodes[i - p].state) ++x;
+        }
+    }
     p = 1;
+    int i;
+//    debugPrint('last : $last');
     // broadcasting message
-    for (int i = me.numbering; i + p < last; p *= 2) {
+    for (i = me.numbering; i + p <= last; p *= 2) {
+      if (i + p == senderId) continue;
       if (_outgoingNodes[i + p].state) {
-        if (x <= 0)
+        if (x <= 1) {
+//          debugPrint('message1 for prashant: ${i + p}');
           _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
-        else
+        } else
           --x;
       }
     }
     // cycle
-    for (int i = me.numbering - last;
-        i + p < me.numbering && i + p < last;
-        p *= 2) {
+    i -= (last + 1);
+    for (; i + p < me.numbering; p *= 2) {
+      if (i + p == senderId) continue;
       if (_outgoingNodes[i + p].state) {
-        if (x <= 0)
+        if (x <= 1) {
+//          debugPrint('message2 for prashant: ${i + p}');
           _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
-        else
+        } else
           --x;
       }
     }
