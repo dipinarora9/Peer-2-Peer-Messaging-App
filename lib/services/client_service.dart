@@ -26,6 +26,11 @@ class ClientService with ChangeNotifier {
   final String _meetingId;
   int _lastNodeTillNow = 0;
 
+  //todo: for debugging purpose
+  Map<int, Node> get incomingNodes => _incomingNodes;
+
+  Map<int, Node> get outgoingNodes => _outgoingNodes;
+
   Map<String, BroadcastMessage> get broadcastChat => _broadcastChat;
   final TextEditingController chatBox = TextEditingController();
   final ScrollController chatController = ScrollController();

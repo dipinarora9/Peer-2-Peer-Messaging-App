@@ -66,6 +66,7 @@ class P2P with ChangeNotifier {
         .onChildAdded
         .listen((event) {
       if (event.snapshot.value == true) {
+        _loading = false;
         navKey.currentState.push(
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider.value(
@@ -147,6 +148,7 @@ class P2P with ChangeNotifier {
         Uri.https('peer2peer.page.link', 'room', linkMap));
     _clientService =
         ClientService(myOffer[1], myOffer[0], shareLink.split('/').last);
+    _loading = false;
     navKey.currentState.push(
       MaterialPageRoute(
         builder: (_) => MultiProvider(

@@ -43,10 +43,107 @@ class BroadcastChat extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text('My number'),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(client.me.numbering.toString()),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text('My UID'),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 2,
+                                    child: Text(client.me.uid),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text('My Username'),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(client.me.username.toString()),
+                                ),
+                              ],
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(client.me.toString()),
-                            )
+                              child: Text('incoming table'),
+                            ),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                columns: [
+                                  DataColumn(label: Text('Numbering')),
+                                  DataColumn(label: Text('Username')),
+                                  DataColumn(label: Text('UID')),
+                                  DataColumn(label: Text('Down count')),
+                                ],
+                                rows: [
+                                  for (var a in client.incomingNodes.entries)
+                                    DataRow(
+                                      cells: [
+                                        DataCell(Text(a.key.toString())),
+                                        DataCell(Text(
+                                            a.value.user.username.toString())),
+                                        DataCell(
+                                            Text(a.value.user.uid.toString())),
+                                        DataCell(
+                                            Text(a.value.downCount.toString())),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('outgoing table'),
+                            ),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                columns: [
+                                  DataColumn(label: Text('Numbering')),
+                                  DataColumn(label: Text('Username')),
+                                  DataColumn(label: Text('UID')),
+                                  DataColumn(label: Text('Down count')),
+                                ],
+                                rows: [
+                                  for (var a in client.outgoingNodes.entries)
+                                    DataRow(
+                                      cells: [
+                                        DataCell(Text(a.key.toString())),
+                                        DataCell(Text(
+                                            a.value.user.username.toString())),
+                                        DataCell(
+                                            Text(a.value.user.uid.toString())),
+                                        DataCell(
+                                            Text(a.value.downCount.toString())),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
