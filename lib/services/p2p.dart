@@ -67,6 +67,7 @@ class P2P with ChangeNotifier {
         .listen((event) {
       if (event.snapshot.value == true) {
         _loading = false;
+        notifyListeners();
         navKey.currentState.push(
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider.value(
@@ -128,6 +129,10 @@ class P2P with ChangeNotifier {
   }
 
   createMeeting() async {
+    if (name.text.isEmpty) {
+      Fluttertoast.showToast(msg: 'Name cannot be empty');
+      return;
+    }
     _loading = true;
     notifyListeners();
     DatabaseReference ref = FirebaseDatabase.instance.reference();
@@ -149,6 +154,7 @@ class P2P with ChangeNotifier {
     _clientService =
         ClientService(myOffer[1], myOffer[0], shareLink.split('/').last);
     _loading = false;
+    notifyListeners();
     navKey.currentState.push(
       MaterialPageRoute(
         builder: (_) => MultiProvider(

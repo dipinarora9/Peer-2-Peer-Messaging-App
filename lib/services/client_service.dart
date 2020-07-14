@@ -100,11 +100,16 @@ class ClientService with ChangeNotifier {
       } else if (String.fromCharCodes(datagram.data).startsWith('BROADCAST>')) {
         BroadcastMessage message =
             BroadcastMessage.fromString(String.fromCharCodes(datagram.data));
-        _broadcastChat['${message.timestamp}-${message.sender}'] = message;
-        notifyListeners();
-        chatController.animateTo(chatController.position.maxScrollExtent + 150,
-            curve: Curves.easeIn, duration: Duration(milliseconds: 200));
-        _broadcastMessage(message);
+        if (!_broadcastChat
+            .containsKey('${message.timestamp}-${message.sender}')) {
+          _broadcastChat['${message.timestamp}-${message.sender}'] = message;
+          notifyListeners();
+          chatController.animateTo(
+              chatController.position.maxScrollExtent + 150,
+              curve: Curves.easeIn,
+              duration: Duration(milliseconds: 200));
+          _broadcastMessage(message);
+        }
       } else if (String.fromCharCodes(datagram.data).startsWith('UPDATE_')) {
         Node user =
             Node.fromString(String.fromCharCodes(datagram.data).split('>')[1]);

@@ -27,6 +27,9 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: p2p.name,
+                      validator: (n) =>
+                          n.isEmpty ? 'Name cannot be empty' : null,
+                      autovalidate: true,
                       decoration: InputDecoration(labelText: 'Name'),
                     ),
                   ),

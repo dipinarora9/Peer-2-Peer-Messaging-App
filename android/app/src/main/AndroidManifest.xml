@@ -2,7 +2,6 @@
     package="dipinarora9.peer2peer">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="Peer 2 Peer Messaging"
         android:icon="@mipmap/ic_launcher">
         <activity
