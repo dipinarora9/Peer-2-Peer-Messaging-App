@@ -96,8 +96,8 @@ class BroadcastChat extends StatelessWidget {
                                 columns: [
                                   DataColumn(label: Text('Numbering')),
                                   DataColumn(label: Text('Username')),
-                                  DataColumn(label: Text('UID')),
                                   DataColumn(label: Text('Down count')),
+                                  DataColumn(label: Text('UID')),
                                 ],
                                 rows: [
                                   for (var a in client.incomingNodes.entries)
@@ -107,9 +107,9 @@ class BroadcastChat extends StatelessWidget {
                                         DataCell(Text(
                                             a.value.user.username.toString())),
                                         DataCell(
-                                            Text(a.value.user.uid.toString())),
-                                        DataCell(
                                             Text(a.value.downCount.toString())),
+                                        DataCell(
+                                            Text(a.value.user.uid.toString())),
                                       ],
                                     ),
                                 ],
@@ -125,8 +125,8 @@ class BroadcastChat extends StatelessWidget {
                                 columns: [
                                   DataColumn(label: Text('Numbering')),
                                   DataColumn(label: Text('Username')),
-                                  DataColumn(label: Text('UID')),
                                   DataColumn(label: Text('Down count')),
+                                  DataColumn(label: Text('UID')),
                                 ],
                                 rows: [
                                   for (var a in client.outgoingNodes.entries)
@@ -136,9 +136,9 @@ class BroadcastChat extends StatelessWidget {
                                         DataCell(Text(
                                             a.value.user.username.toString())),
                                         DataCell(
-                                            Text(a.value.user.uid.toString())),
-                                        DataCell(
                                             Text(a.value.downCount.toString())),
+                                        DataCell(
+                                            Text(a.value.user.uid.toString())),
                                       ],
                                     ),
                                 ],

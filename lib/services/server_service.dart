@@ -16,7 +16,7 @@ class ServerService with ChangeNotifier {
   final String _roomKey;
   RawDatagramSocket _sock1;
   RawDatagramSocket _sock2;
-  Map<int, List<MyDatagram>> _deadBacklog = {};
+  Map<String, List<MyDatagram>> _deadBacklog = {};
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -36,7 +36,7 @@ class ServerService with ChangeNotifier {
           if (!event.snapshot.value.containsKey('allowed')) {
             bool result = await showPopup(event.snapshot.value['username']);
             if (result) {
-              debugPrint('${event.snapshot.key} $address');
+//              debugPrint('${event.snapshot.key} $address');
               _addNode(address, event.snapshot.key,
                   event.snapshot.value['username']);
               _sendDummy(address);
@@ -124,8 +124,10 @@ class ServerService with ChangeNotifier {
       } else if (String.fromCharCodes(datagram.data).startsWith('DEAD>')) {
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
         User user = _getUser(uid);
+        debugPrint('$user');
         allNodes[user.numbering].state = false;
         _sendBuffer('PING'.codeUnits, allNodes[user.numbering].socket);
+        _deadBacklog[uid] = [];
         _deadBacklog[uid].add(datagram);
         Timer.periodic(Duration(seconds: 1), (timer) {
           if (!allNodes[user.numbering].state) {

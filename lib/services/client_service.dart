@@ -59,6 +59,7 @@ class ClientService with ChangeNotifier {
       }
     });
     _setupListener();
+    debugPrint('Requesting routing table1');
     _sendBuffer('ROUTING_TABLE>$uid'.codeUnits, _serverAddress);
     chatController.jumpTo(chatController.position.maxScrollExtent + 100);
   }
@@ -127,6 +128,7 @@ class ClientService with ChangeNotifier {
         notifyListeners();
         if (table.split('>').length > 2) {
           table = table.split('>')[2];
+          debugPrint(table.toString());
           String incomingTable = table.split('&&&&')[0];
           incomingTable.split(';').forEach((peer) {
             if (peer != '') {
@@ -140,7 +142,7 @@ class ClientService with ChangeNotifier {
             if (peer != '') {
               Node node = Node.fromString(peer);
               _outgoingNodes[node.user.numbering] = node;
-              await pingPeer(node.user.numbering);
+              await pingPeer(node.user.uid);
             }
           });
         }
@@ -242,20 +244,34 @@ class ClientService with ChangeNotifier {
   setTimer() {
     if (_timer == null)
       _timer = Timer.periodic(Duration(minutes: 1), (timer) {
-        _outgoingNodes.keys.forEach((uid) async {
-          await pingPeer(uid);
+        _outgoingNodes.values.forEach((user) async {
+          await pingPeer(user.user.uid);
         });
       });
   }
 
-  pingPeer(uid) async {
-    if (!_outgoingNodes[uid].state && _outgoingNodes[uid].downCount > 2) {
-      _sendBuffer('DEAD>$uid'.codeUnits, _serverAddress);
+  int _getUser(String uid) {
+    int numbering;
+    _outgoingNodes.values.any((v) {
+      if (v.user.uid == uid) {
+        numbering = v.user.numbering;
+        return true;
+      }
+      return false;
+    });
+    return numbering;
+  }
+
+  pingPeer(String uid) async {
+    int num = _getUser(uid);
+    if (!_outgoingNodes[num].state && _outgoingNodes[num].downCount > 2) {
+      _sendBuffer(
+          'DEAD>${_outgoingNodes[num].user.uid}'.codeUnits, _serverAddress);
       return;
     }
-    _outgoingNodes[uid].downCount++;
-    _outgoingNodes[uid].state = false;
-    _sendBuffer('PING'.codeUnits, _outgoingNodes[uid].socket);
+    _outgoingNodes[num].downCount++;
+    _outgoingNodes[num].state = false;
+    _sendBuffer('PING'.codeUnits, _outgoingNodes[num].socket);
   }
 
   sendQuitRequest() async {
@@ -436,8 +452,6 @@ class ClientService with ChangeNotifier {
 // calculates incoming and outgoing nodes of newNode
   void _updateRoutingTable(int lastNode, {int dead}) {
     _lastNodeTillNow = lastNode;
-    // todo:  update only peers whose numbering is smaller than me
-    // todo: deletion updates
     int myId = me.numbering, outgoingDeadCount = 0, incomingDeadCount = 0;
     for (int number = 0; number <= lastNode; ++number) {
       if (myId == number) continue;
@@ -486,56 +500,26 @@ class ClientService with ChangeNotifier {
   }
 
   _broadcastMessage(BroadcastMessage feed) {
-//    for (var y in _outgoingNodes.keys) debugPrint(y.toString());
-//    for (var y in _incomingNodes.keys) debugPrint(y.toString());
     int senderId = feed.sender.numbering;
-    int x = 0;
-    bool flag = true;
     int p = 1, last = _lastNodeTillNow;
-    // position of sender
-    debugPrint('$_incomingNodes');
-    if (me.numbering != senderId) {
-      for (int i = me.numbering; i - p >= 0; p *= 2) {
-        if (i - p == senderId) {
-          flag = false;
-          break;
-        }
-        if (_incomingNodes[i - p].state) ++x;
+    int i = me.numbering;
+    if (senderId <= me.numbering) {
+      for (i = me.numbering; i + p <= last; p *= 2) {
+//        if (_outgoingNodes.containsKey(i + p) && _outgoingNodes[i + p].state) {
+        debugPrint(
+            '#############$feed################111  $senderId -> ${i + p}');
+        _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
+//        }
       }
-      // cycle
-      if (flag)
-        for (int i = me.numbering + last + 1; i - p >= 0; p *= 2) {
-          debugPrint('here ${i - p}');
-          if (i - p == senderId) break;
-//          debugPrint('nuller: ${i - p}');
-          if (_incomingNodes[i - p].state) ++x;
-        }
+      if (i + p > senderId) i -= (last + 1);
     }
-    p = 1;
-    int i;
-//    debugPrint('last : $last');
-    // broadcasting message
-    for (i = me.numbering; i + p <= last; p *= 2) {
-      if (i + p == senderId) continue;
-      if (_outgoingNodes[i + p].state) {
-        if (x <= 1) {
-//          debugPrint('message1 for prashant: ${i + p}');
-          _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
-        } else
-          --x;
-      }
-    }
-    // cycle
-    i -= (last + 1);
-    for (; i + p < me.numbering; p *= 2) {
-      if (i + p == senderId) continue;
-      if (_outgoingNodes[i + p].state) {
-        if (x <= 1) {
-//          debugPrint('message2 for prashant: ${i + p}');
-          _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
-        } else
-          --x;
-      }
+    debugPrint('$i ============ $last');
+    for (; i + p < senderId; p *= 2) {
+//      if (_outgoingNodes.containsKey(i + p) && _outgoingNodes[i + p].state) {
+      debugPrint(
+          '##############$feed###############222   $senderId -> ${i + p}');
+      _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
+//      }
     }
   }
 }
