@@ -11,24 +11,27 @@ class HomePage extends StatelessWidget {
         title: Text('P2P Implementation'),
       ),
       body: Consumer<P2P>(
-          builder: (_, value, child) {
-            if (value.loading)
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            return child;
-          },
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
+        builder: (_, value, child) {
+          if (value.loading)
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          return child;
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Form(
+              key: p2p.formKey,
               child: Column(
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: p2p.name,
-                      validator: (n) =>
-                          n.isEmpty ? 'Name cannot be empty' : null,
+                      validator: (n) => n.startsWith(' ')
+                          ? 'Name cannot start with a space'
+                          : null,
                       autovalidate: true,
                       decoration: InputDecoration(labelText: 'Name'),
                     ),
@@ -73,7 +76,9 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

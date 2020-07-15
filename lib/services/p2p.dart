@@ -18,7 +18,7 @@ class P2P with ChangeNotifier {
   bool _loading = false;
 
   static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
-
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String _roomKey;
   ClientService _clientService;
   ServerService _serverService;
@@ -28,41 +28,45 @@ class P2P with ChangeNotifier {
   bool get loading => _loading;
 
   joinMeetingViaUrl() async {
-    _loading = true;
-    notifyListeners();
-    AuthResult user = await FirebaseAuth.instance.signInAnonymously();
-    PendingDynamicLinkData data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
-    _parseDynamicLinkData(data, user.user, '');
+    FirebaseDynamicLinks.instance
+        .getInitialLink()
+        .then((data) => data != null ? _parseDynamicLinkData(data, '') : null);
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData data) async {
+      if (data != null) _parseDynamicLinkData(data, '');
+    }, onError: (OnLinkErrorException e) async {
+      print(e.message);
+      Fluttertoast.showToast(msg: e.message);
+    });
   }
 
   joinMeeting() async {
+    PendingDynamicLinkData data = await FirebaseDynamicLinks.instance
+        .getDynamicLink(Uri.https('peer2peer.page.link', meetingId.text));
+    _parseDynamicLinkData(data, meetingId.text);
+  }
+
+  _parseDynamicLinkData(PendingDynamicLinkData data, String meetingId) async {
     _loading = true;
     notifyListeners();
     AuthResult user = await FirebaseAuth.instance.signInAnonymously();
-    PendingDynamicLinkData data = await FirebaseDynamicLinks.instance
-        .getDynamicLink(Uri.https('peer2peer.page.link', meetingId.text));
-    _parseDynamicLinkData(data, user.user, meetingId.text);
-  }
-
-  _parseDynamicLinkData(
-      PendingDynamicLinkData data, FirebaseUser user, String meetingId) async {
     SocketAddress serverAddress =
         SocketAddress.fromMap(data.link.queryParameters);
     SocketAddress mySocket = await _createMySocket();
     DatabaseReference ref = FirebaseDatabase.instance.reference();
     Map<String, dynamic> clientMap = mySocket.toMap();
-    clientMap['username'] = name.text;
+    clientMap['username'] =
+        name.text != '' ? name.text : user.user.uid.substring(0, 5);
     ref
         .child('rooms')
         .child(data.link.queryParameters['room_id'])
-        .child(user.uid)
+        .child(user.user.uid)
         .update(clientMap);
     _clientService = ClientService(mySocket, serverAddress, meetingId);
     ref
         .child('rooms')
         .child(data.link.queryParameters['room_id'])
-        .child(user.uid)
+        .child(user.user.uid)
         .onChildAdded
         .listen((event) {
       if (event.snapshot.value == true) {
@@ -71,7 +75,7 @@ class P2P with ChangeNotifier {
         navKey.currentState.push(
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider.value(
-              value: _clientService..initialize(user.uid),
+              value: _clientService..initialize(user.user.uid),
               child: BroadcastChat(false),
             ),
           ),
@@ -133,6 +137,10 @@ class P2P with ChangeNotifier {
       Fluttertoast.showToast(msg: 'Name cannot be empty');
       return;
     }
+    if (!formKey.currentState.validate()) {
+      Fluttertoast.showToast(msg: 'Please fix the errors');
+      return;
+    }
     _loading = true;
     notifyListeners();
     DatabaseReference ref = FirebaseDatabase.instance.reference();
@@ -186,5 +194,64 @@ class P2P with ChangeNotifier {
     );
     final ShortDynamicLink shortLink = await parameters.buildShortLink();
     return shortLink.shortUrl.toString();
+  }
+
+  Future<String> askForName() {
+    final TextEditingController name = TextEditingController();
+    final GlobalKey<FormState> fKey = GlobalKey<FormState>();
+    return showDialog(
+      context: navKey.currentState.context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          child: WillPopScope(
+            onWillPop: () {
+              return Future(() => false);
+            },
+            child: SingleChildScrollView(
+              child: Form(
+                key: fKey,
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        decoration: InputDecoration(labelText: 'Name'),
+                        controller: name,
+                        validator: (n) => n.startsWith(' ')
+                            ? 'Name cannot start with a space'
+                            : null,
+                        autovalidate: true,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Submit',
+                            textScaleFactor: 1.1,
+                          ),
+                        ),
+                        elevation: 20,
+                        onPressed: () {
+                          if (!formKey.currentState.validate()) {
+                            Fluttertoast.showToast(
+                                msg: 'Please fix the errors');
+                          } else
+                            navKey.currentState.pop(name.text);
+                        },
+                        color: Color(0xff59C9A5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

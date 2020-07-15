@@ -23,7 +23,7 @@ class ClientService with ChangeNotifier {
   RawDatagramSocket _sock2;
   Map<String, BroadcastMessage> _broadcastChat = {};
   final List<String> actions = ['Debug Info', 'Share Link', 'Quit'];
-  final String _meetingId;
+  String _meetingId;
   int _lastNodeTillNow = 0;
 
   //todo: for debugging purpose
@@ -33,6 +33,7 @@ class ClientService with ChangeNotifier {
 
   Map<String, BroadcastMessage> get broadcastChat => _broadcastChat;
   final TextEditingController chatBox = TextEditingController();
+  final FocusNode chatFocus = FocusNode();
   final ScrollController chatController = ScrollController();
 
   String get meetingId => _meetingId;
@@ -59,8 +60,10 @@ class ClientService with ChangeNotifier {
       }
     });
     _setupListener();
-    debugPrint('Requesting routing table1');
+    _sendDummy(_serverAddress);
+    debugPrint('Requesting routing table');
     _sendBuffer('ROUTING_TABLE>$uid'.codeUnits, _serverAddress);
+//    if (_meetingId == '') _sendBuffer('MEETING_ID'.codeUnits, _serverAddress);
     chatController.jumpTo(chatController.position.maxScrollExtent + 100);
   }
 
@@ -183,7 +186,6 @@ class ClientService with ChangeNotifier {
       } else if (String.fromCharCodes(datagram.data).startsWith('DEAD_')) {
         User deadUser =
             User.fromString(String.fromCharCodes(datagram.data).split('>')[1]);
-        _outgoingNodes.remove(deadUser.uid);
         _updateRoutingTable(
             int.parse(String.fromCharCodes(datagram.data)
                 .split('>')[0]
@@ -191,6 +193,9 @@ class ClientService with ChangeNotifier {
             dead: deadUser.numbering);
       } else if (String.fromCharCodes(datagram.data).startsWith('NOT_DEAD>')) {
         String uid = String.fromCharCodes(datagram.data).split('>')[1];
+        int num = _getUser(uid);
+        _outgoingNodes[num].downCount = 0;
+        _outgoingNodes[num].state = true;
         pingPeer(uid);
       } else if (String.fromCharCodes(datagram.data).startsWith('USER_')) {
         Node node =
@@ -206,6 +211,7 @@ class ClientService with ChangeNotifier {
   }
 
   void _sendDummy(SocketAddress dest) {
+    debugPrint('SENDING DUMMY message to $dest');
     _sendBuffer([], dest);
     _sendBuffer([], dest);
     _sendBuffer([], dest);
@@ -490,6 +496,11 @@ class ClientService with ChangeNotifier {
   }
 
   createBroadcastMessage() {
+    if (chatBox.text == ' ' || chatBox.text == '') {
+      chatBox.clear();
+      chatFocus.unfocus();
+      return;
+    }
     BroadcastMessage mess = BroadcastMessage(me, chatBox.text);
     _broadcastChat['${mess.timestamp}-${mess.sender}'] = mess;
     notifyListeners();
@@ -505,21 +516,14 @@ class ClientService with ChangeNotifier {
     int i = me.numbering;
     if (senderId <= me.numbering) {
       for (i = me.numbering; i + p <= last; p *= 2) {
-//        if (_outgoingNodes.containsKey(i + p) && _outgoingNodes[i + p].state) {
-        debugPrint(
-            '#############$feed################111  $senderId -> ${i + p}');
+        debugPrint('sending message to ${_outgoingNodes[i + p].user}');
         _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
-//        }
       }
       if (i + p > senderId) i -= (last + 1);
     }
-    debugPrint('$i ============ $last');
     for (; i + p < senderId; p *= 2) {
-//      if (_outgoingNodes.containsKey(i + p) && _outgoingNodes[i + p].state) {
-      debugPrint(
-          '##############$feed###############222   $senderId -> ${i + p}');
+      debugPrint('sending message to ${_outgoingNodes[i + p].user}');
       _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
-//      }
     }
   }
 }

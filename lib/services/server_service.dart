@@ -129,34 +129,15 @@ class ServerService with ChangeNotifier {
         _sendBuffer('PING'.codeUnits, allNodes[user.numbering].socket);
         _deadBacklog[uid] = [];
         _deadBacklog[uid].add(datagram);
-        Timer.periodic(Duration(seconds: 1), (timer) {
+        Timer.periodic(Duration(seconds: 30), (timer) {
           if (!allNodes[user.numbering].state) {
             _generateRoutingTable(user.uid, sendDeadStatus: true);
             _removeNode(user.numbering);
-            _sendDatagramBuffer('DEAD>$uid'.codeUnits, datagram);
+            _sendDatagramBuffer(
+                'DEAD_$_lastNodeTillNow>$user'.codeUnits, datagram);
           }
           timer.cancel();
         });
-
-//      } else if (String.fromCharCodes(datagram.data)
-//          .startsWith('UID_FROM_IP-')) {
-//        //--------------------- get uid of given ip {'UID_FROM_IP-192.65.23.155}------
-//        InternetAddress ip =
-//            InternetAddress(String.fromCharCodes(datagram.data).substring(12));
-//        User user = getUID(ip: ip);
-//        sendDatagramBuffer('$user'.codeUnits, datagram);
-//      } else if (String.fromCharCodes(datagram.data)
-//          .startsWith('UID_FROM_USERNAME-')) {
-//        //--------------------- get uid of given ip {'UID_FROM_USERNAME-abc}------
-//        String username = String.fromCharCodes(datagram.data).substring(18);
-//        User user = getUID(username: username);
-//        sendDatagramBuffer('$user'.codeUnits, datagram);
-//      } else if (String.fromCharCodes(datagram.data).startsWith('USERNAME-')) {
-//        //--------------------- get uid of given ip {'USERNAME-abc}------
-//        String result =
-//            checkUsername(String.fromCharCodes(datagram.data).substring(9));
-//        sendDatagramBuffer(result.codeUnits, datagram);
-//      }
       }
     });
   }
@@ -231,7 +212,7 @@ class ServerService with ChangeNotifier {
       if (v.state == true) {
         code += v.toString();
         if (sendDeadStatus)
-          _sendBuffer('DEAD_$_lastNodeTillNow>${v.user}'.codeUnits, v.socket);
+          _sendBuffer('DEAD_$_lastNodeTillNow>$user'.codeUnits, v.socket);
         else
           _sendBuffer(
               'UPDATE_OUTGOING_$_lastNodeTillNow>$v'.codeUnits, v.socket);
@@ -242,7 +223,7 @@ class ServerService with ChangeNotifier {
       if (v.state == true) {
         code += v.toString();
         if (sendDeadStatus)
-          _sendBuffer('DEAD_$_lastNodeTillNow>${v.user}'.codeUnits, v.socket);
+          _sendBuffer('DEAD_$_lastNodeTillNow>$user'.codeUnits, v.socket);
         else
           _sendBuffer(
               'UPDATE_INCOMING_$_lastNodeTillNow>$v'.codeUnits, v.socket);
