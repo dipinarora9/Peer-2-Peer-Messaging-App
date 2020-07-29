@@ -1,5 +1,4 @@
-
-This app demonstrates Peer 2 Peer communication over UDP.
+### This app demonstrates Peer 2 Peer communication over UDP.
 
 We are using UDP Nat-hole punching to achieve quick connection.
 
@@ -15,12 +14,12 @@ Each peer is made smart enough to recalculate its routing table based on the las
 
 Each member peer sends dummy messages to its incoming peer upon getting a routing table or upon its updation, so as to establish UDP hole punching.
 
-There are two ways to send a message:
+#### There are two ways to send a message:
 • Broadcast message (which gets received by everyone)
 • Private message (gets to a particular person)
 
 We have completed the broadcast messaging part and will be completing the private messaging very soon.
 
-This project is made by Dipin Arora ( dipinarora9) and Prashant Sajwan (@PRASHANT-SAJWAN)
+### This project is made by Dipin Arora (@dipinarora9) and Prashant Sajwan (@PRASHANT-SAJWAN)
 
-Link to the reference paper.
+### [Link](https://files.ifi.uzh.ch/CSG/staff/bocek/extern/theses/BA-Jonas-Wagner.pdf) to the reference paper.
