@@ -34,7 +34,7 @@ class P2P with ChangeNotifier {
     try {
       await remoteConfig.setDefaults(defaults);
 
-      await remoteConfig.fetch(expiration: const Duration(hours: 5));
+      await remoteConfig.fetch(expiration: const Duration(seconds: 0));
       await remoteConfig.activateFetched();
       defaults['server_ip'] = remoteConfig.getString('server_ip');
     } catch (e) {}
@@ -122,8 +122,7 @@ class P2P with ChangeNotifier {
         return false;
       });
     });
-
-    sock.send('hey'.codeUnits, InternetAddress('15.207.7.66'), 2020);
+    sock.send('hey'.codeUnits, InternetAddress(defaults['server_ip']), 2020);
     RawSocketEvent event = RawSocketEvent.read;
     int i = 0;
     if (event == RawSocketEvent.read) {
