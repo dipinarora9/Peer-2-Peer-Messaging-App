@@ -17,6 +17,7 @@ dependencies:
   firebase_dynamic_links:
   share:
   firebase_auth:
+  firebase_remote_config:
 
 dev_dependencies:
   flutter_test:

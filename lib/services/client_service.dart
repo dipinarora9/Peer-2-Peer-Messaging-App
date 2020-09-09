@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
 import 'package:peer2peer/screens/private_chat.dart';
 import 'package:provider/provider.dart';
@@ -63,6 +64,14 @@ class ClientService with ChangeNotifier {
     _sendDummy(_serverAddress);
     debugPrint('Requesting routing table');
     _sendBuffer('ROUTING_TABLE>$uid'.codeUnits, _serverAddress);
+    Timer.periodic(Duration(seconds: 10), (timer) {
+      if (me == null) {
+        debugPrint('Nat Hole Punching Unsuccessful😢');
+        Fluttertoast.showToast(msg: 'Nat Hole Punching Unsuccessful😢');
+        P2P.navKey.currentState.pop();
+      }
+      timer.cancel();
+    });
 //    if (_meetingId == '') _sendBuffer('MEETING_ID'.codeUnits, _serverAddress);
     chatController.jumpTo(chatController.position.maxScrollExtent + 100);
   }

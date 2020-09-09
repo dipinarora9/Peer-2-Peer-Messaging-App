@@ -10,7 +10,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => P2P()..joinMeetingViaUrl(),
+      create: (_) => P2P()
+        ..setUpConfig()
+        ..joinMeetingViaUrl(),
       child: MaterialApp(
         title: 'P2P',
         theme: ThemeData(

@@ -5,10 +5,12 @@ import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
+import 'package:peer2peer/models/constants.dart';
 import 'package:peer2peer/screens/broadcast_chat.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
@@ -26,6 +28,17 @@ class P2P with ChangeNotifier {
   final TextEditingController name = TextEditingController();
 
   bool get loading => _loading;
+
+  setUpConfig() async {
+    final RemoteConfig remoteConfig = await RemoteConfig.instance;
+    try {
+      await remoteConfig.setDefaults(defaults);
+
+      await remoteConfig.fetch(expiration: const Duration(hours: 5));
+      await remoteConfig.activateFetched();
+      defaults['server_ip'] = remoteConfig.getString('server_ip');
+    } catch (e) {}
+  }
 
   joinMeetingViaUrl() async {
     FirebaseDynamicLinks.instance
@@ -49,7 +62,7 @@ class P2P with ChangeNotifier {
   _parseDynamicLinkData(PendingDynamicLinkData data, String meetingId) async {
     _loading = true;
     notifyListeners();
-    AuthResult user = await FirebaseAuth.instance.signInAnonymously();
+    UserCredential user = await FirebaseAuth.instance.signInAnonymously();
     SocketAddress serverAddress =
         SocketAddress.fromMap(data.link.queryParameters);
     SocketAddress mySocket = await _createMySocket();
@@ -96,10 +109,10 @@ class P2P with ChangeNotifier {
     var connectivityResult = await (Connectivity().checkConnectivity());
     InternetAddressType addressType;
     if (connectivityResult == ConnectivityResult.mobile) {
-      addressType = InternetAddressType.IPv6;
     } else if (connectivityResult == ConnectivityResult.wifi) {
       addressType = InternetAddressType.IPv4;
     }
+    if (addressType == null) return null;
     l.forEach((address) {
       address.addresses.any((add) {
         if (add.type == addressType) {
@@ -112,12 +125,16 @@ class P2P with ChangeNotifier {
 
     sock.send('hey'.codeUnits, InternetAddress('15.207.7.66'), 2020);
     RawSocketEvent event = RawSocketEvent.read;
+    int i = 0;
     if (event == RawSocketEvent.read) {
       Datagram datagram;
-      while (datagram == null) {
+      while (datagram == null && i < 20) {
         await Future.delayed(Duration(milliseconds: 100));
+        i++;
         datagram = sock.receive();
       }
+      if (datagram == null) return null;
+
       IpAddress externalIp =
           IpAddress.fromString(String.fromCharCodes(datagram.data));
       return SocketAddress(externalIp, myIp);
@@ -128,8 +145,10 @@ class P2P with ChangeNotifier {
   Future<List<SocketAddress>> _createHostOffer() async {
     SocketAddress clientOffer = await _createMySocket();
     SocketAddress serverOffer = await _createMySocket();
-
-    return [serverOffer, clientOffer];
+    if (serverOffer != null && clientOffer != null)
+      return [serverOffer, clientOffer];
+    else
+      return null;
   }
 
   createMeeting() async {
@@ -144,10 +163,16 @@ class P2P with ChangeNotifier {
     _loading = true;
     notifyListeners();
     DatabaseReference ref = FirebaseDatabase.instance.reference();
-    AuthResult user = await FirebaseAuth.instance.signInAnonymously();
+    UserCredential user = await FirebaseAuth.instance.signInAnonymously();
     ref = ref.child('rooms').push();
     _roomKey = ref.key;
     List<SocketAddress> myOffer = await _createHostOffer();
+    if (myOffer == null) {
+      Fluttertoast.showToast(msg: 'Cannot establish connection to the server');
+      _loading = false;
+      notifyListeners();
+      return;
+    }
     _serverService = ServerService(myOffer[0], _roomKey);
     Map<String, dynamic> serverMap = myOffer[0].toMap();
     Map<String, dynamic> clientMap = myOffer[1].toMap();
