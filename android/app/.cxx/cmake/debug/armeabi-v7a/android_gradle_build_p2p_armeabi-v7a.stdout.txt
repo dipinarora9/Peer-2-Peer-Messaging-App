@@ -1,0 +1,2 @@
+ninja: Entering directory `D:\Projects\GITHUB\Peer-2-Peer-Messaging-App\android\app\.cxx\cmake\debug\armeabi-v7a'
+ninja: no work to do.

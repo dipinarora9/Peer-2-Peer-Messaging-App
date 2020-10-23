@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:connectivity/connectivity.dart';
@@ -14,7 +15,10 @@ import 'package:peer2peer/models/constants.dart';
 import 'package:peer2peer/screens/broadcast_chat.dart';
 import 'package:peer2peer/services/client_service.dart';
 import 'package:peer2peer/services/server_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+
+import 'native_utils.dart';
 
 class P2P with ChangeNotifier {
   bool _loading = false;
@@ -37,6 +41,7 @@ class P2P with ChangeNotifier {
       await remoteConfig.fetch(expiration: const Duration(seconds: 0));
       await remoteConfig.activateFetched();
       defaults['server_ip'] = remoteConfig.getString('server_ip');
+      debugPrint(defaults['server_ip']);
     } catch (e) {}
   }
 
@@ -88,7 +93,9 @@ class P2P with ChangeNotifier {
         navKey.currentState.push(
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider.value(
-              value: _clientService..initialize(user.user.uid),
+              value: _clientService
+                ..initialize(user.user.uid)
+                ..setupCallbackReceivers(),
               child: BroadcastChat(false),
             ),
           ),
@@ -196,7 +203,9 @@ class P2P with ChangeNotifier {
                 ..initialize(myOffer[1], user.user.uid, name.text),
             ),
             ChangeNotifierProvider.value(
-              value: _clientService..initialize(user.user.uid),
+              value: _clientService
+                ..initialize(user.user.uid)
+                ..setupCallbackReceivers(),
             ),
           ],
           child: BroadcastChat(true),
@@ -219,6 +228,51 @@ class P2P with ChangeNotifier {
     final ShortDynamicLink shortLink = await parameters.buildShortLink();
     return shortLink.shortUrl.toString();
   }
+
+  initialize() async {
+    if (!await Permission.microphone.isGranted)
+      await Permission.microphone.request();
+
+    final Pointer Function() createPlayer = p2pLib
+        .lookup<NativeFunction<Pointer Function()>>("createPlayer")
+        .asFunction();
+    player = createPlayer();
+    final initializeApi = p2pLib.lookupFunction<IntPtr Function(Pointer<Void>),
+        int Function(Pointer<Void>)>("InitDartApiDL");
+    int result = initializeApi(NativeApi.initializeApiDLData);
+    debugPrint('HERE IS IT $player $result');
+  }
+
+  resume() {
+    final int Function(Pointer) resume = p2pLib
+        .lookup<NativeFunction<Int32 Function(Pointer)>>("resume")
+        .asFunction();
+    int result = resume(player);
+
+    debugPrint('HERE IS IT RESUMED $result');
+  }
+
+  pause() {
+    final int Function(Pointer) stop = p2pLib
+        .lookup<NativeFunction<Int32 Function(Pointer)>>("stop")
+        .asFunction();
+    int result = stop(player);
+
+    debugPrint('HERE IS IT PAUSED $result');
+  }
+
+  // getBuffer() async {
+  //   final BufferFunction buffer = NativeUtils.p2pLib
+  //       .lookup<NativeFunction<BufferNativeFunction>>("getBuffer")
+  //       .asFunction();
+  //   int result =
+  //       buffer(player, Pointer.fromFunction<CallbackFunction>(callback));
+  //
+  //   // await Future.delayed(Duration(seconds: 5));
+  //   // debugPrint('HERE IS IT PLAYING NOW');
+  //
+  //   debugPrint('HERE IS IT $result');
+  // }
 
   Future<String> askForName() {
     final TextEditingController name = TextEditingController();
@@ -245,7 +299,7 @@ class P2P with ChangeNotifier {
                         validator: (n) => n.startsWith(' ')
                             ? 'Name cannot start with a space'
                             : null,
-                        autovalidate: true,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                       ),
                     ),
                     Padding(

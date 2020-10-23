@@ -1,0 +1,14 @@
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/CMakeFiles/rebuild_cache.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/CMakeFiles/p2p.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/CMakeFiles/install/local.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/CMakeFiles/install.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/CMakeFiles/edit_cache.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/CMakeFiles/list_install_components.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/CMakeFiles/install/strip.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/oboe/CMakeFiles/oboe.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/oboe/CMakeFiles/install/local.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/oboe/CMakeFiles/install.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/oboe/CMakeFiles/edit_cache.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/oboe/CMakeFiles/rebuild_cache.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/oboe/CMakeFiles/list_install_components.dir
+D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/x86_64/oboe/CMakeFiles/install/strip.dir

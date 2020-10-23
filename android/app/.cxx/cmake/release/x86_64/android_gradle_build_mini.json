@@ -1,0 +1,26 @@
+{
+  "buildFiles": [
+    "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\build\\cmake\\platforms.cmake",
+    "C:\\src\\oboe\\CMakeLists.txt",
+    "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86_64\" clean"
+  ],
+  "buildTargetsCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "OboeSinePlayer-Release-x86_64": {
+      "artifactName": "OboeSinePlayer",
+      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86_64\" OboeSinePlayer",
+      "abi": "x86_64",
+      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\release\\obj\\x86_64\\libOboeSinePlayer.so"
+    },
+    "oboe-Release-x86_64": {
+      "artifactName": "oboe",
+      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86_64\" oboe",
+      "abi": "x86_64",
+      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86_64\\oboe\\liboboe.a"
+    }
+  }
+}

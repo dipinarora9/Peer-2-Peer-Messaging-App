@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:peer2peer/models/common_classes.dart';
+import 'package:peer2peer/models/native_models.dart';
 import 'package:peer2peer/screens/private_chat.dart';
 import 'package:provider/provider.dart';
 
+import 'native_utils.dart';
 import 'p2p.dart';
 
 class ClientService with ChangeNotifier {
@@ -26,6 +31,9 @@ class ClientService with ChangeNotifier {
   final List<String> actions = ['Debug Info', 'Share Link', 'Quit'];
   String _meetingId;
   int _lastNodeTillNow = 0;
+  final interactiveCppRequests = ReceivePort()..listen(handleCppRequests);
+  int nativePort;
+  bool play = false;
 
   //todo: for debugging purpose
   Map<int, Node> get incomingNodes => _incomingNodes;
@@ -79,7 +87,14 @@ class ClientService with ChangeNotifier {
   _setupListener() {
     _mySock.stream.listen((datagram) async {
       debugPrint('got a message $datagram');
-      if (String.fromCharCodes(datagram.data) == 'PING') {
+      if (datagram.data[0] == 9 &&
+          datagram.data[datagram.data.length - 1] == 9) {
+        NativeUtils.playBuffer(
+            player,
+            NativeUtils.toPointer(
+                datagram.data.sublist(1, datagram.data.length - 2)),
+            datagram.data.length);
+      } else if (String.fromCharCodes(datagram.data) == 'PING') {
         _sendDatagramBuffer('PONG>${me.numbering}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
         int numbering =
@@ -534,5 +549,71 @@ class ClientService with ChangeNotifier {
       debugPrint('sending message to ${_outgoingNodes[i + p].user}');
       _sendBuffer(feed.toString().codeUnits, _outgoingNodes[i + p].socket);
     }
+  }
+
+  broadcastBytes(List<int> bytes) {
+    int senderId = me.numbering;
+    int p = 1, last = _lastNodeTillNow;
+    int i = me.numbering;
+    if (senderId <= me.numbering) {
+      for (i = me.numbering; i + p <= last; p *= 2) {
+        debugPrint('sending message to ${_outgoingNodes[i + p].user}');
+        _sendBuffer(bytes, _outgoingNodes[i + p].socket);
+      }
+      if (i + p > senderId) i -= (last + 1);
+    }
+    for (; i + p < senderId; p *= 2) {
+      debugPrint('sending message to ${_outgoingNodes[i + p].user}');
+      _sendBuffer(bytes, _outgoingNodes[i + p].socket);
+    }
+  }
+
+  setupCallbackReceivers() {
+    nativePort = interactiveCppRequests.sendPort.nativePort;
+  }
+
+  static void handleCppRequests(dynamic message) {
+    final cppRequest = CppRequest.fromCppMessage(message);
+    print('Dart:   Got message: $cppRequest');
+    // final Uint8List buffer = cppRequest.data;
+    if (cppRequest.method == 'audio_buffer') {
+      final Uint8List temp = cppRequest.data;
+      List<int> buffer = Uint8List(temp.length + 2).toList();
+
+      buffer[0] = 9;
+      for (int i = 0; i < temp.length; i++) {
+        buffer[i + 1] = temp[i];
+      }
+      buffer[buffer.length - 1] = 9;
+      // buffer[0] = 9;
+      // buffer[buffer.length - 1] = 9;
+      debugPrint(buffer.toString());
+      globalClient.broadcastBytes(buffer);
+    }
+  }
+
+  // static void callback(Pointer<Uint8> ptr, int frames, int timeout) {
+  //   debugPrint('HERE IS IT callback $frames');
+  //   Uint8List buffer = NativeUtils.fromPointer(ptr, frames);
+  //   buffer.insert(0, 9);
+  //   buffer.add(9);
+  //   debugPrint('HERE IS IT callback $buffer $frames');
+  //   globalClient.broadcastBytes(buffer);
+  // }
+
+  bool _recording = false;
+
+  // nativeRecord() {
+  //
+  //   return nativeRecord;
+  // }
+
+  record() {
+    _recording = !_recording;
+    debugPrint(nativePort.toString());
+    int result =
+        NativeUtils.nativeRecord(player, _recording ? 1 : 0, nativePort);
+
+    debugPrint('HERE IS IT Recording $result');
   }
 }

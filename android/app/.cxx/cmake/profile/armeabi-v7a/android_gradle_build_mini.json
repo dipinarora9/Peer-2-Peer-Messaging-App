@@ -1,0 +1,26 @@
+{
+  "buildFiles": [
+    "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\build\\cmake\\android.toolchain.cmake",
+    "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\build\\cmake\\platforms.cmake",
+    "C:\\src\\oboe\\CMakeLists.txt",
+    "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\armeabi-v7a\" clean"
+  ],
+  "buildTargetsCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\armeabi-v7a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "oboe-Debug-armeabi-v7a": {
+      "artifactName": "oboe",
+      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\armeabi-v7a\" oboe",
+      "abi": "armeabi-v7a",
+      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\armeabi-v7a\\oboe\\liboboe.a"
+    },
+    "OboeSinePlayer-Debug-armeabi-v7a": {
+      "artifactName": "OboeSinePlayer",
+      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\armeabi-v7a\" OboeSinePlayer",
+      "abi": "armeabi-v7a",
+      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\profile\\obj\\armeabi-v7a\\libOboeSinePlayer.so"
+    }
+  }
+}

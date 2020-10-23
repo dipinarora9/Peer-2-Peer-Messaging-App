@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:peer2peer/services/client_service.dart';
+import 'package:peer2peer/services/native_utils.dart';
 import 'package:peer2peer/services/server_service.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
@@ -13,6 +14,7 @@ class BroadcastChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final client = Provider.of<ClientService>(context, listen: false);
+    globalClient = Provider.of<ClientService>(context, listen: false);
     return WillPopScope(
       onWillPop: () {
         client.sendQuitRequest();
@@ -242,6 +244,12 @@ class BroadcastChat extends StatelessWidget {
                 color: Color(0xffAECFDF).withOpacity(0.8),
                 child: Row(
                   children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.mic,
+                      ),
+                      onPressed: () => client.record(),
+                    ),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),

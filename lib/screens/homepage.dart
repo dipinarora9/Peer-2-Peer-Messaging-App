@@ -32,8 +32,23 @@ class HomePage extends StatelessWidget {
                       validator: (n) => n.startsWith(' ')
                           ? 'Name cannot start with a space'
                           : null,
-                      autovalidate: true,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: InputDecoration(labelText: 'Name'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Initialize',
+                          textScaleFactor: 1.1,
+                        ),
+                      ),
+                      elevation: 20,
+                      onPressed: () => p2p.initialize(),
+                      color: Color(0xff59C9A5),
                     ),
                   ),
                   Padding(
@@ -51,6 +66,21 @@ class HomePage extends StatelessWidget {
                       color: Color(0xff59C9A5),
                     ),
                   ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: RaisedButton(
+                  //     child: Padding(
+                  //       padding: const EdgeInsets.all(8.0),
+                  //       child: Text(
+                  //         'pause',
+                  //         textScaleFactor: 1.1,
+                  //       ),
+                  //     ),
+                  //     elevation: 20,
+                  //     onPressed: () => p2p.pause(),
+                  //     color: Color(0xff59C9A5),
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(

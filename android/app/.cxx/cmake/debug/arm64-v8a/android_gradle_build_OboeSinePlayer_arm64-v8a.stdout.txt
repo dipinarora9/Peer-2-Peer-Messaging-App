@@ -1,0 +1,22 @@
+ninja: Entering directory `D:\Projects\GITHUB\Peer-2-Peer-Messaging-App\android\app\.cxx\cmake\debug\arm64-v8a'
+[1/2] Building CXX object CMakeFiles/OboeSinePlayer.dir/c++/audio-receiver.cpp.o
+../../../../../c++/audio-receiver.cpp:14:34: warning: data argument not used by format string [-Wformat-extra-args]
+        LOGE("HERE IS IT error", oboe::convertToText(result));
+             ~~~~~~~~~~~~~~~~~~  ^
+C:/src/oboe/include\../../../src/oboe/src/common/OboeDebug.h:30:71: note: expanded from macro 'LOGE'
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, MODULE_NAME, __VA_ARGS__)
+                                                                      ^~~~~~~~~~~
+../../../../../c++/audio-receiver.cpp:30:34: warning: data argument not used by format string [-Wformat-extra-args]
+        LOGE("HERE IS IT error", oboe::convertToText(result));
+             ~~~~~~~~~~~~~~~~~~  ^
+C:/src/oboe/include\../../../src/oboe/src/common/OboeDebug.h:30:71: note: expanded from macro 'LOGE'
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, MODULE_NAME, __VA_ARGS__)
+                                                                      ^~~~~~~~~~~
+../../../../../c++/audio-receiver.cpp:105:38: warning: data argument not used by format string [-Wformat-extra-args]
+        LOGE("HERE IS IT NHI CHLA ", oboe::convertToText(result.error()));
+             ~~~~~~~~~~~~~~~~~~~~~~  ^
+C:/src/oboe/include\../../../src/oboe/src/common/OboeDebug.h:30:71: note: expanded from macro 'LOGE'
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, MODULE_NAME, __VA_ARGS__)
+                                                                      ^~~~~~~~~~~
+3 warnings generated.
+[2/2] Linking CXX shared library D:\Projects\GITHUB\Peer-2-Peer-Messaging-App\build\app\intermediates\cmake\debug\obj\arm64-v8a\libOboeSinePlayer.so

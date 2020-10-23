@@ -1,0 +1,313 @@
+[
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -Dp2p_EXPORTS -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles\\p2p.dir\\c++\\audio_receiver.cpp.o -c D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\audio_receiver.cpp",
+  "file": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/c++/audio_receiver.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -Dp2p_EXPORTS -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles\\p2p.dir\\c++\\bridge_services.cpp.o -c D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\bridge_services.cpp",
+  "file": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/c++/bridge_services.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -Dp2p_EXPORTS -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles\\p2p.dir\\c++\\include\\dart_api_dl.cc.o -c D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\dart_api_dl.cc",
+  "file": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/c++/include/dart_api_dl.cc"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\aaudio\\AAudioLoader.cpp.o -c C:\\src\\oboe\\src\\aaudio\\AAudioLoader.cpp",
+  "file": "C:\\src\\oboe\\src\\aaudio\\AAudioLoader.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\aaudio\\AudioStreamAAudio.cpp.o -c C:\\src\\oboe\\src\\aaudio\\AudioStreamAAudio.cpp",
+  "file": "C:\\src\\oboe\\src\\aaudio\\AudioStreamAAudio.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\AudioSourceCaller.cpp.o -c C:\\src\\oboe\\src\\common\\AudioSourceCaller.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\AudioSourceCaller.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\AudioStream.cpp.o -c C:\\src\\oboe\\src\\common\\AudioStream.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\AudioStream.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\AudioStreamBuilder.cpp.o -c C:\\src\\oboe\\src\\common\\AudioStreamBuilder.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\AudioStreamBuilder.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\DataConversionFlowGraph.cpp.o -c C:\\src\\oboe\\src\\common\\DataConversionFlowGraph.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\DataConversionFlowGraph.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\FilterAudioStream.cpp.o -c C:\\src\\oboe\\src\\common\\FilterAudioStream.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\FilterAudioStream.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\FixedBlockAdapter.cpp.o -c C:\\src\\oboe\\src\\common\\FixedBlockAdapter.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\FixedBlockAdapter.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\FixedBlockReader.cpp.o -c C:\\src\\oboe\\src\\common\\FixedBlockReader.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\FixedBlockReader.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\FixedBlockWriter.cpp.o -c C:\\src\\oboe\\src\\common\\FixedBlockWriter.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\FixedBlockWriter.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\LatencyTuner.cpp.o -c C:\\src\\oboe\\src\\common\\LatencyTuner.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\LatencyTuner.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\SourceFloatCaller.cpp.o -c C:\\src\\oboe\\src\\common\\SourceFloatCaller.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\SourceFloatCaller.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\SourceI16Caller.cpp.o -c C:\\src\\oboe\\src\\common\\SourceI16Caller.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\SourceI16Caller.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\Utilities.cpp.o -c C:\\src\\oboe\\src\\common\\Utilities.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\Utilities.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\QuirksManager.cpp.o -c C:\\src\\oboe\\src\\common\\QuirksManager.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\QuirksManager.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\fifo\\FifoBuffer.cpp.o -c C:\\src\\oboe\\src\\fifo\\FifoBuffer.cpp",
+  "file": "C:\\src\\oboe\\src\\fifo\\FifoBuffer.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\fifo\\FifoController.cpp.o -c C:\\src\\oboe\\src\\fifo\\FifoController.cpp",
+  "file": "C:\\src\\oboe\\src\\fifo\\FifoController.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\fifo\\FifoControllerBase.cpp.o -c C:\\src\\oboe\\src\\fifo\\FifoControllerBase.cpp",
+  "file": "C:\\src\\oboe\\src\\fifo\\FifoControllerBase.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\fifo\\FifoControllerIndirect.cpp.o -c C:\\src\\oboe\\src\\fifo\\FifoControllerIndirect.cpp",
+  "file": "C:\\src\\oboe\\src\\fifo\\FifoControllerIndirect.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\FlowGraphNode.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\FlowGraphNode.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\FlowGraphNode.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\ClipToRange.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\ClipToRange.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\ClipToRange.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\ManyToMultiConverter.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\ManyToMultiConverter.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\ManyToMultiConverter.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\MonoToMultiConverter.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\MonoToMultiConverter.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\MonoToMultiConverter.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\RampLinear.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\RampLinear.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\RampLinear.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\SampleRateConverter.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\SampleRateConverter.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\SampleRateConverter.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\SinkFloat.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\SinkFloat.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\SinkFloat.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\SinkI16.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\SinkI16.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\SinkI16.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\SinkI24.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\SinkI24.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\SinkI24.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\SourceFloat.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\SourceFloat.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\SourceFloat.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\SourceI16.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\SourceI16.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\SourceI16.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\SourceI24.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\SourceI24.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\SourceI24.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\IntegerRatio.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\IntegerRatio.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\IntegerRatio.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\LinearResampler.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\LinearResampler.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\LinearResampler.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\MultiChannelResampler.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\MultiChannelResampler.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\MultiChannelResampler.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\PolyphaseResampler.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\PolyphaseResampler.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\PolyphaseResampler.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\PolyphaseResamplerMono.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\PolyphaseResamplerMono.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\PolyphaseResamplerMono.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\PolyphaseResamplerStereo.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\PolyphaseResamplerStereo.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\PolyphaseResamplerStereo.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\SincResampler.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\SincResampler.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\SincResampler.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\flowgraph\\resampler\\SincResamplerStereo.cpp.o -c C:\\src\\oboe\\src\\flowgraph\\resampler\\SincResamplerStereo.cpp",
+  "file": "C:\\src\\oboe\\src\\flowgraph\\resampler\\SincResamplerStereo.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\opensles\\AudioInputStreamOpenSLES.cpp.o -c C:\\src\\oboe\\src\\opensles\\AudioInputStreamOpenSLES.cpp",
+  "file": "C:\\src\\oboe\\src\\opensles\\AudioInputStreamOpenSLES.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\opensles\\AudioOutputStreamOpenSLES.cpp.o -c C:\\src\\oboe\\src\\opensles\\AudioOutputStreamOpenSLES.cpp",
+  "file": "C:\\src\\oboe\\src\\opensles\\AudioOutputStreamOpenSLES.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\opensles\\AudioStreamBuffered.cpp.o -c C:\\src\\oboe\\src\\opensles\\AudioStreamBuffered.cpp",
+  "file": "C:\\src\\oboe\\src\\opensles\\AudioStreamBuffered.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\opensles\\AudioStreamOpenSLES.cpp.o -c C:\\src\\oboe\\src\\opensles\\AudioStreamOpenSLES.cpp",
+  "file": "C:\\src\\oboe\\src\\opensles\\AudioStreamOpenSLES.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\opensles\\EngineOpenSLES.cpp.o -c C:\\src\\oboe\\src\\opensles\\EngineOpenSLES.cpp",
+  "file": "C:\\src\\oboe\\src\\opensles\\EngineOpenSLES.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\opensles\\OpenSLESUtilities.cpp.o -c C:\\src\\oboe\\src\\opensles\\OpenSLESUtilities.cpp",
+  "file": "C:\\src\\oboe\\src\\opensles\\OpenSLESUtilities.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\opensles\\OutputMixerOpenSLES.cpp.o -c C:\\src\\oboe\\src\\opensles\\OutputMixerOpenSLES.cpp",
+  "file": "C:\\src\\oboe\\src\\opensles\\OutputMixerOpenSLES.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\StabilizedCallback.cpp.o -c C:\\src\\oboe\\src\\common\\StabilizedCallback.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\StabilizedCallback.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\Trace.cpp.o -c C:\\src\\oboe\\src\\common\\Trace.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\Trace.cpp"
+},
+
+{
+  "directory": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/debug/arm64-v8a",
+  "command": "C:\\Users\\delhi\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DOBOE_ENABLE_LOGGING=1 -IC:/src/oboe/src -IC:/src/oboe/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror -o oboe\\CMakeFiles\\oboe.dir\\src\\common\\Version.cpp.o -c C:\\src\\oboe\\src\\common\\Version.cpp",
+  "file": "C:\\src\\oboe\\src\\common\\Version.cpp"
+}
+]

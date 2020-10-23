@@ -206,6 +206,33 @@ class BroadcastMessage {
   }
 }
 
+// class BroadcastBytes {
+//   User _sender;
+//   String _message;
+//   int _timestamp;
+//
+//   BroadcastMessage(this._sender, this._message)
+//       : _timestamp = DateTime.now().millisecondsSinceEpoch;
+//
+//   String get message => _message;
+//
+//   User get sender => _sender;
+//
+//   int get timestamp => _timestamp;
+//
+//   BroadcastMessage.fromString(String message) {
+//     message = message.split('>')[1];
+//     _sender = User.fromString(message.split('|')[0]);
+//     _message = message.split('|')[1];
+//     _timestamp = int.parse(message.split('|')[2]);
+//   }
+//
+//   @override
+//   String toString() {
+//     return 'BROADCAST>$_sender|$_message|$_timestamp';
+//   }
+// }
+
 class Message {
   User _sender;
   User _receiver;

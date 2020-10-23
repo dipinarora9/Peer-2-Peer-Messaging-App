@@ -18,6 +18,8 @@ dependencies:
   share:
   firebase_auth:
   firebase_remote_config:
+  permission_handler:
+  ffi:
 
 dev_dependencies:
   flutter_test:
