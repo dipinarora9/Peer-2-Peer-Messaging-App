@@ -1,18 +1,5 @@
 #include "audio_receiver.h"
 
-//void NotifyDart(Dart_Port send_port, const Work *work) {
-//    const auto work_addr = reinterpret_cast<intptr_t>(work);
-//    LOGE("C   :  Posting message ",
-//         send_port, work_addr);
-//
-//    Dart_CObject dart_object;
-//    dart_object.type = Dart_CObject_kInt64;
-//    dart_object.value.as_int64 = work_addr;
-//
-//    const bool result = Dart_PostCObject_DL(send_port, &dart_object);
-//    if (!result)
-//        LOGE("C   :  Posting message to port failed.");
-//}
 
 static void FreeFinalizer(void *, Dart_WeakPersistentHandle, void *value) {
 //    free(value);
@@ -91,7 +78,6 @@ oboe::DataCallbackResult
 P2P::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
     if (this->isRecording) {
         callback(this->getDartPort(), (int16_t *) audioData, numFrames);
-//            NotifyDart(this->getDartPort(), reinterpret_cast<const Work *>(callback));
     }
     return oboe::DataCallbackResult::Continue;
 }

@@ -33,6 +33,7 @@ class ClientService with ChangeNotifier {
   int _lastNodeTillNow = 0;
   final interactiveCppRequests = ReceivePort()..listen(handleCppRequests);
   int nativePort;
+  SendPort sendPort;
   bool play = false;
 
   //todo: for debugging purpose
@@ -89,11 +90,17 @@ class ClientService with ChangeNotifier {
       debugPrint('got a message $datagram');
       if (datagram.data[0] == 9 &&
           datagram.data[datagram.data.length - 1] == 9) {
-        NativeUtils.playBuffer(
-            player,
-            NativeUtils.toPointer(
-                datagram.data.sublist(1, datagram.data.length - 2)),
-            datagram.data.length);
+        if (sendPort != null)
+          sendPort.send(
+            CppResponse(0, datagram.data.sublist(1, datagram.data.length - 2),
+                    datagram.data.length - 2, player.address)
+                .toCppMessage(),
+          );
+        // NativeUtils.playBuffer(
+        //     player,
+        //     NativeUtils.toPointer(
+        //         datagram.data.sublist(1, datagram.data.length - 2)),
+        //     datagram.data.length-2);
       } else if (String.fromCharCodes(datagram.data) == 'PING') {
         _sendDatagramBuffer('PONG>${me.numbering}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
@@ -581,14 +588,15 @@ class ClientService with ChangeNotifier {
       List<int> buffer = Uint8List(temp.length + 2).toList();
 
       buffer[0] = 9;
-      for (int i = 0; i < temp.length; i++) {
-        buffer[i + 1] = temp[i];
-      }
+      for (int i = 0; i < temp.length; i++) buffer[i + 1] = temp[i];
       buffer[buffer.length - 1] = 9;
       // buffer[0] = 9;
       // buffer[buffer.length - 1] = 9;
       debugPrint(buffer.toString());
       globalClient.broadcastBytes(buffer);
+    } else if (cppRequest.method == 'send_port') {
+      debugPrint("GOIT IT");
+      globalClient.sendPort = cppRequest.replyPort;
     }
   }
 
@@ -603,17 +611,14 @@ class ClientService with ChangeNotifier {
 
   bool _recording = false;
 
-  // nativeRecord() {
-  //
-  //   return nativeRecord;
-  // }
+  bool get recording => _recording;
 
   record() {
     _recording = !_recording;
+    notifyListeners();
     debugPrint(nativePort.toString());
     int result =
         NativeUtils.nativeRecord(player, _recording ? 1 : 0, nativePort);
-
     debugPrint('HERE IS IT Recording $result');
   }
 }

@@ -34,8 +34,9 @@ class NativeUtils {
   static final int Function(Pointer, int, int) nativeRecord = p2pLib
       .lookup<NativeFunction<Int32 Function(Pointer, Int8, Int64)>>('record')
       .asFunction();
+
   static final int Function(Pointer, Pointer<Int16>, int) playBuffer = p2pLib
-      .lookup<NativeFunction<Int32 Function(Pointer, Pointer<Int16>, Int32)>>(
+      .lookup<NativeFunction<Int64 Function(Pointer, Pointer<Int16>, Int32)>>(
           'playBuffer')
       .asFunction();
 }

@@ -245,9 +245,14 @@ class BroadcastChat extends StatelessWidget {
                 child: Row(
                   children: <Widget>[
                     IconButton(
-                      icon: Icon(
-                        Icons.mic,
-                      ),
+                      icon: Builder(builder: (c) {
+                        final v =
+                            c.select((ClientService value) => value.recording);
+                        return Icon(
+                          Icons.mic,
+                          color: v ? Colors.red : Colors.green,
+                        );
+                      }),
                       onPressed: () => client.record(),
                     ),
                     Expanded(

@@ -3,19 +3,10 @@
 
 #include <oboe/Oboe.h>
 #include <../../../src/oboe/src/common/OboeDebug.h>
-//#include "dart_api.h"
-//#include "dart_native_api.h"
-//#include "dart_api_dl.h"
 #include "include/dart_api.h"
 #include "include/dart_native_api.h"
 #include "include/dart_api_dl.h"
-#include <thread>
-//#include <../../../src/flutter/bin/cache/dart-sdk/include/dart_api.h>
-//#include <../../../src/flutter/bin/cache/dart-sdk/include/dart_api_dl2.h>
-//#include <../../../src/flutter/bin/cache/dart-sdk/include/dart_native_api2.h>
 
-//typedef bool (*Dart_PostCObjectType)(Dart_Port port_id, Dart_CObject* message);
-//Dart_PostCObjectType Dart_PostCObject_DIPIN;
 
 class P2P : public oboe::AudioStreamCallback {
 public:
@@ -37,9 +28,19 @@ public:
 
     Dart_Port getDartPort() { return this->dartPort; }
 
+    Dart_Port getCppPort() { return this->cppPort; }
+
+    Dart_Port initializeCppNative() {
+        cppPort = Dart_NewNativePort_DL("cppPort", &nativeHandler, false);
+        return cppPort;
+    }
+
+    static void nativeHandler(Dart_Port_DL p, Dart_CObject *message);
+
 private:
     bool isRecording{false};
     Dart_Port dartPort;
+    Dart_Port cppPort;
 };
 
 #endif //ANDROID_AUDIO_RECEIVER_H
