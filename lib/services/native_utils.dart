@@ -12,7 +12,8 @@ typedef BufferFunction = int Function(
 
 typedef CallbackFunction = Void Function(Pointer<Uint8>, Int32, Int64);
 
-Pointer player;
+Pointer inPlayer;
+Pointer outPlayer;
 DynamicLibrary p2pLib = DynamicLibrary.open("libp2p.so");
 ClientService globalClient;
 

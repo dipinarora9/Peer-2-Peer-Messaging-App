@@ -33,18 +33,15 @@ static void callback(Dart_Port port, int16_t *buffer, int32_t frames) {
     c_request.value.as_array.length =
             sizeof(c_request_arr) / sizeof(c_request_arr[0]);
 
-//    printf("C   :  Dart_PostCObject_(request: %" Px ", call: %" Px ").\n",
-//            reinterpret_cast<intptr_t>(&c_request),
-//            reinterpret_cast<intptr_t>(&c_pending_call));
-
     Dart_PostCObject_DL(port, &c_request);
     LOGE("Sent");
 }
 
-int32_t P2P::input() {
+int32_t P2PInput::input() {
     oboe::AudioStreamBuilder builder;
     builder.setDirection(oboe::Direction::Input)
             ->setCallback(this)
+            ->setFormat(oboe::AudioFormat::I16)
             ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->openManagedStream(inStream);
@@ -57,10 +54,11 @@ int32_t P2P::input() {
     return 1;
 }
 
-int32_t P2P::output() {
+int32_t P2POutput::output() {
     oboe::AudioStreamBuilder builder;
     builder.setSharingMode(oboe::SharingMode::Exclusive)
-            ->setCallback(nullptr)
+            ->setCallback(this)
+            ->setFormat(oboe::AudioFormat::I16)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->openManagedStream(outStream);
 
@@ -72,12 +70,29 @@ int32_t P2P::output() {
     return 1;
 }
 
-void P2P::setIsRecording(bool r) { this->isRecording = r; }
+void P2PInput::setIsRecording(bool r) { this->isRecording = r; }
 
 oboe::DataCallbackResult
-P2P::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
+P2PInput::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
     if (this->isRecording) {
-        callback(this->getDartPort(), (int16_t *) audioData, numFrames);
+        callback(this->getDartPort(), (int16_t *) audioData,
+                 numFrames * oboeStream->getBytesPerFrame());
     }
+    return oboe::DataCallbackResult::Continue;
+}
+
+oboe::DataCallbackResult
+P2POutput::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
+    if (player_index < buffer_index) {
+        auto *data = (int16_t *) audioData;
+        for (int i = 0; i < numFrames; i++) {
+            if (i < buffer[player_index % 100].second)
+                data[i] = buffer[player_index % 100].first[i];
+            else data[i] = 0;
+        }
+        LOGE("HERE IS IT PLAYING FROM CALLBACK");
+        player_index++;
+    } else
+        memset(static_cast<int16_t *>(audioData), 0, numFrames * oboeStream->getBytesPerFrame());
     return oboe::DataCallbackResult::Continue;
 }

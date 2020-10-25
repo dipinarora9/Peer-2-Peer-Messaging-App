@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -90,17 +89,21 @@ class ClientService with ChangeNotifier {
       debugPrint('got a message $datagram');
       if (datagram.data[0] == 9 &&
           datagram.data[datagram.data.length - 1] == 9) {
-        if (sendPort != null)
-          sendPort.send(
-            CppResponse(0, datagram.data.sublist(1, datagram.data.length - 2),
-                    datagram.data.length - 2, player.address)
-                .toCppMessage(),
-          );
-        // NativeUtils.playBuffer(
-        //     player,
-        //     NativeUtils.toPointer(
-        //         datagram.data.sublist(1, datagram.data.length - 2)),
-        //     datagram.data.length-2);
+        // if (sendPort != null)
+        //   sendPort.send(
+        //     CppResponse(
+        //             0,
+        //             NativeUtils.toPointer(
+        //                 datagram.data.sublist(1, datagram.data.length - 2)),
+        //             datagram.data.length - 2,
+        //             player.address)
+        //         .toCppMessage(),
+        //   );
+        NativeUtils.playBuffer(
+            outPlayer,
+            NativeUtils.toPointer(
+                datagram.data.sublist(1, datagram.data.length - 2)),
+            datagram.data.length - 2);
       } else if (String.fromCharCodes(datagram.data) == 'PING') {
         _sendDatagramBuffer('PONG>${me.numbering}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
@@ -584,14 +587,11 @@ class ClientService with ChangeNotifier {
     print('Dart:   Got message: $cppRequest');
     // final Uint8List buffer = cppRequest.data;
     if (cppRequest.method == 'audio_buffer') {
-      final Uint8List temp = cppRequest.data;
-      List<int> buffer = Uint8List(temp.length + 2).toList();
-
+      final List<int> temp = cppRequest.data;
+      List<int> buffer = List(temp.length + 2);
       buffer[0] = 9;
       for (int i = 0; i < temp.length; i++) buffer[i + 1] = temp[i];
       buffer[buffer.length - 1] = 9;
-      // buffer[0] = 9;
-      // buffer[buffer.length - 1] = 9;
       debugPrint(buffer.toString());
       globalClient.broadcastBytes(buffer);
     } else if (cppRequest.method == 'send_port') {
@@ -618,7 +618,7 @@ class ClientService with ChangeNotifier {
     notifyListeners();
     debugPrint(nativePort.toString());
     int result =
-        NativeUtils.nativeRecord(player, _recording ? 1 : 0, nativePort);
+        NativeUtils.nativeRecord(inPlayer, _recording ? 1 : 0, nativePort);
     debugPrint('HERE IS IT Recording $result');
   }
 }

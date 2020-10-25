@@ -6,100 +6,125 @@ DART_EXPORT intptr_t InitDartApiDL(void *data) {
 }
 
 DART_EXPORT
-P2P *createPlayer() {
-    LOGE("HERE IS IT native INITIALIZED");
-    auto *player = new P2P();
-    int r = player->output();
+P2PInput *createINPlayer() {
+    LOGE("HERE IS IT input INITIALIZED");
+    auto *player = new P2PInput();
     int s = player->input();
-    if (r && s)
+    if (s)
         return player;
     else return nullptr;
 }
 
 DART_EXPORT
-int32_t stop(P2P *player) {
-    player->inStream->requestPause();
-    player->outStream->requestPause();
-    player->setIsRecording(false);
-    return 1;
+P2POutput *createOUTPlayer() {
+    LOGE("HERE IS IT output INITIALIZED");
+    auto *player = new P2POutput();
+    int r = player->output();
+    if (r)
+        return player;
+    else return nullptr;
 }
+
+//DART_EXPORT
+//int32_t stop(P2P *player) {
+//    player->inStream->requestPause();
+//    player->outStream->requestPause();
+//    player->setIsRecording(false);
+//    return 1;
+//}
+//
+//DART_EXPORT
+//int32_t resume(P2P *player) {
+//    player->inStream->requestFlush();
+//    player->inStream->requestStart();
+//    player->outStream->requestStart();
+//    player->setIsRecording(true);
+//    return 1;
+//}
+
+
+//void run(P2P *player) {
+//    const auto requestFrames = (int32_t) (2 *
+//                                          (player->inStream->getSampleRate() / 1000));
+//    LOGE("HERE IS IT STARTING THREAD");
+//    uint8_t buffer[requestFrames];
+//    int64_t timeout = 1e6 * 3;
+//    while (player->getIsRecording()) {
+//        auto result = player->inStream->read(buffer, requestFrames, timeout);
+//        if (result != oboe::Result::OK) {
+//            LOGE("HERE IS IT NHI CHLA ", oboe::convertToText(result.error()));
+//            player->setIsRecording(false);
+//        } else;
+////            callback(player->getDartPort(), buffer, requestFrames);
+//
+//    }
+//    LOGE("HERE IS IT ENDING THREAD");
+//}
+
+//DART_EXPORT
+//int16_t getBuffer(P2P *player) {
+//    LOGE("HERE IS IT native called getBuffer");
+//    if (player == nullptr) {
+//        LOGE("HERE IS IT native nhi chla bsdk");
+//        return 0;
+//    }
+//
+//    constexpr int millisecondToRecord = 2;
+//    const auto requestFrames = (int32_t) (millisecondToRecord *
+//                                          (player->inStream->getSampleRate() / 1000));
+//    LOGE("HERE IS IT idhr hu");
+//    uint8_t buffer[requestFrames];
+//    int64_t timeout = 1000000 * 3;
+//    int frameReads = 0;
+//    do {
+//        auto result = player->inStream->read(buffer, player->inStream->getBufferSizeInFrames(),
+//                                             0);
+//        if (result != oboe::Result::OK) break;
+//        frameReads = result.value();
+//    } while (frameReads != 0);
+//    LOGE("HERE IS IT hoyga khaali");
+//
+////    auto *thread1 = new std::thread(run, player);
+//    LOGE("HERE IS IT after starting the thread");
+//    return 1;
+//}
 
 DART_EXPORT
-int32_t resume(P2P *player) {
-    player->inStream->requestFlush();
-    player->inStream->requestStart();
-    player->outStream->requestStart();
-    player->setIsRecording(true);
-    return 1;
-}
+int32_t playBuffer(P2POutput *player, int16_t *b, int32_t frames) {
+    LOGE("HERE IS IT adding to buffer");
 
-
-void run(P2P *player) {
-    const auto requestFrames = (int32_t) (2 *
-                                          (player->inStream->getSampleRate() / 1000));
-    LOGE("HERE IS IT STARTING THREAD");
-    uint8_t buffer[requestFrames];
-    int64_t timeout = 1e6 * 3;
-    while (player->getIsRecording()) {
-        auto result = player->inStream->read(buffer, requestFrames, timeout);
-        if (result != oboe::Result::OK) {
-            LOGE("HERE IS IT NHI CHLA ", oboe::convertToText(result.error()));
-            player->setIsRecording(false);
-        } else;
-//            callback(player->getDartPort(), buffer, requestFrames);
-
+    player->buffer[player->buffer_index % 100] = std::make_pair(b, frames);
+    player->buffer_index++;
+    if (player->buffer_index == 500) {
+        player->buffer_index = 0;
+        player->player_index = 0;
     }
-    LOGE("HERE IS IT ENDING THREAD");
-}
-
-DART_EXPORT
-int16_t getBuffer(P2P *player) {
-    LOGE("HERE IS IT native called getBuffer");
-    if (player == nullptr) {
-        LOGE("HERE IS IT native nhi chla bsdk");
-        return 0;
-    }
-
-    constexpr int millisecondToRecord = 2;
-    const auto requestFrames = (int32_t) (millisecondToRecord *
-                                          (player->inStream->getSampleRate() / 1000));
-    LOGE("HERE IS IT idhr hu");
-    uint8_t buffer[requestFrames];
-    int64_t timeout = 1000000 * 3;
-    int frameReads = 0;
-    do {
-        auto result = player->inStream->read(buffer, player->inStream->getBufferSizeInFrames(),
-                                             0);
-        if (result != oboe::Result::OK) break;
-        frameReads = result.value();
-    } while (frameReads != 0);
-    LOGE("HERE IS IT hoyga khaali");
-
-//    auto *thread1 = new std::thread(run, player);
-    LOGE("HERE IS IT after starting the thread");
     return 1;
 }
 
-DART_EXPORT
-int32_t playBuffer(P2P *player, uint8_t *buffer, int32_t frames) {
-    LOGE("HERE IS IT playing buffer");
-    int64_t timeout = 1000000 * 3;
-    player->outStream->write(buffer, frames, 0);
-    return 1;
-}
-
-void P2P::nativeHandler(Dart_Port_DL p, Dart_CObject *message) {
+void P2PInput::nativeHandler(Dart_Port_DL p, Dart_CObject *message) {
     LOGE("MESSAGE RECEIVED NATIVELY");
     Dart_CObject **c_response_args = message->value.as_array.values;
     Dart_CObject *c_pending_call = c_response_args[0];
     Dart_CObject *buffer = c_response_args[1];
     auto frames = reinterpret_cast<int32_t *>(c_response_args[2]);
     Dart_CObject *playPointer = c_response_args[3];
-    playBuffer(reinterpret_cast<P2P *>(playPointer), reinterpret_cast<uint8_t *>(buffer),
-               *frames);
+//    playBuffer(reinterpret_cast<P2P *>(playPointer), reinterpret_cast<int16_t *>(buffer),
+//               *frames);
 }
 
-int sendPort(P2P *player) {
+void P2POutput::nativeHandler(Dart_Port_DL p, Dart_CObject *message) {
+    LOGE("MESSAGE RECEIVED NATIVELY");
+    Dart_CObject **c_response_args = message->value.as_array.values;
+    Dart_CObject *c_pending_call = c_response_args[0];
+    Dart_CObject *buffer = c_response_args[1];
+    auto frames = reinterpret_cast<int32_t *>(c_response_args[2]);
+    Dart_CObject *playPointer = c_response_args[3];
+//    playBuffer(reinterpret_cast<P2P *>(playPointer), reinterpret_cast<int16_t *>(buffer),
+//               *frames);
+}
+
+int sendPort(P2PInput *player) {
     Dart_CObject c_send_port;
     c_send_port.type = Dart_CObject_kSendPort;
     c_send_port.value.as_send_port.id = player->getCppPort();
@@ -133,7 +158,7 @@ int sendPort(P2P *player) {
 }
 
 DART_EXPORT
-int64_t record(P2P *player, int8_t v, Dart_Port port) {
+int64_t record(P2PInput *player, int8_t v, Dart_Port port) {
     LOGE("RECORD CALLED");
     player->setDartPort(port);
     player->setIsRecording(v);

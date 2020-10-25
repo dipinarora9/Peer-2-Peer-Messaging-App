@@ -233,33 +233,37 @@ class P2P with ChangeNotifier {
     if (!await Permission.microphone.isGranted)
       await Permission.microphone.request();
 
-    final Pointer Function() createPlayer = p2pLib
-        .lookup<NativeFunction<Pointer Function()>>("createPlayer")
+    final Pointer Function() createINPlayer = p2pLib
+        .lookup<NativeFunction<Pointer Function()>>("createINPlayer")
         .asFunction();
-    player = createPlayer();
+    inPlayer = createINPlayer();
+    final Pointer Function() createOUTPlayer = p2pLib
+        .lookup<NativeFunction<Pointer Function()>>("createOUTPlayer")
+        .asFunction();
+    outPlayer = createOUTPlayer();
     final initializeApi = p2pLib.lookupFunction<IntPtr Function(Pointer<Void>),
         int Function(Pointer<Void>)>("InitDartApiDL");
     int result = initializeApi(NativeApi.initializeApiDLData);
-    debugPrint('HERE IS IT $player $result');
+    debugPrint('HERE IS IT $inPlayer $outPlayer $result');
   }
 
-  resume() {
-    final int Function(Pointer) resume = p2pLib
-        .lookup<NativeFunction<Int32 Function(Pointer)>>("resume")
-        .asFunction();
-    int result = resume(player);
-
-    debugPrint('HERE IS IT RESUMED $result');
-  }
-
-  pause() {
-    final int Function(Pointer) stop = p2pLib
-        .lookup<NativeFunction<Int32 Function(Pointer)>>("stop")
-        .asFunction();
-    int result = stop(player);
-
-    debugPrint('HERE IS IT PAUSED $result');
-  }
+  // resume() {
+  //   final int Function(Pointer) resume = p2pLib
+  //       .lookup<NativeFunction<Int32 Function(Pointer)>>("resume")
+  //       .asFunction();
+  //   int result = resume(player);
+  //
+  //   debugPrint('HERE IS IT RESUMED $result');
+  // }
+  //
+  // pause() {
+  //   final int Function(Pointer) stop = p2pLib
+  //       .lookup<NativeFunction<Int32 Function(Pointer)>>("stop")
+  //       .asFunction();
+  //   int result = stop(player);
+  //
+  //   debugPrint('HERE IS IT PAUSED $result');
+  // }
 
   // getBuffer() async {
   //   final BufferFunction buffer = NativeUtils.p2pLib

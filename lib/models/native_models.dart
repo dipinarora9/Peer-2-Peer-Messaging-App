@@ -1,11 +1,11 @@
+import 'dart:ffi';
 import 'dart:isolate';
-import 'dart:typed_data';
 
 class CppRequest {
   final SendPort replyPort;
   final int pendingCall;
   final String method;
-  final Uint8List data;
+  final List<int> data;
 
   factory CppRequest.fromCppMessage(List message) {
     return CppRequest._(message[0], message[1], message[2], message[3]);
@@ -19,7 +19,7 @@ class CppRequest {
 
 class CppResponse {
   final int pendingCall;
-  final Uint8List data;
+  final Pointer<Int16> data;
   final int length;
   final int pointer;
 
@@ -28,5 +28,5 @@ class CppResponse {
   List toCppMessage() =>
       List.from([pendingCall, data, length, pointer], growable: false);
 
-  String toString() => 'CppResponse(message: ${data.length})';
+  String toString() => 'CppResponse(message: $data)';
 }
