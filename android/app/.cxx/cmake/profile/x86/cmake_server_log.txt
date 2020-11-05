@@ -58,215 +58,7 @@ CMAKE SERVER:
 
 CMAKE SERVER: [== "CMake Server" ==[
 
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Check for working C compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Check for working C compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe
-CMAKE SERVER: Check for working C compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":33,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Check for working C compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -- works","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Check for working C compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -- works
-CMAKE SERVER: Check for working C compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -- works
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting C compiler ABI info","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting C compiler ABI info
-CMAKE SERVER: Detecting C compiler ABI info
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":65,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting C compiler ABI info - done","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting C compiler ABI info - done
-CMAKE SERVER: Detecting C compiler ABI info - done
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting C compile features","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting C compile features
-CMAKE SERVER: Detecting C compile features
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":96,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":126,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":155,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting C compile features - done","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting C compile features - done
-CMAKE SERVER: Detecting C compile features - done
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Check for working CXX compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Check for working CXX compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe
-CMAKE SERVER: Check for working CXX compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":184,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Check for working CXX compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -- works","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Check for working CXX compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -- works
-CMAKE SERVER: Check for working CXX compiler: C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -- works
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting CXX compiler ABI info","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting CXX compiler ABI info
-CMAKE SERVER: Detecting CXX compiler ABI info
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":211,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting CXX compiler ABI info - done","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting CXX compiler ABI info - done
-CMAKE SERVER: Detecting CXX compiler ABI info - done
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting CXX compile features","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting CXX compile features
-CMAKE SERVER: Detecting CXX compile features
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":237,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":262,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":287,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":311,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"Detecting CXX compile features - done","type":"message"}
-
-CMAKE SERVER: ]== "CMake Server" ==]
-
-CMAKE SERVER: Detecting CXX compile features - done
-CMAKE SERVER: Detecting CXX compile features - done
-CMAKE SERVER: 
-
-CMAKE SERVER: [== "CMake Server" ==[
-
-CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":334,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
+CMAKE SERVER: {"cookie":"","inReplyTo":"configure","progressCurrent":900,"progressMaximum":1000,"progressMessage":"Configuring","progressMinimum":0,"type":"progress"}
 
 CMAKE SERVER: ]== "CMake Server" ==]
 
@@ -353,7 +145,7 @@ CMAKE SERVER:
 
 CMAKE SERVER: [== "CMake Server" ==[
 
-CMAKE SERVER: {"buildFiles":[{"isCMake":true,"isTemporary":false,"sources":["C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in"]},{"isCMake":false,"isTemporary":false,"sources":["CMakeLists.txt","C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/build/cmake/platforms.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake","C:/src/oboe/CMakeLists.txt"]},{"isCMake":false,"isTemporary":true,"sources":["app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeSystem.cmake","app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeCCompiler.cmake","app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake","app/.cxx/cmake/profile/x86/CMakeFiles/feature_tests.c","app/.cxx/cmake/profile/x86/CMakeFiles/feature_tests.c","app/.cxx/cmake/profile/x86/CMakeFiles/feature_tests.c","app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeCCompiler.cmake","app/.cxx/cmake/profile/x86/CMakeFiles/feature_tests.cxx","app/.cxx/cmake/profile/x86/CMakeFiles/feature_tests.cxx","app/.cxx/cmake/profile/x86/CMakeFiles/feature_tests.cxx","app/.cxx/cmake/profile/x86/CMakeFiles/feature_tests.cxx","app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake"]}],"cmakeRootDirectory":"C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10","cookie":"","inReplyTo":"cmakeInputs","sourceDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android","type":"reply"}
+CMAKE SERVER: {"buildFiles":[{"isCMake":true,"isTemporary":false,"sources":["C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake"]},{"isCMake":false,"isTemporary":false,"sources":["CMakeLists.txt","C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake","C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/build/cmake/platforms.cmake","C:/src/oboe/CMakeLists.txt"]},{"isCMake":false,"isTemporary":true,"sources":["app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeSystem.cmake","app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeCCompiler.cmake","app/.cxx/cmake/profile/x86/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake"]}],"cmakeRootDirectory":"C:/Users/delhi/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10","cookie":"","inReplyTo":"cmakeInputs","sourceDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android","type":"reply"}
 
 CMAKE SERVER: ]== "CMake Server" ==]
 
@@ -367,7 +159,7 @@ CMAKE SERVER:
 
 CMAKE SERVER: [== "CMake Server" ==[
 
-CMAKE SERVER: {"configurations":[{"name":"Debug","projects":[{"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86","name":"Project","sourceDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android","targets":[{"artifacts":["D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe/liboboe.a"],"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe","fileGroups":[{"compileFlags":"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror","defines":["OBOE_ENABLE_LOGGING=1"],"includePath":[{"path":"C:/src/oboe/src"},{"path":"C:/src/oboe/include"}],"isGenerated":false,"language":"CXX","sources":["src/aaudio/AAudioLoader.cpp","src/aaudio/AudioStreamAAudio.cpp","src/common/AudioSourceCaller.cpp","src/common/AudioStream.cpp","src/common/AudioStreamBuilder.cpp","src/common/DataConversionFlowGraph.cpp","src/common/FilterAudioStream.cpp","src/common/FixedBlockAdapter.cpp","src/common/FixedBlockReader.cpp","src/common/FixedBlockWriter.cpp","src/common/LatencyTuner.cpp","src/common/SourceFloatCaller.cpp","src/common/SourceI16Caller.cpp","src/common/Utilities.cpp","src/common/QuirksManager.cpp","src/fifo/FifoBuffer.cpp","src/fifo/FifoController.cpp","src/fifo/FifoControllerBase.cpp","src/fifo/FifoControllerIndirect.cpp","src/flowgraph/FlowGraphNode.cpp","src/flowgraph/ClipToRange.cpp","src/flowgraph/ManyToMultiConverter.cpp","src/flowgraph/MonoToMultiConverter.cpp","src/flowgraph/RampLinear.cpp","src/flowgraph/SampleRateConverter.cpp","src/flowgraph/SinkFloat.cpp","src/flowgraph/SinkI16.cpp","src/flowgraph/SinkI24.cpp","src/flowgraph/SourceFloat.cpp","src/flowgraph/SourceI16.cpp","src/flowgraph/SourceI24.cpp","src/flowgraph/resampler/IntegerRatio.cpp","src/flowgraph/resampler/LinearResampler.cpp","src/flowgraph/resampler/MultiChannelResampler.cpp","src/flowgraph/resampler/PolyphaseResampler.cpp","src/flowgraph/resampler/PolyphaseResamplerMono.cpp","src/flowgraph/resampler/PolyphaseResamplerStereo.cpp","src/flowgraph/resampler/SincResampler.cpp","src/flowgraph/resampler/SincResamplerStereo.cpp","src/opensles/AudioInputStreamOpenSLES.cpp","src/opensles/AudioOutputStreamOpenSLES.cpp","src/opensles/AudioStreamBuffered.cpp","src/opensles/AudioStreamOpenSLES.cpp","src/opensles/EngineOpenSLES.cpp","src/opensles/OpenSLESUtilities.cpp","src/opensles/OutputMixerOpenSLES.cpp","src/common/StabilizedCallback.cpp","src/common/Trace.cpp","src/common/Version.cpp"]}],"fullName":"liboboe.a","linkerLanguage":"CXX","name":"oboe","sourceDirectory":"C:/src/oboe","sysroot":"C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot","type":"STATIC_LIBRARY"},{"artifacts":["D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/build/app/intermediates/cmake/profile/obj/x86/libOboeSinePlayer.so"],"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86","fileGroups":[{"compileFlags":"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC  ","defines":["OBOE_ENABLE_LOGGING=1","OboeSinePlayer_EXPORTS"],"includePath":[{"path":"C:/src/oboe/include"}],"isGenerated":false,"language":"CXX","sources":["c++/audio-receiver.cpp"]},{"isGenerated":false,"sources":["c++/audio-receiver.h"]}],"fullName":"libOboeSinePlayer.so","linkFlags":"-Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,-z,noexecstack","linkLibraries":"oboe\\liboboe.a -llog -lOpenSLES -latomic -lm","linkerLanguage":"CXX","name":"OboeSinePlayer","sourceDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android","sysroot":"C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot","type":"SHARED_LIBRARY"}]},{"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe","name":"oboe","sourceDirectory":"C:/src/oboe","targets":[{"artifacts":["D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe/liboboe.a"],"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe","fileGroups":[{"compileFlags":"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror","defines":["OBOE_ENABLE_LOGGING=1"],"includePath":[{"path":"C:/src/oboe/src"},{"path":"C:/src/oboe/include"}],"isGenerated":false,"language":"CXX","sources":["src/aaudio/AAudioLoader.cpp","src/aaudio/AudioStreamAAudio.cpp","src/common/AudioSourceCaller.cpp","src/common/AudioStream.cpp","src/common/AudioStreamBuilder.cpp","src/common/DataConversionFlowGraph.cpp","src/common/FilterAudioStream.cpp","src/common/FixedBlockAdapter.cpp","src/common/FixedBlockReader.cpp","src/common/FixedBlockWriter.cpp","src/common/LatencyTuner.cpp","src/common/SourceFloatCaller.cpp","src/common/SourceI16Caller.cpp","src/common/Utilities.cpp","src/common/QuirksManager.cpp","src/fifo/FifoBuffer.cpp","src/fifo/FifoController.cpp","src/fifo/FifoControllerBase.cpp","src/fifo/FifoControllerIndirect.cpp","src/flowgraph/FlowGraphNode.cpp","src/flowgraph/ClipToRange.cpp","src/flowgraph/ManyToMultiConverter.cpp","src/flowgraph/MonoToMultiConverter.cpp","src/flowgraph/RampLinear.cpp","src/flowgraph/SampleRateConverter.cpp","src/flowgraph/SinkFloat.cpp","src/flowgraph/SinkI16.cpp","src/flowgraph/SinkI24.cpp","src/flowgraph/SourceFloat.cpp","src/flowgraph/SourceI16.cpp","src/flowgraph/SourceI24.cpp","src/flowgraph/resampler/IntegerRatio.cpp","src/flowgraph/resampler/LinearResampler.cpp","src/flowgraph/resampler/MultiChannelResampler.cpp","src/flowgraph/resampler/PolyphaseResampler.cpp","src/flowgraph/resampler/PolyphaseResamplerMono.cpp","src/flowgraph/resampler/PolyphaseResamplerStereo.cpp","src/flowgraph/resampler/SincResampler.cpp","src/flowgraph/resampler/SincResamplerStereo.cpp","src/opensles/AudioInputStreamOpenSLES.cpp","src/opensles/AudioOutputStreamOpenSLES.cpp","src/opensles/AudioStreamBuffered.cpp","src/opensles/AudioStreamOpenSLES.cpp","src/opensles/EngineOpenSLES.cpp","src/opensles/OpenSLESUtilities.cpp","src/opensles/OutputMixerOpenSLES.cpp","src/common/StabilizedCallback.cpp","src/common/Trace.cpp","src/common/Version.cpp"]}],"fullName":"liboboe.a","linkerLanguage":"CXX","name":"oboe","sourceDirectory":"C:/src/oboe","sysroot":"C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot","type":"STATIC_LIBRARY"}]}]}],"cookie":"","inReplyTo":"codemodel","type":"reply"}
+CMAKE SERVER: {"configurations":[{"name":"Debug","projects":[{"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86","name":"Project","sourceDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android","targets":[{"artifacts":["D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/build/app/intermediates/cmake/profile/obj/x86/libp2p.so"],"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86","fileGroups":[{"compileFlags":"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -Ofast","defines":["OBOE_ENABLE_LOGGING=1","p2p_EXPORTS"],"includePath":[{"path":"C:/src/oboe/include"}],"isGenerated":false,"language":"CXX","sources":["c++/audio_receiver.cpp","c++/bridge_services.cpp","c++/include/dart_api_dl.cc"]},{"isGenerated":false,"sources":["c++/audio_receiver.h","c++/include/dart_api.h","c++/include/dart_api_dl.h","c++/include/dart_native_api.h","c++/include/internal/dart_api_dl_impl.h","c++/include/dart_tools_api.h","c++/include/dart_version.h"]}],"fullName":"libp2p.so","linkFlags":"-Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,-z,noexecstack","linkLibraries":"oboe\\liboboe.a -llog -lOpenSLES -latomic -lm","linkerLanguage":"CXX","name":"p2p","sourceDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android","sysroot":"C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot","type":"SHARED_LIBRARY"},{"artifacts":["D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe/liboboe.a"],"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe","fileGroups":[{"compileFlags":"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror","defines":["OBOE_ENABLE_LOGGING=1"],"includePath":[{"path":"C:/src/oboe/src"},{"path":"C:/src/oboe/include"}],"isGenerated":false,"language":"CXX","sources":["src/aaudio/AAudioLoader.cpp","src/aaudio/AudioStreamAAudio.cpp","src/common/AudioSourceCaller.cpp","src/common/AudioStream.cpp","src/common/AudioStreamBuilder.cpp","src/common/DataConversionFlowGraph.cpp","src/common/FilterAudioStream.cpp","src/common/FixedBlockAdapter.cpp","src/common/FixedBlockReader.cpp","src/common/FixedBlockWriter.cpp","src/common/LatencyTuner.cpp","src/common/SourceFloatCaller.cpp","src/common/SourceI16Caller.cpp","src/common/Utilities.cpp","src/common/QuirksManager.cpp","src/fifo/FifoBuffer.cpp","src/fifo/FifoController.cpp","src/fifo/FifoControllerBase.cpp","src/fifo/FifoControllerIndirect.cpp","src/flowgraph/FlowGraphNode.cpp","src/flowgraph/ClipToRange.cpp","src/flowgraph/ManyToMultiConverter.cpp","src/flowgraph/MonoToMultiConverter.cpp","src/flowgraph/RampLinear.cpp","src/flowgraph/SampleRateConverter.cpp","src/flowgraph/SinkFloat.cpp","src/flowgraph/SinkI16.cpp","src/flowgraph/SinkI24.cpp","src/flowgraph/SourceFloat.cpp","src/flowgraph/SourceI16.cpp","src/flowgraph/SourceI24.cpp","src/flowgraph/resampler/IntegerRatio.cpp","src/flowgraph/resampler/LinearResampler.cpp","src/flowgraph/resampler/MultiChannelResampler.cpp","src/flowgraph/resampler/PolyphaseResampler.cpp","src/flowgraph/resampler/PolyphaseResamplerMono.cpp","src/flowgraph/resampler/PolyphaseResamplerStereo.cpp","src/flowgraph/resampler/SincResampler.cpp","src/flowgraph/resampler/SincResamplerStereo.cpp","src/opensles/AudioInputStreamOpenSLES.cpp","src/opensles/AudioOutputStreamOpenSLES.cpp","src/opensles/AudioStreamBuffered.cpp","src/opensles/AudioStreamOpenSLES.cpp","src/opensles/EngineOpenSLES.cpp","src/opensles/OpenSLESUtilities.cpp","src/opensles/OutputMixerOpenSLES.cpp","src/common/StabilizedCallback.cpp","src/common/Trace.cpp","src/common/Version.cpp"]}],"fullName":"liboboe.a","linkerLanguage":"CXX","name":"oboe","sourceDirectory":"C:/src/oboe","sysroot":"C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot","type":"STATIC_LIBRARY"}]},{"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe","name":"oboe","sourceDirectory":"C:/src/oboe","targets":[{"artifacts":["D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe/liboboe.a"],"buildDirectory":"D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/profile/x86/oboe","fileGroups":[{"compileFlags":"-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast -Werror","defines":["OBOE_ENABLE_LOGGING=1"],"includePath":[{"path":"C:/src/oboe/src"},{"path":"C:/src/oboe/include"}],"isGenerated":false,"language":"CXX","sources":["src/aaudio/AAudioLoader.cpp","src/aaudio/AudioStreamAAudio.cpp","src/common/AudioSourceCaller.cpp","src/common/AudioStream.cpp","src/common/AudioStreamBuilder.cpp","src/common/DataConversionFlowGraph.cpp","src/common/FilterAudioStream.cpp","src/common/FixedBlockAdapter.cpp","src/common/FixedBlockReader.cpp","src/common/FixedBlockWriter.cpp","src/common/LatencyTuner.cpp","src/common/SourceFloatCaller.cpp","src/common/SourceI16Caller.cpp","src/common/Utilities.cpp","src/common/QuirksManager.cpp","src/fifo/FifoBuffer.cpp","src/fifo/FifoController.cpp","src/fifo/FifoControllerBase.cpp","src/fifo/FifoControllerIndirect.cpp","src/flowgraph/FlowGraphNode.cpp","src/flowgraph/ClipToRange.cpp","src/flowgraph/ManyToMultiConverter.cpp","src/flowgraph/MonoToMultiConverter.cpp","src/flowgraph/RampLinear.cpp","src/flowgraph/SampleRateConverter.cpp","src/flowgraph/SinkFloat.cpp","src/flowgraph/SinkI16.cpp","src/flowgraph/SinkI24.cpp","src/flowgraph/SourceFloat.cpp","src/flowgraph/SourceI16.cpp","src/flowgraph/SourceI24.cpp","src/flowgraph/resampler/IntegerRatio.cpp","src/flowgraph/resampler/LinearResampler.cpp","src/flowgraph/resampler/MultiChannelResampler.cpp","src/flowgraph/resampler/PolyphaseResampler.cpp","src/flowgraph/resampler/PolyphaseResamplerMono.cpp","src/flowgraph/resampler/PolyphaseResamplerStereo.cpp","src/flowgraph/resampler/SincResampler.cpp","src/flowgraph/resampler/SincResamplerStereo.cpp","src/opensles/AudioInputStreamOpenSLES.cpp","src/opensles/AudioOutputStreamOpenSLES.cpp","src/opensles/AudioStreamBuffered.cpp","src/opensles/AudioStreamOpenSLES.cpp","src/opensles/EngineOpenSLES.cpp","src/opensles/OpenSLESUtilities.cpp","src/opensles/OutputMixerOpenSLES.cpp","src/common/StabilizedCallback.cpp","src/common/Trace.cpp","src/common/Version.cpp"]}],"fullName":"liboboe.a","linkerLanguage":"CXX","name":"oboe","sourceDirectory":"C:/src/oboe","sysroot":"C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot","type":"STATIC_LIBRARY"}]}]}],"cookie":"","inReplyTo":"codemodel","type":"reply"}
 
 CMAKE SERVER: ]== "CMake Server" ==]
 

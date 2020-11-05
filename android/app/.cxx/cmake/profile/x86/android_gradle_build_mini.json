@@ -16,11 +16,11 @@
       "abi": "x86",
       "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\x86\\oboe\\liboboe.a"
     },
-    "OboeSinePlayer-Debug-x86": {
-      "artifactName": "OboeSinePlayer",
-      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\x86\" OboeSinePlayer",
+    "p2p-Debug-x86": {
+      "artifactName": "p2p",
+      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\profile\\x86\" p2p",
       "abi": "x86",
-      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\profile\\obj\\x86\\libOboeSinePlayer.so"
+      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\profile\\obj\\x86\\libp2p.so"
     }
   }
 }

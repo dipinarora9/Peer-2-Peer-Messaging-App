@@ -10,17 +10,17 @@
   ],
   "buildTargetsCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
+    "p2p-Release-arm64-v8a": {
+      "artifactName": "p2p",
+      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\arm64-v8a\" p2p",
+      "abi": "arm64-v8a",
+      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libp2p.so"
+    },
     "oboe-Release-arm64-v8a": {
       "artifactName": "oboe",
       "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\arm64-v8a\" oboe",
       "abi": "arm64-v8a",
       "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\arm64-v8a\\oboe\\liboboe.a"
-    },
-    "OboeSinePlayer-Release-arm64-v8a": {
-      "artifactName": "OboeSinePlayer",
-      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\arm64-v8a\" OboeSinePlayer",
-      "abi": "arm64-v8a",
-      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libOboeSinePlayer.so"
     }
   }
 }

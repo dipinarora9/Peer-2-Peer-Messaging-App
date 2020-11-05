@@ -1,4 +1,4 @@
-### This app demonstrates Peer 2 Peer communication over UDP.
+### This app demonstrates Peer 2 Peer Voice and Text communication over UDP.
 
 We are using UDP Nat-hole punching to achieve quick connection.
 

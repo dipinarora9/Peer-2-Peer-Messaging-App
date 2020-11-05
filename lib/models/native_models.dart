@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:isolate';
 
 class CppRequest {
@@ -14,12 +13,12 @@ class CppRequest {
   CppRequest._(this.replyPort, this.pendingCall, this.method, this.data);
 
   String toString() =>
-      'CppRequest(method: $method, ${data != null ? data.length : 0} bytes)';
+      'CppRequest(method: $method, ${data != null ? data : 0} bytes)';
 }
 
 class CppResponse {
   final int pendingCall;
-  final Pointer<Int16> data;
+  final List<int> data;
   final int length;
   final int pointer;
 

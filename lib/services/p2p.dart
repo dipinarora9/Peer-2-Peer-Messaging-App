@@ -232,15 +232,15 @@ class P2P with ChangeNotifier {
   initialize() async {
     if (!await Permission.microphone.isGranted)
       await Permission.microphone.request();
-
-    final Pointer Function() createINPlayer = p2pLib
-        .lookup<NativeFunction<Pointer Function()>>("createINPlayer")
-        .asFunction();
-    inPlayer = createINPlayer();
     final Pointer Function() createOUTPlayer = p2pLib
         .lookup<NativeFunction<Pointer Function()>>("createOUTPlayer")
         .asFunction();
     outPlayer = createOUTPlayer();
+    final Pointer Function(Pointer) createINPlayer = p2pLib
+        .lookup<NativeFunction<Pointer Function(Pointer)>>("createINPlayer")
+        .asFunction();
+    inPlayer = createINPlayer(outPlayer);
+
     final initializeApi = p2pLib.lookupFunction<IntPtr Function(Pointer<Void>),
         int Function(Pointer<Void>)>("InitDartApiDL");
     int result = initializeApi(NativeApi.initializeApiDLData);

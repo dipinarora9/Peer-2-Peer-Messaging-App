@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -86,19 +87,8 @@ class ClientService with ChangeNotifier {
 
   _setupListener() {
     _mySock.stream.listen((datagram) async {
-      debugPrint('got a message $datagram');
       if (datagram.data[0] == 9 &&
           datagram.data[datagram.data.length - 1] == 9) {
-        // if (sendPort != null)
-        //   sendPort.send(
-        //     CppResponse(
-        //             0,
-        //             NativeUtils.toPointer(
-        //                 datagram.data.sublist(1, datagram.data.length - 2)),
-        //             datagram.data.length - 2,
-        //             player.address)
-        //         .toCppMessage(),
-        //   );
         NativeUtils.playBuffer(
             outPlayer,
             NativeUtils.toPointer(
@@ -584,30 +574,19 @@ class ClientService with ChangeNotifier {
 
   static void handleCppRequests(dynamic message) {
     final cppRequest = CppRequest.fromCppMessage(message);
-    print('Dart:   Got message: $cppRequest');
-    // final Uint8List buffer = cppRequest.data;
     if (cppRequest.method == 'audio_buffer') {
+      // NativeUtils.playBuffer(outPlayer, NativeUtils.toPointer(cppRequest.data),
+      //     cppRequest.data.length);
       final List<int> temp = cppRequest.data;
-      List<int> buffer = List(temp.length + 2);
+      List<int> buffer = Uint8List(temp.length + 2);
       buffer[0] = 9;
       for (int i = 0; i < temp.length; i++) buffer[i + 1] = temp[i];
       buffer[buffer.length - 1] = 9;
-      debugPrint(buffer.toString());
       globalClient.broadcastBytes(buffer);
-    } else if (cppRequest.method == 'send_port') {
-      debugPrint("GOIT IT");
-      globalClient.sendPort = cppRequest.replyPort;
+    } else if (cppRequest.method == 'sample_rate') {
+      debugPrint("SAMPLE RATE AAGYA     ${cppRequest.replyPort}");
     }
   }
-
-  // static void callback(Pointer<Uint8> ptr, int frames, int timeout) {
-  //   debugPrint('HERE IS IT callback $frames');
-  //   Uint8List buffer = NativeUtils.fromPointer(ptr, frames);
-  //   buffer.insert(0, 9);
-  //   buffer.add(9);
-  //   debugPrint('HERE IS IT callback $buffer $frames');
-  //   globalClient.broadcastBytes(buffer);
-  // }
 
   bool _recording = false;
 
@@ -617,8 +596,8 @@ class ClientService with ChangeNotifier {
     _recording = !_recording;
     notifyListeners();
     debugPrint(nativePort.toString());
-    int result =
-        NativeUtils.nativeRecord(inPlayer, _recording ? 1 : 0, nativePort);
+    int result = NativeUtils.nativeRecord(
+        inPlayer, outPlayer, _recording ? 1 : 0, nativePort);
     debugPrint('HERE IS IT Recording $result');
   }
 }

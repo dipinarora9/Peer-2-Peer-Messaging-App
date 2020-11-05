@@ -15,3 +15,5 @@ add_library(p2p
         c++/include/dart_version.h)
 
 target_link_libraries(p2p oboe log)
+
+target_compile_options(p2p PRIVATE -Ofast)

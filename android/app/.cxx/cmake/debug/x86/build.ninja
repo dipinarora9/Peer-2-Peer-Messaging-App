@@ -50,21 +50,21 @@ build cmake_object_order_depends_target_p2p: phony || cmake_object_order_depends
 build CMakeFiles/p2p.dir/c++/audio_receiver.cpp.o: CXX_COMPILER__p2p ../../../../../c++/audio_receiver.cpp || cmake_object_order_depends_target_p2p
   DEFINES = -DOBOE_ENABLE_LOGGING=1 -Dp2p_EXPORTS
   DEP_FILE = CMakeFiles\p2p.dir\c++\audio_receiver.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -Ofast
   INCLUDES = -IC:/src/oboe/include
   OBJECT_DIR = CMakeFiles\p2p.dir
   OBJECT_FILE_DIR = CMakeFiles\p2p.dir\c++
 build CMakeFiles/p2p.dir/c++/bridge_services.cpp.o: CXX_COMPILER__p2p ../../../../../c++/bridge_services.cpp || cmake_object_order_depends_target_p2p
   DEFINES = -DOBOE_ENABLE_LOGGING=1 -Dp2p_EXPORTS
   DEP_FILE = CMakeFiles\p2p.dir\c++\bridge_services.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -Ofast
   INCLUDES = -IC:/src/oboe/include
   OBJECT_DIR = CMakeFiles\p2p.dir
   OBJECT_FILE_DIR = CMakeFiles\p2p.dir\c++
 build CMakeFiles/p2p.dir/c++/include/dart_api_dl.cc.o: CXX_COMPILER__p2p ../../../../../c++/include/dart_api_dl.cc || cmake_object_order_depends_target_p2p
   DEFINES = -DOBOE_ENABLE_LOGGING=1 -Dp2p_EXPORTS
   DEP_FILE = CMakeFiles\p2p.dir\c++\include\dart_api_dl.cc.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -Ofast
   INCLUDES = -IC:/src/oboe/include
   OBJECT_DIR = CMakeFiles\p2p.dir
   OBJECT_FILE_DIR = CMakeFiles\p2p.dir\c++\include

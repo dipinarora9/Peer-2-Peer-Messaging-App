@@ -1,7 +1,7 @@
 {
   "stringTable": {
     "0": "D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/android/app/.cxx/cmake/release/x86",
-    "1": "--target=i686-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DOboeSinePlayer_EXPORTS -IC:/src/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -O2 -DNDEBUG -fPIC",
+    "1": "--target=i686-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dp2p_EXPORTS -IC:/src/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -O2 -DNDEBUG -fPIC -Ofast",
     "2": "--target=i686-none-linux-android21 --gcc-toolchain=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/delhi/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IC:/src/oboe/src -IC:/src/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -O2 -DNDEBUG -fPIC -std=c++14 -Wall -Wextra-semi -Wshadow -Wshadow-field -Ofast"
   },
   "buildFiles": [
@@ -15,6 +15,61 @@
   ],
   "buildTargetsCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
+    "p2p-Release-x86": {
+      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86\" p2p",
+      "buildType": "release",
+      "toolchain": "1434882739",
+      "abi": "x86",
+      "artifactName": "p2p",
+      "files": [
+        {
+          "src": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\audio_receiver.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\bridge_services.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\dart_api_dl.cc",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [
+        {
+          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\audio_receiver.h",
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\dart_api.h",
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\dart_api_dl.h",
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\dart_native_api.h",
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\internal\\dart_api_dl_impl.h",
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\dart_tools_api.h",
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\include\\dart_version.h",
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\release\\obj\\x86\\libp2p.so"
+    },
     "oboe-Release-x86": {
       "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86\" oboe",
       "buildType": "release",
@@ -270,27 +325,6 @@
       ],
       "headers": [],
       "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86\\oboe\\liboboe.a"
-    },
-    "OboeSinePlayer-Release-x86": {
-      "buildCommand": "C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\app\\.cxx\\cmake\\release\\x86\" OboeSinePlayer",
-      "buildType": "release",
-      "toolchain": "1434882739",
-      "abi": "x86",
-      "artifactName": "OboeSinePlayer",
-      "files": [
-        {
-          "src": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\audio-receiver.cpp",
-          "flagsOrdinal": 1,
-          "workingDirectoryOrdinal": 0
-        }
-      ],
-      "headers": [
-        {
-          "header": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\c++\\audio-receiver.h",
-          "workingDirectoryOrdinal": 0
-        }
-      ],
-      "output": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\build\\app\\intermediates\\cmake\\release\\obj\\x86\\libOboeSinePlayer.so"
     }
   },
   "toolchains": {
@@ -300,6 +334,7 @@
   },
   "cFileExtensions": [],
   "cppFileExtensions": [
+    "cc",
     "cpp"
   ]
 }
