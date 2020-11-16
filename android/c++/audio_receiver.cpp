@@ -123,7 +123,6 @@ void P2PInput::setIsRecording(bool r) { this->isRecording = r; }
 oboe::DataCallbackResult
 P2PInput::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
     if (this->isRecording) {
-
         auto *fd = (float *) audioData;
         callback(this->getDartPort(), fd, numFrames);
 //        int32_t framesLeft = numFrames;

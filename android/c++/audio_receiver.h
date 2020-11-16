@@ -39,7 +39,6 @@ public:
 
     int32_t write(uint8_t *b, int32_t numFrames) {
         int32_t framesLeft = numFrames;
-        if (player_index < 0) player_index++;
         while (framesLeft > 0) {
             int32_t indexFrame = buffer_index % MAXLIMIT;
             // contiguous writes
@@ -66,22 +65,25 @@ public:
 
         int32_t framesLeft = std::min(numFrames,
                                       std::min(MAXLIMIT, (int32_t) (buffer_index - player_index)));
-        while (framesLeft > 0 && player_index >= 0) {
-            int32_t indexFrame = player_index % MAXLIMIT;
-            // contiguous reads
-            int32_t framesToEnd = MAXLIMIT - indexFrame;
-            int32_t framesNow = std::min(framesLeft, framesToEnd);
-            int32_t numSamples = framesNow;
-            int32_t sampleIndex = indexFrame;
+        if (framesLeft == 0)
+            memset(b, 0, numFrames * outStream->getBytesPerFrame());
+        else
+            while (framesLeft > 0) {
+                int32_t indexFrame = player_index % MAXLIMIT;
+                // contiguous reads
+                int32_t framesToEnd = MAXLIMIT - indexFrame;
+                int32_t framesNow = std::min(framesLeft, framesToEnd);
+                int32_t numSamples = framesNow;
+                int32_t sampleIndex = indexFrame;
 
-            memcpy(b,
-                   &buffer[sampleIndex],
-                   (numSamples * sizeof(float)));
+                memcpy(b,
+                       &buffer[sampleIndex],
+                       (numSamples * sizeof(float)));
 
-            player_index += framesNow;
-            framesLeft -= framesNow;
-            framesRead += framesNow;
-        }
+                player_index += framesNow;
+                framesLeft -= framesNow;
+                framesRead += framesNow;
+            }
         return framesRead;
     }
 

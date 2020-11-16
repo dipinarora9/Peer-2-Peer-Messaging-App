@@ -94,7 +94,8 @@ int sendPort(P2POutput *player) {
     return 1;
 }
 
-int sendSampleRate(P2POutput *player) {
+
+void sendSampleRate(P2POutput *player) {
     Dart_CObject c_send_port;
     c_send_port.type = Dart_CObject_kInt32;
     c_send_port.value.as_int32 = player->outStream->getSampleRate();
@@ -122,7 +123,6 @@ int sendSampleRate(P2POutput *player) {
 //            reinterpret_cast<intptr_t>(&c_pending_call));
 
     Dart_PostCObject_DL(player->getDartPort(), &c_request);
-
 }
 
 DART_EXPORT
