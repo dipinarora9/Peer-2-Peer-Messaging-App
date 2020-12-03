@@ -19,6 +19,96 @@
   },
   {
     "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\build-tools\\28.0.3\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\build-tools\\29.0.2\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\build-tools\\30.0.2\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmdline-tools\\latest\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\emulator\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\ndk\\20.0.5594570\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\ndk\\21.0.6113669\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\patcher\\v4\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\platform-tools\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\platforms\\android-28\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\platforms\\android-29\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\platforms\\android-30\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\sources\\android-30\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "Parsing C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\system-images\\android-29\\google_apis_playstore\\x86\\package.xml",
+    "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
+    "tag": "debug|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
     "message": "- CMake found in SDK at \u0027C:\\Users\\delhi\\AppData\\Local\\Android\\sdk\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027",
     "file": "D:\\Projects\\GITHUB\\Peer-2-Peer-Messaging-App\\android\\CMakeLists.txt",
     "tag": "debug|armeabi-v7a"

@@ -52,16 +52,20 @@ static void callback(Dart_Port port, const float *buffer, int32_t frames) {
 
     Dart_CObject c_pending_call;
     c_pending_call.type = Dart_CObject_kNull;
-    uint8_t sendBuffer[frames];
+    uint8_t sendBuffer[3 * frames];
     Dart_CObject c_method_name;
     c_method_name.type = Dart_CObject_kString;
     c_method_name.value.as_string = const_cast<char *>("audio_buffer");
     for (int i = 0; i < frames; i++)
-        sendBuffer[i] = ((buffer[i] + 1) / 2 * 255);
+        sendBuffer[i] = buffer[i] > 0 ? 0 : 1;
+    for (int i = frames, j = 0; j < frames; i += 2, j++) {
+        sendBuffer[i] = buffer[j] * 255.0;
+        sendBuffer[i + 1] = (buffer[j] * 255.0 - sendBuffer[i]) * 255.0;
+    }
     Dart_CObject c_request_data;
     c_request_data.type = Dart_CObject_kExternalTypedData;
     c_request_data.value.as_external_typed_data.type = Dart_TypedData_kUint8;
-    c_request_data.value.as_external_typed_data.length = frames;
+    c_request_data.value.as_external_typed_data.length = 3 * frames;
     c_request_data.value.as_external_typed_data.data = sendBuffer;
     c_request_data.value.as_external_typed_data.peer = sendBuffer;
     c_request_data.value.as_external_typed_data.callback = FreeFinalizer;
@@ -125,83 +129,22 @@ P2PInput::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t n
     if (this->isRecording) {
         auto *fd = (float *) audioData;
         callback(this->getDartPort(), fd, numFrames);
-//        int32_t framesLeft = numFrames;
-//        while (framesLeft > 0) {
-//            int32_t indexFrame = outputPlayer->buffer_index;
-//            // contiguous writes
-//            int32_t framesToEnd = outputPlayer->getLimit() - indexFrame;
-//            int32_t framesNow = std::min(framesLeft, framesToEnd);
+//        uint8_t sendBuffer[3 * numFrames];
 //
-//            memcpy(&outputPlayer->buffer[framesNow],
-//                   fd,
-//                   (framesNow * sizeof(float)));
-//            outputPlayer->buffer += framesNow;
-//            outputPlayer->buffer_index += framesNow;
-//            framesLeft -= framesNow;
-//        }
-//        auto fD = (int16_t *) audioData;
-//        int32_t framesLeft = numFrames;
-//        while (framesLeft > 0) {
-//            int32_t indexFrame = outputPlayer->buffer_index;
-//            // contiguous writes
-//            int32_t framesToEndOfBuffer = outputPlayer->getLimit() - indexFrame;
-//            int32_t framesNow = std::min(framesLeft, framesToEndOfBuffer);
-//
-//            for (int i = 0; i < framesNow; i++) {
-//                outputPlayer->buffer[outputPlayer->buffer_index % (outputPlayer->getLimit())] =
-//                        (int16_t) (*fD++ * (1.0f / 32768));
-//                outputPlayer->buffer_index++;
-//            }
-//
-//            framesLeft -= framesNow;
+//        for (int i = 0; i < numFrames; i++)
+//            sendBuffer[i] = fd[i] > 0 ? 0 : 1;
+//        for (int i = numFrames, j = 0; j < numFrames; i += 2, j++) {
+//            sendBuffer[i] = fd[j] * 255.0;
+//            sendBuffer[i + 1] = (fd[j] * 255.0 - sendBuffer[i]) * 255.0;
 //        }
 //
-//        if (outputPlayer->buffer_index == outputPlayer->getLimit() - 1) {
-//            outputPlayer->buffer_index = 0;
-//        }
-
-
+//        this->outputPlayer->write(sendBuffer, numFrames * 3);
     }
     return oboe::DataCallbackResult::Continue;
 }
 
 oboe::DataCallbackResult
 P2POutput::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
-
-//    if (player_index < buffer_index && testFlag) {
-//        auto *data = (int16_t *) audioData;
-//        int32_t framesRead = 0;
-//        int32_t framesLeft = std::min(numFrames,
-//                                      std::min(MAXLIMIT, (int32_t) (buffer_index - player_index)));
-//        while (framesLeft > 0) {
-//            int32_t indexFrame = player_index;
-//            // contiguous reads
-//            int32_t framesToEnd = MAXLIMIT - indexFrame;
-//            int32_t framesNow = std::min(framesLeft, framesToEnd);
-//            int32_t numSamples = framesNow;
-//            int32_t sampleIndex = indexFrame;
-//
-//            memcpy(data,
-//                   &buffer[sampleIndex],
-//                   (numSamples * sizeof(float)));
-//
-//            player_index += framesNow;
-//            framesLeft -= framesNow;
-//            framesRead += framesNow;
-//        }
-//
-////        for (int i = 0; i < numFrames; i++) {
-////            if (i < buffer[player_index % 100].second)
-////                data[i] = buffer[player_index % 100].first[i];
-////            else data[i] = 0;
-////        }
-////        player_index++;
-//        if (player_index == MAXLIMIT / 2) {
-//            player_index = 0;
-//            buffer_index -= MAXLIMIT / 2;
-//        }
-//    } else
-//        memset(static_cast<int16_t *>(audioData), 0, numFrames * oboeStream->getBytesPerFrame());
     auto *d = (float *) audioData;
     int32_t s = read(d, numFrames);
     return oboe::DataCallbackResult::Continue;

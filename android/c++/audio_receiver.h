@@ -38,7 +38,7 @@ public:
 
 
     int32_t write(uint8_t *b, int32_t numFrames) {
-        int32_t framesLeft = numFrames;
+        int32_t framesLeft = numFrames / 3;
         while (framesLeft > 0) {
             int32_t indexFrame = buffer_index % MAXLIMIT;
             // contiguous writes
@@ -47,8 +47,15 @@ public:
             int32_t numSamples = framesNow;
             int32_t sampleIndex = indexFrame;
 
-            for (int i = 0; i < numSamples; i++)
-                buffer[i + sampleIndex] = (double) b[i] / 255 * 2 - 1;
+            for (int i = numSamples, j = 0; j < numSamples; i += 2, j++) {
+                buffer[j + sampleIndex] = b[i] / 255.0;
+                buffer[j + sampleIndex] += (b[i + 1] / 255.0) / 255.0;
+                if (b[j])
+                    buffer[j + sampleIndex] *= -1;
+            }
+
+//            for (int i = 0; i < numSamples; i++)
+//                buffer[i + sampleIndex] = (double) b[i] / 255 * 2 - 1;
 
 //            memcpy(&buffer[sampleIndex],
 //                   b,
@@ -79,7 +86,7 @@ public:
                 memcpy(b,
                        &buffer[sampleIndex],
                        (numSamples * sizeof(float)));
-
+//                LOGE("HERE IS IT ETHE AAN");
                 player_index += framesNow;
                 framesLeft -= framesNow;
                 framesRead += framesNow;
