@@ -46,7 +46,7 @@ static void FreeFinalizer(void *, Dart_WeakPersistentHandle, void *value) {
 //    free(value);
 }
 
-static void callback(Dart_Port port, const float *buffer, int32_t frames) {
+static void callback(Dart_Port port, const int16_t *buffer, int32_t frames) {
     Dart_CObject c_send_port;
     c_send_port.type = Dart_CObject_kNull;
 
@@ -58,10 +58,16 @@ static void callback(Dart_Port port, const float *buffer, int32_t frames) {
     c_method_name.value.as_string = const_cast<char *>("audio_buffer");
     for (int i = 0; i < frames; i++)
         sendBuffer[i] = buffer[i] > 0 ? 0 : 1;
+
     for (int i = frames, j = 0; j < frames; i += 2, j++) {
-        sendBuffer[i] = buffer[j] * 255.0;
-        sendBuffer[i + 1] = (buffer[j] * 255.0 - sendBuffer[i]) * 255.0;
+        sendBuffer[i] = (double) buffer[j] / 32768 * 255;
+        sendBuffer[i + 1] = (((double) buffer[j] / 32768 * 255) - sendBuffer[i]) * 255;
     }
+
+//    for (int i = frames, j = 0; j < frames; i += 2, j++) {
+//        sendBuffer[i] = buffer[j] * 255.0;
+//        sendBuffer[i + 1] = (buffer[j] * 255.0 - sendBuffer[i]) * 255.0;
+//    }
     Dart_CObject c_request_data;
     c_request_data.type = Dart_CObject_kExternalTypedData;
     c_request_data.value.as_external_typed_data.type = Dart_TypedData_kUint8;
@@ -85,7 +91,7 @@ int32_t P2PInput::input() {
     oboe::AudioStreamBuilder builder;
     builder.setDirection(oboe::Direction::Input)
             ->setCallback(this)
-            ->setFormat(oboe::AudioFormat::Float)
+            ->setFormat(oboe::AudioFormat::I16)
             ->setChannelCount(1)
             ->setSampleRate(48000)
             ->setSharingMode(oboe::SharingMode::Shared)
@@ -127,15 +133,15 @@ void P2PInput::setIsRecording(bool r) { this->isRecording = r; }
 oboe::DataCallbackResult
 P2PInput::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
     if (this->isRecording) {
-        auto *fd = (float *) audioData;
+        auto *fd = (int16_t *) audioData;
         callback(this->getDartPort(), fd, numFrames);
 //        uint8_t sendBuffer[3 * numFrames];
 //
 //        for (int i = 0; i < numFrames; i++)
 //            sendBuffer[i] = fd[i] > 0 ? 0 : 1;
 //        for (int i = numFrames, j = 0; j < numFrames; i += 2, j++) {
-//            sendBuffer[i] = fd[j] * 255.0;
-//            sendBuffer[i + 1] = (fd[j] * 255.0 - sendBuffer[i]) * 255.0;
+//            sendBuffer[i] = (double) fd[j] / 32768 * 255;
+//            sendBuffer[i + 1] = (((double) fd[j] / 32768 * 255) - sendBuffer[i]) * 255;
 //        }
 //
 //        this->outputPlayer->write(sendBuffer, numFrames * 3);

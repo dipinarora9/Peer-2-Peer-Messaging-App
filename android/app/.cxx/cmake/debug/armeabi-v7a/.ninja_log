@@ -141,3 +141,9 @@
 10	972	628725169	CMakeFiles/p2p.dir/c++/audio_receiver.cpp.o	6f3fceb272ad0150
 6	987	628725169	CMakeFiles/p2p.dir/c++/bridge_services.cpp.o	efd43db9add1795e
 987	1561	628725169	D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/build/app/intermediates/cmake/debug/obj/armeabi-v7a/libp2p.so	e5b8981f9c0c9716
+32	1144	628780362	CMakeFiles/p2p.dir/c++/audio_receiver.cpp.o	6f3fceb272ad0150
+7	652	628780462	CMakeFiles/p2p.dir/c++/bridge_services.cpp.o	efd43db9add1795e
+653	2220	628780463	D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/build/app/intermediates/cmake/debug/obj/armeabi-v7a/libp2p.so	e5b8981f9c0c9716
+5	809	628780828	CMakeFiles/p2p.dir/c++/bridge_services.cpp.o	efd43db9add1795e
+8	837	628780828	CMakeFiles/p2p.dir/c++/audio_receiver.cpp.o	6f3fceb272ad0150
+837	1412	628780828	D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/build/app/intermediates/cmake/debug/obj/armeabi-v7a/libp2p.so	e5b8981f9c0c9716

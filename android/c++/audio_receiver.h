@@ -47,12 +47,22 @@ public:
             int32_t numSamples = framesNow;
             int32_t sampleIndex = indexFrame;
 
-            for (int i = numSamples, j = 0; j < numSamples; i += 2, j++) {
-                buffer[j + sampleIndex] = b[i] / 255.0;
-                buffer[j + sampleIndex] += (b[i + 1] / 255.0) / 255.0;
-                if (b[j])
-                    buffer[j + sampleIndex] *= -1;
+            for (int i = framesLeft, j = 0; j < numSamples; i += 2, j++) {
+                int16_t frame = (double) b[i] / 255 * 32768;
+                frame += ((double) b[i + 1] / 255 * 32768) / 255;
+                frame += 1;
+                if (b[j]) frame *= -1;
+//                __android_log_print(ANDROID_LOG_INFO, "HERE IS IT DIPIN",
+//                                    "calculated %d original %d",
+//                                    frame, original[j]);
+                buffer[j + sampleIndex] = frame * (1.0f / 32768);
             }
+//            for (int i = numSamples, j = 0; j < numSamples; i += 2, j++) {
+//                buffer[j + sampleIndex] = b[i] / 255.0;
+//                buffer[j + sampleIndex] += (b[i + 1] / 255.0) / 255.0;
+//                if (b[j])
+//                    buffer[j + sampleIndex] *= -1;
+//            }
 
 //            for (int i = 0; i < numSamples; i++)
 //                buffer[i + sampleIndex] = (double) b[i] / 255 * 2 - 1;
