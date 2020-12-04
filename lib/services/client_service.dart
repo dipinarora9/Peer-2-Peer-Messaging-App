@@ -89,11 +89,11 @@ class ClientService with ChangeNotifier {
     _mySock.stream.listen((datagram) async {
       if (datagram.data[0] == 9 &&
           datagram.data[datagram.data.length - 1] == 9) {
-        // NativeUtils.playBuffer(
-        //     outPlayer,
-        //     NativeUtils.toPointer(
-        //         datagram.data.sublist(1, datagram.data.length - 2)),
-        //     datagram.data.length - 2);
+        NativeUtils.playBuffer(
+            outPlayer,
+            NativeUtils.toPointer(
+                datagram.data.sublist(1, datagram.data.length - 2)),
+            datagram.data.length - 2);
       } else if (String.fromCharCodes(datagram.data) == 'PING') {
         _sendDatagramBuffer('PONG>${me.numbering}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
