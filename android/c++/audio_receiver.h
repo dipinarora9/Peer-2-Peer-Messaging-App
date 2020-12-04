@@ -115,8 +115,6 @@ class P2PInput : public oboe::AudioStreamCallback {
 public:
     int32_t input();
 
-    P2POutput *outputPlayer;
-
     oboe::DataCallbackResult
     onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) override;
 
@@ -126,11 +124,14 @@ public:
 
     void setDartPort(Dart_Port p) { this->dartPort = p; }
 
+    void setOutPlayer(P2POutput *&p) { this->outputPlayer = p; }
+
     Dart_Port getDartPort() { return this->dartPort; }
 
 private:
     bool isRecording{false};
     Dart_Port dartPort;
+    P2POutput *outputPlayer;
 };
 
 #endif //ANDROID_AUDIO_RECEIVER_H

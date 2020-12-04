@@ -89,11 +89,11 @@ class ClientService with ChangeNotifier {
     _mySock.stream.listen((datagram) async {
       if (datagram.data[0] == 9 &&
           datagram.data[datagram.data.length - 1] == 9) {
-        NativeUtils.playBuffer(
-            outPlayer,
-            NativeUtils.toPointer(
-                datagram.data.sublist(1, datagram.data.length - 2)),
-            datagram.data.length - 2);
+        // NativeUtils.playBuffer(
+        //     outPlayer,
+        //     NativeUtils.toPointer(
+        //         datagram.data.sublist(1, datagram.data.length - 2)),
+        //     datagram.data.length - 2);
       } else if (String.fromCharCodes(datagram.data) == 'PING') {
         _sendDatagramBuffer('PONG>${me.numbering}'.codeUnits, datagram);
       } else if (String.fromCharCodes(datagram.data).startsWith('PONG>')) {
@@ -583,9 +583,7 @@ class ClientService with ChangeNotifier {
       for (int i = 0; i < temp.length; i++) buffer[i + 1] = temp[i];
       buffer[buffer.length - 1] = 9;
       globalClient.broadcastBytes(buffer);
-    } else if (cppRequest.method == 'sample_rate') {
-      debugPrint("SAMPLE RATE AAGYA     ${cppRequest.replyPort}");
-    }
+    } else if (cppRequest.method == 'send_port') {}
   }
 
   bool _recording = false;

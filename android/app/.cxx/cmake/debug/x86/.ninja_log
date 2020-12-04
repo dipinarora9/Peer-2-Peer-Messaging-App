@@ -155,3 +155,6 @@
 4	832	628780830	CMakeFiles/p2p.dir/c++/bridge_services.cpp.o	4cb4bba3186d5dd2
 8	884	628780830	CMakeFiles/p2p.dir/c++/audio_receiver.cpp.o	7ceb683139171267
 884	1387	628780831	D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/build/app/intermediates/cmake/debug/obj/x86/libp2p.so	7aeae764f2a17e50
+9	1054	628786654	CMakeFiles/p2p.dir/c++/bridge_services.cpp.o	4cb4bba3186d5dd2
+4	1067	628786654	CMakeFiles/p2p.dir/c++/audio_receiver.cpp.o	7ceb683139171267
+1067	1767	628786655	D:/Projects/GITHUB/Peer-2-Peer-Messaging-App/build/app/intermediates/cmake/debug/obj/x86/libp2p.so	7aeae764f2a17e50

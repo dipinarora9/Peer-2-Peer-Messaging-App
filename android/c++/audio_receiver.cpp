@@ -1,47 +1,95 @@
 #include "audio_receiver.h"
 
 /*
- * #include <iostream>
+ #include <iostream>
+#include <iomanip>
 using namespace std;
 
-void printF(float *arr){
-    for(int i=0;i<5;i++)
+void printF(float *arr, int size){
+    for(int i=0;i<size;i++)
         std::cout << arr[i] <<" ";
     cout<<endl;
 }
-void printI(int *arr){
-    for(int i=0;i<5;i++)
+void printF2 (float *arr, float *p, int size){
+    for(int i=0;i<size;i++)
+        std::cout << p[i] - arr[i] <<" ";
+    cout<<endl;
+}
+void printI(int *arr, int size){
+    for(int i=0;i<size;i++)
         std::cout << arr[i] << " ";
     cout<<endl;
 }
 
 int main() {
     int numFrames= 5;
-    float fd[] = {0.86264, 0.7818, -0.18418, 0.8141, 0.471};
-    int id[] = { 22684, 7818, -18418,  8141, 471};
 
-	for (int i = 0; i < numFrames; i++)
-            id[i] = ((double) id[i] / 32768 + 1) / 2 * 255;
-    printI(id);
+    float fd[] = {0.862998947879569, 0.4884894798894, -0.18479791498, 0.8117905415, 0.4579461571};
+    int nd[20];
+    float org[5];
+    for (int i = 0; i < 5; ++i) {
+    org[i] = fd[i];
+    nd[i] = fd[i] < 0? 1 : 0;
+    if (fd[i] < 0) fd[i] *= -1.0;
+    }
+    // float fd[] = {0.86, 0.29, 0.99, 0.150, 0.0};
 
-     for (int i = 0; i < numFrames; i++)
-            id[i] = ((double) id[i] / 255 * 2 - 1) * 32768;
+    //     int id[] = { 22684, 7818, -18418,  8141, 471};
 
-    printI(id);
+    for (int i = numFrames,j=0; j < numFrames; i+=3, j++) {
+    // cout << fixed << setprecision(8) << fd[j] << ' ';
+    nd[i] = fd[j] * 255.0;
+    nd[i+1]=(fd[j]*255.0 - nd[i])*255.0;
+    nd[i+2]=(((fd[j]*255.0 - nd[i])*10e6 - (int) nd[i+1]/255*10e6)/10e6)*255;
+    }
+    // cout << '\n';
 
-    for (int i = 0; i < numFrames; i++)
-            fd[i] = (fd[i] + 1)/2 * 255;
-    printF(fd);
+    // printI(nd, 20);
 
-     for (int i = 0; i < numFrames; i++)
-            fd[i] = fd[i] / 255 * 2 -1;
 
-    printF(fd);
+    for (int i = numFrames,j=0; j < numFrames; i+=3, j++) {
+    fd[j] = nd[i] / 255.0;
+    fd[j] += (nd[i + 1] / 255.0) / 255.0;
+    fd[j] += ((nd[i + 2] / 255.0) / 255.0) / 255.0;
+    if (nd[j])
+    fd[j] *= -1;
+    }
 
-	return 0;
-}
+    // cout << "array fd: \n";
+    // printF(fd, 5);
+    // cout << "error : \n";
+    // printF2(fd, org, 5);int id[] = { -14, 32750, -5,  25 ,-1561};
+    int fsnad[] = { -14, 32750, -5,  25, -1561};
+    int ds[15];
+    for (int i=0; i<5;i++) {ds[i] = id[i]>0?0:1;if(id[i]<0)id[i]*=-1;}
+    for (int i = 5, j=0; j<5; i+=2, j++)
+    {
+    cout<< fixed << setprecision(10)<< (double) id[j] / 32768 * 255 <<" ";
+    ds[i] = (double) id[j] / 32768 * 255 ;
+    ds[i+1] =(((double) id[j] / 32768 * 255) - ds[i]) * 255;
+    }
+    cout<<'\n';
+    printI(ds ,15);
+    for (int i = 5, j=0; j<5; i+=2, j++)
+    {cout<< fixed << setprecision(10)<<(double)ds[i+1]/255.0 * 32768<<" ";
 
- * */
+    id[j] = (double) ds[i] / 255 * 32768;
+    id[j] += ((double)ds[i+1] / 255  * 32768)/255;  id[j]+=1;
+    if(ds[j]) id[j]*=-1;
+
+    }
+    cout << "\ncalculated id: \n";
+    printI(id, 5);
+    for (int i = 0; i < 5; i++){
+    fd[i] =id[i] * (1.0f / 32768);
+    org[i] =fsnad[i] * (1.0f / 32768);
+    }
+    cout << "array fd: \n";
+    printF(fd, 5);
+    cout << "error : \n";
+    printF2(fd, org, 5);
+    return 0;
+} */
 static void FreeFinalizer(void *, Dart_WeakPersistentHandle, void *value) {
 //    free(value);
 }
@@ -92,8 +140,7 @@ int32_t P2PInput::input() {
     builder.setDirection(oboe::Direction::Input)
             ->setCallback(this)
             ->setFormat(oboe::AudioFormat::I16)
-            ->setChannelCount(1)
-            ->setSampleRate(48000)
+            ->setChannelCount(oboe::Mono)
             ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->openManagedStream(inStream);
@@ -103,6 +150,8 @@ int32_t P2PInput::input() {
         LOGE("HERE IS IT error in", oboe::convertToText(result));
         return 0;
     }
+    inStream->requestPause();
+    inStream->requestFlush();
     return 1;
 }
 
@@ -112,8 +161,7 @@ int32_t P2POutput::output() {
             ->setSharingMode(oboe::SharingMode::Shared)
             ->setCallback(this)
             ->setFormat(oboe::AudioFormat::Float)
-            ->setChannelCount(1)
-            ->setSampleRate(48000)
+            ->setChannelCount(oboe::Mono)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->openManagedStream(outStream);
 
@@ -125,6 +173,9 @@ int32_t P2POutput::output() {
         LOGE("HERE IS IT error out", oboe::convertToText(result));
         return 0;
     }
+    outStream->requestPause();
+    outStream->requestFlush();
+    outStream->requestStart();
     return 1;
 }
 

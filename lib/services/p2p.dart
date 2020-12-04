@@ -245,6 +245,7 @@ class P2P with ChangeNotifier {
         int Function(Pointer<Void>)>("InitDartApiDL");
     int result = initializeApi(NativeApi.initializeApiDLData);
     debugPrint('HERE IS IT $inPlayer $outPlayer $result');
+    Fluttertoast.showToast(msg: 'Initialized $inPlayer $outPlayer');
   }
 
   // resume() {
