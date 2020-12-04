@@ -39,9 +39,9 @@ void P2POutput::nativeHandler(Dart_Port_DL p, Dart_CObject *message) {
     Dart_CObject *buffer = c_response_args[1];
     auto frames = reinterpret_cast<int32_t *>(c_response_args[2]);
     Dart_CObject *playPointer = c_response_args[3];
-    __android_log_print(ANDROID_LOG_INFO, "HERE IS IT DIPIN",
-                        "address %d",
-                        (int) playPointer);
+//    __android_log_print(ANDROID_LOG_INFO, "HERE IS IT DIPIN",
+//                        "address %d",
+//                        (int) playPointer);
     playBuffer(reinterpret_cast<P2POutput *>(playPointer), reinterpret_cast<uint8_t *>(buffer),
                *frames);
 }
