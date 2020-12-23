@@ -20,6 +20,10 @@ Each member peer sends dummy messages to its incoming peer upon getting a routin
 
 We have completed the broadcast messaging part and will be completing the private messaging very soon.
 
+### Voice Communication
+- We are using [OBOE](https://github.com/google/oboe) C++ library to send/receive and record/play voice buffer. 
+- Communication between Flutter(Dart) and C++ is established using Dart FFI. 
+
 ### This project is made by Dipin Arora (@dipinarora9) and Prashant Sajwan (@PRASHANT-SAJWAN)
 
 ### [Link](https://files.ifi.uzh.ch/CSG/staff/bocek/extern/theses/BA-Jonas-Wagner.pdf) to the reference paper.
